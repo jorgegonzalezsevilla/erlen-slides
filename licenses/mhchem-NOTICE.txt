@@ -1,0 +1,8 @@
+KaTeX mhchem extension bundled with KaTeX 0.16.11.
+KaTeX adaptation: MIT.
+Underlying mhchem parser: Apache-2.0.
+Copyright (c) 2011-2015 The MathJax Consortium
+Copyright (c) 2015-2018 Martin Hensel
+Source and adaptation details:
+https://github.com/KaTeX/KaTeX/blob/v0.16.11/contrib/mhchem/mhchem.js
+See Apache-2.0.txt and KaTeX-MIT.txt.

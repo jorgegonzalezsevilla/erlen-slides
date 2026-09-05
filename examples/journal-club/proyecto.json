@@ -1,0 +1,180 @@
+{
+  "v": 1,
+  "meta": {
+    "title": "Journal club crítico",
+    "short": "Journal club crítico",
+    "subtitle": "Ejemplo didáctico · datos ilustrativos",
+    "authors": "",
+    "institute": "",
+    "date": "",
+    "theme": "revista",
+    "aspect": "169",
+    "numbers": true,
+    "footline": true
+  },
+  "slides": [
+    {
+      "id": "example-journal-club-1",
+      "layout": "title",
+      "title": "",
+      "blocks": [],
+      "notes": "Ejemplo didáctico. Sustituye contenido y datos por los de tu trabajo. No atribuir estas cifras a un experimento.",
+      "min": 0.5
+    },
+    {
+      "id": "example-journal-club-2",
+      "layout": "content",
+      "title": "La pregunta que guía el trabajo",
+      "blocks": [
+        {
+          "id": "example-journal-club-3",
+          "type": "text",
+          "text": "¿La evidencia del artículo sostiene su afirmación principal?",
+          "size": "l",
+          "align": "left"
+        },
+        {
+          "id": "example-journal-club-4",
+          "type": "text",
+          "text": "Caso de uso ilustrativo. Define aquí el sistema, la comparación y el alcance.",
+          "size": "s",
+          "align": "left"
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    },
+    {
+      "id": "example-journal-club-5",
+      "layout": "content",
+      "title": "Una estrategia explícita",
+      "blocks": [
+        {
+          "id": "example-journal-club-6",
+          "type": "smart",
+          "kind": "proceso",
+          "w": 95,
+          "caption": "",
+          "anim": "fade",
+          "items": [
+            {
+              "t": "Citar el artículo real"
+            },
+            {
+              "t": "Reconstruir diseño y controles"
+            },
+            {
+              "t": "Examinar figuras y estadística"
+            },
+            {
+              "t": "Discutir validez externa"
+            }
+          ]
+        }
+      ],
+      "notes": "Explica las decisiones y los controles, no solo los nombres de las técnicas.",
+      "min": 1.5
+    },
+    {
+      "id": "example-journal-club-7",
+      "layout": "content",
+      "title": "Mostrar la evidencia",
+      "blocks": [
+        {
+          "id": "example-journal-club-8",
+          "type": "table",
+          "header": true,
+          "align": "c",
+          "caption": "Guía de lectura: sustituir por un artículo verificable.",
+          "rows": [
+            [
+              "Elemento",
+              "Qué extraer del artículo"
+            ],
+            [
+              "Pregunta",
+              "Población o sistema y comparación"
+            ],
+            [
+              "Evidencia",
+              "Mediciones y controles"
+            ],
+            [
+              "Limitación",
+              "Sesgos y alternativas"
+            ],
+            [
+              "Reproducción",
+              "Datos y código disponibles"
+            ]
+          ]
+        }
+      ],
+      "notes": "Datos o modelos didácticos: reemplazar antes de presentar resultados propios.",
+      "min": 1.5
+    },
+    {
+      "id": "example-journal-club-9",
+      "layout": "content",
+      "title": "Interpretación y límites",
+      "blocks": [
+        {
+          "id": "example-journal-club-10",
+          "type": "bullets",
+          "items": [
+            {
+              "t": "No se incluye una referencia inventada.",
+              "lvl": 0
+            },
+            {
+              "t": "Importa un DOI real desde Referencias o conecta Zotero voluntariamente.",
+              "lvl": 0
+            },
+            {
+              "t": "Distingue la afirmación del autor de tu evaluación crítica.",
+              "lvl": 0
+            }
+          ],
+          "step": false
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    },
+    {
+      "id": "example-journal-club-11",
+      "layout": "content",
+      "title": "Antes de compartir",
+      "blocks": [
+        {
+          "id": "example-journal-club-12",
+          "type": "bullets",
+          "items": [
+            {
+              "t": "DOI, versión y posibles correcciones",
+              "lvl": 0
+            },
+            {
+              "t": "Tamaño muestral y unidad experimental",
+              "lvl": 0
+            },
+            {
+              "t": "Disponibilidad de datos y reproducibilidad",
+              "lvl": 0
+            }
+          ],
+          "step": false
+        },
+        {
+          "id": "example-journal-club-13",
+          "type": "text",
+          "text": "Conserva el proyecto JSON y revisa la exportación final.",
+          "size": "s",
+          "align": "left"
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    }
+  ]
+}

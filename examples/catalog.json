@@ -1,0 +1,98 @@
+[
+  {
+    "id": "calibracion",
+    "title": "Calibración UV–Vis",
+    "description": "De los patrones a la discusión del intervalo de trabajo.",
+    "file": "calibracion/proyecto.json",
+    "slides": 6,
+    "data": "illustrative"
+  },
+  {
+    "id": "cinetica",
+    "title": "Cinética de primer orden",
+    "description": "Comparar un modelo analítico con mediciones y residuos.",
+    "file": "cinetica/proyecto.json",
+    "slides": 6,
+    "data": "illustrative"
+  },
+  {
+    "id": "defensa",
+    "title": "Defensa de tesis",
+    "description": "Una pregunta, una estrategia y el alcance de la evidencia.",
+    "file": "defensa/proyecto.json",
+    "slides": 6,
+    "data": "illustrative"
+  },
+  {
+    "id": "reunion-laboratorio",
+    "title": "Reunión de laboratorio",
+    "description": "Avances, controles, obstáculos y la siguiente decisión.",
+    "file": "reunion-laboratorio/proyecto.json",
+    "slides": 6,
+    "data": "illustrative"
+  },
+  {
+    "id": "journal-club",
+    "title": "Journal club crítico",
+    "description": "Desarmar un artículo sin confundir hallazgos e interpretación.",
+    "file": "journal-club/proyecto.json",
+    "slides": 6,
+    "data": "illustrative"
+  },
+  {
+    "id": "equilibrio-quimico",
+    "title": "Equilibrio ácido–base",
+    "description": "Una explicación con reacciones y límites del modelo.",
+    "file": "equilibrio-quimico/proyecto.json",
+    "slides": 6,
+    "data": "illustrative"
+  },
+  {
+    "id": "espectroscopia",
+    "title": "Perfil espectral",
+    "description": "Presentar una señal, su línea base y la asignación pendiente.",
+    "file": "espectroscopia/proyecto.json",
+    "slides": 6,
+    "data": "illustrative"
+  },
+  {
+    "id": "reproducibilidad",
+    "title": "Análisis reproducible",
+    "description": "Un resultado que conserva el camino desde el archivo original.",
+    "file": "reproducibilidad/proyecto.json",
+    "slides": 6,
+    "data": "illustrative"
+  },
+  {
+    "id": "diseno-experimental",
+    "title": "Diseño experimental",
+    "description": "Controles, asignación y unidad de análisis antes de medir.",
+    "file": "diseno-experimental/proyecto.json",
+    "slides": 6,
+    "data": "illustrative"
+  },
+  {
+    "id": "congreso",
+    "title": "Comunicación de congreso",
+    "description": "Una charla breve con un mensaje, una figura y una limitación.",
+    "file": "congreso/proyecto.json",
+    "slides": 6,
+    "data": "illustrative"
+  },
+  {
+    "id": "derivacion",
+    "title": "Derivación de un modelo",
+    "description": "De una ley diferencial a una predicción comprobable.",
+    "file": "derivacion/proyecto.json",
+    "slides": 6,
+    "data": "illustrative"
+  },
+  {
+    "id": "datos-abiertos",
+    "title": "Plan de datos abiertos",
+    "description": "Preparar archivos reutilizables antes de depositarlos.",
+    "file": "datos-abiertos/proyecto.json",
+    "slides": 6,
+    "data": "illustrative"
+  }
+]

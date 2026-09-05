@@ -1,0 +1,30 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+import {readFileSync as read,writeFileSync as write,mkdirSync,cpSync,rmSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+import {join,dirname} from 'node:path';
+import {createHash} from 'node:crypto';
+import {icons} from 'lucide';
+const root=join(dirname(fileURLToPath(import.meta.url)),'..');
+const get=p=>read(join(root,p),'utf8');
+const version=JSON.parse(get('package.json')).version;
+const order=get('src/js/_orden.txt').trim().split('\n');
+const css=get('src/css/_preludio.css')+get('src/css/_orden.txt').trim().split('\n').map(n=>get('src/css/'+n)).join('\n');
+const lib=p=>get('node_modules/'+p);
+const names=['Undo2','Redo2','Search','Expand','Minimize2','ZoomIn','ZoomOut','Plus','HelpCircle','FlaskConical','Atom','ChartLine','FolderOpen','Download','Play','Settings2','House','Presentation','ArrowUpRight','ArrowRight','LayoutTemplate','Archive','ChevronRight'];
+const licenses=['@floating-ui/core','@floating-ui/dom','lucide'];
+const ui='/*\n'+licenses.map(p=>lib(p+'/LICENSE')).join('\n').replace(/\*\//g,'* /')+'\n*/\n'+lib('@floating-ui/core/dist/floating-ui.core.umd.min.js')+'\n'+lib('@floating-ui/dom/dist/floating-ui.dom.umd.min.js')+'\nwindow.ERLEN_ICONOS='+JSON.stringify(Object.fromEntries(names.map(n=>[n,icons[n]])))+';';
+const script=s=>'<script>'+s.replace(/<\/script/gi,'<\\/script')+'</script>';
+const html='<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Erlen Slides · Scientific presentations</title><meta name="description" content="Presentaciones científicas libres con ecuaciones, química, datos y exportación. Sin cuenta."><style>body{margin:0;font:14px system-ui,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]{display:none!important}</style><style>'+get('src/css/fuentes-katex.css')+get('src/css/fuentes-tx.css')+css+'</style></head><body>'+get('src/cuerpo.html')+script(get('vendor/katex.min.js'))+script(get('vendor/mhchem.min.js'))+script('window.ERLEN={version:'+JSON.stringify(version)+',telemetria:false};window.ERLEN_LIBRE=true;')+script(ui)+script(get('src/preludio.js')+order.map(n=>get('src/js/'+n)).join('\n'))+'</body></html>\n';
+const out=join(root,'public');mkdirSync(out,{recursive:true});
+write(join(out,'index.html'),html);write(join(out,'erlen-slides-offline.html'),html.replace('window.ERLEN_LIBRE=true;','window.ERLEN_LIBRE=false;'));
+cpSync(join(root,'LICENSE'),join(out,'LICENSE'));cpSync(join(root,'licenses'),join(out,'licenses'),{recursive:true});
+const science=join(out,'libre');mkdirSync(science,{recursive:true});
+const assets=[['@rdkit/rdkit','dist/RDKit_minimal.js','rdkit.js'],['@rdkit/rdkit','dist/RDKit_minimal.wasm','RDKit_minimal.wasm'],['kekule','dist/kekule.min.js','kekule.js'],['3dmol','build/3Dmol-min.js','3dmol.js'],['plotly.js-basic-dist-min','plotly-basic.min.js','plotly.js']];
+const manifest=[];
+for(const [pkg,file,name]of assets){const data=read(join(root,'node_modules',pkg,file));write(join(science,name),data);manifest.push({package:pkg,version:JSON.parse(lib(pkg+'/package.json')).version,file:name,bytes:data.length,sha256:createHash('sha256').update(data).digest('hex')});}
+for(const pkg of new Set([...licenses,...assets.map(a=>a[0])]))cpSync(join(root,'node_modules',pkg,'LICENSE'),join(out,'licenses',pkg.replaceAll('/','-')+'.txt'));
+cpSync(join(root,'node_modules/3dmol/build/3Dmol-min.js.LICENSE.txt'),join(out,'licenses/3dmol-dependencies.txt'));
+cpSync(join(root,'node_modules/kekule/dist/themes'),join(science,'themes'),{recursive:true});cpSync(join(root,'web/quimica-worker.js'),join(science,'quimica-worker.js'));
+write(join(science,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
+write(join(out,'build.json'),JSON.stringify({version,modules:order.length,sha256:createHash('sha256').update(html).digest('hex')},null,2)+'\n');
+console.log(`Built Erlen Slides ${version}: ${order.length} modules, ${(Buffer.byteLength(html)/1024).toFixed(0)} KiB, no production configuration.`);

@@ -1,0 +1,176 @@
+{
+  "v": 1,
+  "meta": {
+    "title": "Derivación de un modelo",
+    "short": "Derivación de un modelo",
+    "subtitle": "Ejemplo didáctico · datos ilustrativos",
+    "authors": "",
+    "institute": "",
+    "date": "",
+    "theme": "revista",
+    "aspect": "169",
+    "numbers": true,
+    "footline": true
+  },
+  "slides": [
+    {
+      "id": "example-derivacion-1",
+      "layout": "title",
+      "title": "",
+      "blocks": [],
+      "notes": "Ejemplo didáctico. Sustituye contenido y datos por los de tu trabajo. No atribuir estas cifras a un experimento.",
+      "min": 0.5
+    },
+    {
+      "id": "example-derivacion-2",
+      "layout": "content",
+      "title": "La pregunta que guía el trabajo",
+      "blocks": [
+        {
+          "id": "example-derivacion-3",
+          "type": "text",
+          "text": "¿Cómo se obtiene la solución de un decaimiento de primer orden?",
+          "size": "l",
+          "align": "left"
+        },
+        {
+          "id": "example-derivacion-4",
+          "type": "text",
+          "text": "Caso de uso ilustrativo. Define aquí el sistema, la comparación y el alcance.",
+          "size": "s",
+          "align": "left"
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    },
+    {
+      "id": "example-derivacion-5",
+      "layout": "content",
+      "title": "Una estrategia explícita",
+      "blocks": [
+        {
+          "id": "example-derivacion-6",
+          "type": "smart",
+          "kind": "proceso",
+          "w": 95,
+          "caption": "",
+          "anim": "fade",
+          "items": [
+            {
+              "t": "Definir variables"
+            },
+            {
+              "t": "Plantear la ley"
+            },
+            {
+              "t": "Integrar"
+            },
+            {
+              "t": "Aplicar condición inicial"
+            }
+          ]
+        }
+      ],
+      "notes": "Explica las decisiones y los controles, no solo los nombres de las técnicas.",
+      "min": 1.5
+    },
+    {
+      "id": "example-derivacion-7",
+      "layout": "content",
+      "title": "Mostrar la evidencia",
+      "blocks": [
+        {
+          "id": "example-derivacion-8",
+          "type": "math",
+          "tex": "c(t)=c_0e^{-kt}",
+          "size": "n",
+          "derivacion": true,
+          "pasos": [
+            {
+              "tex": "\\frac{dc}{dt}=-kc",
+              "nota": "Hipótesis: k constante."
+            },
+            {
+              "tex": "\\int_{c_0}^{c(t)}\\frac{dc}{c}=-\\int_0^t k\\,dt",
+              "nota": "Separación de variables."
+            },
+            {
+              "tex": "\\ln\\frac{c(t)}{c_0}=-kt",
+              "nota": "Integración para c positivo."
+            },
+            {
+              "tex": "c(t)=c_0e^{-kt}",
+              "nota": "Solución con condición inicial."
+            }
+          ]
+        }
+      ],
+      "notes": "Datos o modelos didácticos: reemplazar antes de presentar resultados propios.",
+      "min": 1.5
+    },
+    {
+      "id": "example-derivacion-9",
+      "layout": "content",
+      "title": "Interpretación y límites",
+      "blocks": [
+        {
+          "id": "example-derivacion-10",
+          "type": "bullets",
+          "items": [
+            {
+              "t": "La derivación depende de k constante y c positivo.",
+              "lvl": 0
+            },
+            {
+              "t": "Una solución matemática no verifica la ley física.",
+              "lvl": 0
+            },
+            {
+              "t": "Comparar la predicción con datos independientes.",
+              "lvl": 0
+            }
+          ],
+          "step": false
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    },
+    {
+      "id": "example-derivacion-11",
+      "layout": "content",
+      "title": "Antes de compartir",
+      "blocks": [
+        {
+          "id": "example-derivacion-12",
+          "type": "bullets",
+          "items": [
+            {
+              "t": "Dominio, unidades y condiciones iniciales",
+              "lvl": 0
+            },
+            {
+              "t": "Pasos algebraicos y supuestos",
+              "lvl": 0
+            },
+            {
+              "t": "Caso límite t = 0 y comportamiento asintótico",
+              "lvl": 0
+            }
+          ],
+          "step": false
+        },
+        {
+          "id": "example-derivacion-13",
+          "type": "text",
+          "text": "Conserva el proyecto JSON y revisa la exportación final.",
+          "size": "s",
+          "align": "left"
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    }
+  ]
+}

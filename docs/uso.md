@@ -1,0 +1,43 @@
+# Usar Erlen Slides
+
+## Crear una charla
+
+En Inicio elige **Nueva presentación**, **Explorar ejemplos** o **Importar proyecto**. Un documento nuevo empieza con una portada vacía. Pon un título y añade diapositivas desde la tira lateral. Puedes reordenarlas, cambiar el diseño o abrir la vista general.
+
+Haz clic sobre el texto de la diapositiva para editar. El panel derecho separa Insertar, Diapositiva, Diseño y las propiedades del bloque seleccionado. Las ecuaciones reciben LaTeX; las reacciones reciben sintaxis mhchem. Por ejemplo: `A = \\varepsilon l c` en la documentación representa la orden LaTeX `A = \varepsilon l c` que debes escribir en el editor.
+
+## Gráficas y química
+
+Una gráfica conserva los pares de datos y sus etiquetas. Verifica unidades y significado de la incertidumbre antes de mostrar resultados. Los ejemplos tienen datos didácticos. El editor no certifica un ajuste, una asignación espectral ni la validez de un método.
+
+En Recursos → Laboratorio científico puedes usar RDKit para analizar estructuras, Kekule para dibujarlas, 3Dmol para visualizarlas y Plotly para generar gráficas. Estas herramientas adicionales requieren servir los recursos de `public/libre/` por HTTP, incluso si el servidor es local y no hay Internet. Abrir únicamente el HTML offline permite seguir viendo figuras ya insertadas.
+
+## Guardar y recuperar
+
+El indicador superior informa del autoguardado. Archivo permite conservar varias presentaciones con nombre. En Recursos hay copias de recuperación, respaldo ZIP, plantillas e identidad institucional. Un respaldo ZIP contiene proyectos JSON y un archivo de plantillas: importa cada presentación desde Inicio y las plantillas desde su opción específica.
+
+Guarda una copia JSON externa antes de borrar los datos del navegador. Importar otro proyecto valida su estructura; los borradores actuales se conservan al cambiar desde Inicio si hay espacio disponible. Si el almacenamiento se llena, descarga tu trabajo antes de continuar.
+
+## Presentar
+
+Usa Presentar o F5. Avanza con las flechas; Esc vuelve al editor. N muestra notas, P abre la vista de presentador, L activa tinta/puntero y B alterna la pantalla en negro. Las ayudas dentro de la app describen atajos y opciones adicionales.
+
+## Exportaciones
+
+| Formato | Uso | Revisión necesaria |
+|---|---|---|
+| JSON | Conservar y volver a editar en Erlen | Es la copia de trabajo recomendada |
+| PDF | Compartir una copia visual | Usa Imprimir/Guardar como PDF y revisa tamaño, fondos y recortes |
+| PPTX | Abrir en software de presentaciones | Algunos elementos complejos se convierten en imágenes; revisa tipografías y alineación en el programa destino |
+| Beamer / TEX | Continuar un flujo con LaTeX | Requiere una distribución de LaTeX; temas y elementos especiales pueden diferir de la vista web |
+| HTML | Presentar en un navegador | Revisa la copia exportada y la disponibilidad de recursos que hayas incorporado |
+
+No se ha certificado compatibilidad visual idéntica con todas las versiones de PowerPoint ni con todos los motores LaTeX. La validación específica de esta publicación está en [validacion.md](validacion.md).
+
+## Referencias y conexiones voluntarias
+
+Puedes escribir tus referencias o recuperar metadatos por DOI desde Crossref. Zotero ofrece conexión de escritorio o Web. Estas acciones se inician desde sus controles; no son necesarias para editar. Una clave de Zotero pertenece al usuario: no la agregues a ejemplos, capturas o repositorios.
+
+## Móvil
+
+En una pantalla estrecha las herramientas pasan a un panel desplegable. El menú de más opciones reúne acciones de archivo y exportación. La edición científica densa resulta más cómoda en una pantalla grande; la vista móvil permite revisar y hacer cambios puntuales.

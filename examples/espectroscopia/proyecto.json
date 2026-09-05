@@ -1,0 +1,175 @@
+{
+  "v": 1,
+  "meta": {
+    "title": "Perfil espectral",
+    "short": "Perfil espectral",
+    "subtitle": "Ejemplo didáctico · datos ilustrativos",
+    "authors": "",
+    "institute": "",
+    "date": "",
+    "theme": "acuarela",
+    "aspect": "169",
+    "numbers": true,
+    "footline": true
+  },
+  "slides": [
+    {
+      "id": "example-espectroscopia-1",
+      "layout": "title",
+      "title": "",
+      "blocks": [],
+      "notes": "Ejemplo didáctico. Sustituye contenido y datos por los de tu trabajo. No atribuir estas cifras a un experimento.",
+      "min": 0.5
+    },
+    {
+      "id": "example-espectroscopia-2",
+      "layout": "content",
+      "title": "La pregunta que guía el trabajo",
+      "blocks": [
+        {
+          "id": "example-espectroscopia-3",
+          "type": "text",
+          "text": "¿Una señal es consistente con el componente que buscamos?",
+          "size": "l",
+          "align": "left"
+        },
+        {
+          "id": "example-espectroscopia-4",
+          "type": "text",
+          "text": "Caso de uso ilustrativo. Define aquí el sistema, la comparación y el alcance.",
+          "size": "s",
+          "align": "left"
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    },
+    {
+      "id": "example-espectroscopia-5",
+      "layout": "content",
+      "title": "Una estrategia explícita",
+      "blocks": [
+        {
+          "id": "example-espectroscopia-6",
+          "type": "smart",
+          "kind": "proceso",
+          "w": 95,
+          "caption": "",
+          "anim": "fade",
+          "items": [
+            {
+              "t": "Adquirir un blanco"
+            },
+            {
+              "t": "Documentar el preprocesamiento"
+            },
+            {
+              "t": "Mostrar señal y unidades"
+            },
+            {
+              "t": "Contrastar la asignación"
+            }
+          ]
+        }
+      ],
+      "notes": "Explica las decisiones y los controles, no solo los nombres de las técnicas.",
+      "min": 1.5
+    },
+    {
+      "id": "example-espectroscopia-7",
+      "layout": "content",
+      "title": "Mostrar la evidencia",
+      "blocks": [
+        {
+          "id": "example-espectroscopia-8",
+          "type": "chart",
+          "kind": "linea",
+          "data": "Número de onda\tIntensidad\n0\t0.002\n1\t0.044\n2\t0.458\n3\t1.000\n4\t0.458\n5\t0.044\n6\t0.002",
+          "xlabel": "Coordenada espectral (u.a.)",
+          "ylabel": "Intensidad normalizada",
+          "title": "",
+          "w": 90,
+          "ar": 0.48,
+          "grid": true,
+          "legend": false,
+          "offset": false,
+          "offsetPct": 55,
+          "showFit": true,
+          "anim": "fade",
+          "caption": "Datos ilustrativos para explicar el método; sustituir por mediciones propias."
+        },
+        {
+          "id": "example-espectroscopia-9",
+          "type": "math",
+          "tex": "I(x)=e^{-(x-3)^2/(2(0.8)^2)}",
+          "size": "n"
+        }
+      ],
+      "notes": "Datos o modelos didácticos: reemplazar antes de presentar resultados propios.",
+      "min": 1.5
+    },
+    {
+      "id": "example-espectroscopia-10",
+      "layout": "content",
+      "title": "Interpretación y límites",
+      "blocks": [
+        {
+          "id": "example-espectroscopia-11",
+          "type": "bullets",
+          "items": [
+            {
+              "t": "Perfil gaussiano sintético; el eje no representa una técnica particular.",
+              "lvl": 0
+            },
+            {
+              "t": "Una coincidencia visual no basta para asignar una especie.",
+              "lvl": 0
+            },
+            {
+              "t": "Declarar suavizado, normalización y corrección de línea base.",
+              "lvl": 0
+            }
+          ],
+          "step": false
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    },
+    {
+      "id": "example-espectroscopia-12",
+      "layout": "content",
+      "title": "Antes de compartir",
+      "blocks": [
+        {
+          "id": "example-espectroscopia-13",
+          "type": "bullets",
+          "items": [
+            {
+              "t": "Técnica, resolución y calibración del eje",
+              "lvl": 0
+            },
+            {
+              "t": "Datos crudos y parámetros de preprocesamiento",
+              "lvl": 0
+            },
+            {
+              "t": "Referencia verificable para cada asignación",
+              "lvl": 0
+            }
+          ],
+          "step": false
+        },
+        {
+          "id": "example-espectroscopia-14",
+          "type": "text",
+          "text": "Conserva el proyecto JSON y revisa la exportación final.",
+          "size": "s",
+          "align": "left"
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    }
+  ]
+}

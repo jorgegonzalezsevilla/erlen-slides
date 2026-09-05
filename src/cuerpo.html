@@ -1,0 +1,81 @@
+<div class="app" id="app">
+  <div class="topbar">
+    <button class="icon-btn hamb" id="hambBtn" aria-controls="inspector" aria-expanded="false" title="Panel de edición" aria-label="Abrir panel de edición">☰</button>
+    <button id="inicioBtn" aria-label="Abrir Erlen Slides" class="wordmark" title="Volver a Erlen Slides"><svg class="marca-svg" viewBox="0 0 64 64" aria-hidden="true"><path d="M25 8h14v16l14 26a4 4 0 0 1-3.6 5.6H14.6A4 4 0 0 1 11 50l14-26z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="M19 42h26l5.5 9.5H13.5z" fill="var(--acc)"/></svg><span class="marca-txt">Erlen</span></button>
+    <span class="editor-producto">Presentaciones</span>
+    <button id="edicionBadge" class="ed-badge" aria-label="Acerca de Erlen Slides">AGPLv3</button>
+    <div class="tb-sep"></div>
+    <input class="deck-title" id="deckTitleInput" aria-label="Título de la presentación" title="Título de la presentación" placeholder="Presentación sin título">
+    <span class="save-ind" id="saveInd" role="status" aria-live="polite"></span>
+    <button class="icon-btn" id="undoBtn" title="Deshacer (Ctrl+Z)" aria-label="Deshacer">⟲</button>
+    <button class="icon-btn" id="redoBtn" title="Rehacer (Ctrl+Shift+Z)" aria-label="Rehacer">⟳</button>
+    <div class="tb-sep"></div>
+    <button class="btn only-wide" id="decksBtn" title="Mis presentaciones">Archivo</button>
+    <button class="btn only-wide" id="exportBtn" title="Exportar">Exportar</button>
+    <button class="icon-btn only-narrow" id="moreBtn" title="Archivo, exportar y ayuda" aria-label="Más opciones">⋯</button>
+    <button class="btn btn-pri" id="presentBtn" aria-label="Presentar" title="Presentar (F5)"><span class="only-wide-i">▶ Presentar</span><span class="only-narrow-i">▶</span></button>
+    <button class="icon-btn" id="buscarBtn" title="Buscar y reemplazar (Ctrl+F)" aria-label="Buscar">⌕</button>
+    <button class="icon-btn only-wide" id="temaBtn" title="Apariencia del editor" aria-label="Apariencia del editor">◐</button>
+    <input type="checkbox" id="densChk" class="dens-chk only-wide" aria-label="Interfaz compacta">
+    <label class="icon-btn dens-btn only-wide" for="densChk" title="Densidad de la interfaz: cómoda o compacta"></label>
+    <button class="icon-btn" id="asisBtn" title="Asistente (Ctrl+J)" aria-label="Asistente">✦</button>
+    <button class="icon-btn" id="cuentaBtn" hidden aria-label="Tu cuenta">◯</button>
+    <button class="icon-btn only-wide" id="helpBtn" title="Ayuda y atajos" aria-label="Ayuda">?</button>
+  </div>
+  <div class="cinta" id="cinta" hidden></div>
+  <div class="main">
+    <div class="filmstrip">
+      <div class="fs-head"><span class="panel-label">Diapositivas</span></div>
+      <div class="fs-list" id="fsList" role="listbox" aria-label="Diapositivas"></div>
+      <button class="btn fs-add" id="addSlideBtn" title="Nueva diapositiva"><span class="only-wide-i">+ Nueva diapositiva</span><span class="only-narrow-i">+</span></button>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-scroll" id="canvasScroll">
+        <div class="stage" id="stage"><div class="stage-inner" id="stageInner"></div></div>
+      </div>
+      <div class="canvas-foot">
+        <div class="foot-izq">
+          <span class="slide-pos" id="slidePos" role="status" aria-live="polite"></span>
+          <button class="prep-ind" id="prepInd" title="Qué falta para que esté lista"></button>
+        </div>
+        <div class="zoombox">
+          <button class="icon-btn" id="zoomOut" title="Alejar" aria-label="Alejar">−</button>
+          <span class="zlabel" id="zoomLabel">100%</span>
+          <button class="icon-btn" id="zoomIn" title="Acercar" aria-label="Acercar">+</button>
+          <button class="icon-btn" id="zoomFit" title="Ajustar a la ventana" aria-label="Ajustar">⤢</button>
+          <button class="icon-btn" id="sorterBtn" title="Ver todas las diapositivas (Ctrl+G)" aria-label="Ver todas las diapositivas">⊞</button>
+          <button class="icon-btn" id="concBtn" title="Modo concentración (F9)" aria-label="Modo concentración">⛶</button>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-mask" id="drawerMask"></div>
+    <div class="inspector" id="inspector" aria-label="Herramientas de edición">
+      <div class="drawer-close"><span>Herramientas</span><button class="icon-btn" id="drawerClose" aria-label="Cerrar herramientas">✕</button></div>
+      <div class="insp-tabs" role="tablist">
+        <button class="itab on" data-tab="insert">Insertar</button>
+        <button class="itab" data-tab="slide">Diapositiva</button>
+        <button class="itab" data-tab="design">Diseño</button>
+        <button class="itab itab-blk" data-tab="bloque" hidden>Bloque</button>
+      </div>
+      <div class="insp-body" id="inspBody"></div>
+    </div>
+  </div>
+</div>
+<div class="toasts" id="toasts" role="status" aria-live="polite" aria-atomic="false"></div>
+<div id="asisRoot"></div>
+<div id="modalRoot"></div>
+<main id="workspaceRoot" class="workspace" hidden aria-label="Inicio de Erlen"></main>
+<div id="sorterRoot"></div>
+<div id="argRoot"></div>
+<div id="presentRoot"></div>
+<div id="printArea"></div>
+<div id="workbench" style="position:absolute;left:-99999px;top:0"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="daltonismo-deuter" color-interpolation-filters="linearRGB">
+    <feColorMatrix type="matrix" values="0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0"/>
+  </filter>
+  <filter id="daltonismo-protan" color-interpolation-filters="linearRGB">
+    <feColorMatrix type="matrix" values="0.567 0.433 0 0 0  0.558 0.442 0 0 0  0 0.242 0.758 0 0  0 0 0 1 0"/>
+  </filter>
+</svg>
+

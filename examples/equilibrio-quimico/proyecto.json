@@ -1,0 +1,187 @@
+{
+  "v": 1,
+  "meta": {
+    "title": "Equilibrio ácido–base",
+    "short": "Equilibrio ácido–base",
+    "subtitle": "Ejemplo didáctico · datos ilustrativos",
+    "authors": "",
+    "institute": "",
+    "date": "",
+    "theme": "arena",
+    "aspect": "169",
+    "numbers": true,
+    "footline": true
+  },
+  "slides": [
+    {
+      "id": "example-equilibrio-quimico-1",
+      "layout": "title",
+      "title": "",
+      "blocks": [],
+      "notes": "Ejemplo didáctico. Sustituye contenido y datos por los de tu trabajo. No atribuir estas cifras a un experimento.",
+      "min": 0.5
+    },
+    {
+      "id": "example-equilibrio-quimico-2",
+      "layout": "content",
+      "title": "La pregunta que guía el trabajo",
+      "blocks": [
+        {
+          "id": "example-equilibrio-quimico-3",
+          "type": "text",
+          "text": "¿Qué predice un modelo ideal para la relación ácido/base?",
+          "size": "l",
+          "align": "left"
+        },
+        {
+          "id": "example-equilibrio-quimico-4",
+          "type": "text",
+          "text": "Caso de uso ilustrativo. Define aquí el sistema, la comparación y el alcance.",
+          "size": "s",
+          "align": "left"
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    },
+    {
+      "id": "example-equilibrio-quimico-5",
+      "layout": "content",
+      "title": "Una estrategia explícita",
+      "blocks": [
+        {
+          "id": "example-equilibrio-quimico-6",
+          "type": "smart",
+          "kind": "proceso",
+          "w": 95,
+          "caption": "",
+          "anim": "fade",
+          "items": [
+            {
+              "t": "Definir especies"
+            },
+            {
+              "t": "Plantear el equilibrio"
+            },
+            {
+              "t": "Declarar aproximaciones"
+            },
+            {
+              "t": "Comparar con mediciones"
+            }
+          ]
+        }
+      ],
+      "notes": "Explica las decisiones y los controles, no solo los nombres de las técnicas.",
+      "min": 1.5
+    },
+    {
+      "id": "example-equilibrio-quimico-7",
+      "layout": "content",
+      "title": "Mostrar la evidencia",
+      "blocks": [
+        {
+          "id": "example-equilibrio-quimico-8",
+          "type": "chem",
+          "tex": "HA <=> H+ + A-"
+        },
+        {
+          "id": "example-equilibrio-quimico-9",
+          "type": "math",
+          "tex": "\\mathrm{pH}=\\mathrm{p}K_a+\\log_{10}\\frac{[\\mathrm{A}^{-}]}{[\\mathrm{HA}]}",
+          "size": "n"
+        },
+        {
+          "id": "example-equilibrio-quimico-10",
+          "type": "table",
+          "header": true,
+          "align": "c",
+          "caption": "Relación ideal calculada; no recomendación de preparación.",
+          "rows": [
+            [
+              "[A⁻]/[HA]",
+              "pH − pKa"
+            ],
+            [
+              "0.1",
+              "−1"
+            ],
+            [
+              "1",
+              "0"
+            ],
+            [
+              "10",
+              "1"
+            ]
+          ]
+        }
+      ],
+      "notes": "Datos o modelos didácticos: reemplazar antes de presentar resultados propios.",
+      "min": 1.5
+    },
+    {
+      "id": "example-equilibrio-quimico-11",
+      "layout": "content",
+      "title": "Interpretación y límites",
+      "blocks": [
+        {
+          "id": "example-equilibrio-quimico-12",
+          "type": "bullets",
+          "items": [
+            {
+              "t": "Las concentraciones aproximan actividades bajo supuestos explícitos.",
+              "lvl": 0
+            },
+            {
+              "t": "No usar esta diapositiva como protocolo de seguridad.",
+              "lvl": 0
+            },
+            {
+              "t": "Contrastar las aproximaciones con el sistema experimental.",
+              "lvl": 0
+            }
+          ],
+          "step": false
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    },
+    {
+      "id": "example-equilibrio-quimico-13",
+      "layout": "content",
+      "title": "Antes de compartir",
+      "blocks": [
+        {
+          "id": "example-equilibrio-quimico-14",
+          "type": "bullets",
+          "items": [
+            {
+              "t": "Identidad de especies, temperatura y actividades",
+              "lvl": 0
+            },
+            {
+              "t": "Rango de validez de la aproximación",
+              "lvl": 0
+            },
+            {
+              "t": "Mediciones y calibración del electrodo",
+              "lvl": 0
+            }
+          ],
+          "step": false
+        },
+        {
+          "id": "example-equilibrio-quimico-15",
+          "type": "text",
+          "text": "Conserva el proyecto JSON y revisa la exportación final.",
+          "size": "s",
+          "align": "left"
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    }
+  ]
+}

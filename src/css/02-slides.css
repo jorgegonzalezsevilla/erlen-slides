@@ -1,0 +1,1116 @@
+/* ==== 02-slides.css ==== */
+/* ================= diapositivas: los temas al modo Beamer =================
+   .slide es un lienzo de tamaño fijo que después se escala con transform.
+   Cada tema pinta su propio papel: los colores de la diapositiva son del
+   documento, no de la interfaz, y no cambian si la app está en claro u oscuro.
+
+   Los diecinueve temas salen del mismo molde. Añadir uno es rellenar su bloque de
+   variables; rara vez hace falta una regla nueva:
+     colores    --sbg --sfg --smut --sacc (--sacc-txt cuando el acento no se
+                lee sobre el papel) --sline --scard --sblock --salert --sexample
+     márgenes   --fbt --fbx --fbb            arriba · a los lados · abajo
+     letra      --sfam --sz-cuerpo --slh --speso
+     tamaños    --sz-ft --sz-fts --sz-tp --sz-sec --sz-pie
+     título     --sft-bg --sft-fg --ft-pt --ft-pb --ft-regla --ft-borde
+     viñetas    --bl-m --bl-m1 --bl-m2 y sus colores */
+.slide{position:relative;overflow:hidden;flex:none;user-select:none;border-radius:2px}
+.mode-edit.slide{user-select:auto}
+.slide.asp169{width:1280px;height:720px}
+.slide.asp43{width:1024px;height:768px}
+.slide,.slide *{box-sizing:border-box}
+
+/* La misma escala de espaciado que la interfaz, pero fijada en píxeles de
+   diapositiva: el lienzo mide siempre lo mismo, así que la densidad elegida
+   para la app no debe encogerlo. Una sala grande pide los peldaños altos. */
+.slide{--e1:4px;--e2:8px;--e3:12px;--e4:16px;--e5:24px;--e6:32px;--e7:48px;--e8:64px}
+
+/* ---------- el molde: lo que vale para todos los temas ---------- */
+.slide{
+  --sfam:'Fira Sans',system-ui,sans-serif;--speso:400;--speso-b:600;
+  --sz-cuerpo:25px;--slh:1.48;
+  --sz-ft:34px;--sz-fts:20px;--sz-tp:48px;--sz-tpsub:25px;--sz-tpmeta:23px;--sz-sec:44px;--sz-pie:16px;
+  --fbt:28px;--fbx:48px;--fbb:48px;
+  --ft-pt:26px;--ft-pb:22px;--ft-peso:600;--ft-lh:1.16;--ft-esp:0;
+  --ft-regla:0px;--ft-regla-col:var(--sacc);--ft-hueco:0px;
+  --ft-borde:0px;--ft-borde-col:transparent;--ft-sub:var(--smut);
+  --sacc-txt:var(--sacc);
+  --bl-gap:var(--e4);--bl-m:'▸';--bl-m1:'–';--bl-m2:'•';--bl-pl:36px;
+  --bl-col:var(--sacc);--bl-col1:var(--smut);--bl-col2:var(--smut);
+  --gap-col:var(--e6);--radio:0px;
+  --tp-px:92px;--sec-px:92px;
+}
+.slide{font-family:var(--sfam);font-weight:var(--speso);font-size:var(--sz-cuerpo);line-height:var(--slh);
+  background:var(--sbg);color:var(--sfg)}
+.slide b,.slide strong{font-weight:var(--speso-b)}
+.slide .katex{font-size:1.06em}
+.slide .katex-display{margin:.3em 0}
+.slide [data-edit]{min-height:1em}
+.slide [data-edit]:empty::before,.slide [data-edit].is-empty::before{content:attr(data-ph);opacity:.38}
+
+/* ---------- los temas ---------- */
+/* Moderno y plano; la barra oscura del título es su seña. El naranja da 2,6:1
+   sobre el papel claro, así que el acento en texto se oscurece hasta 4,6:1: es
+   el mínimo que la marca de cita, de 15 px, necesita para leerse. */
+.th-metropolis{--spie-bg:#23373B;--spie-fg:#FAFAFA;--sbg:#FAFAFA;--sfg:#23373B;--smut:#5F7176;--sacc:#EB811B;
+  --sacc-txt:color-mix(in srgb,var(--sacc) 62%,var(--sfg));--sft-bg:#23373B;--sft-fg:#FAFAFA;
+  --sblock:#23373B;--salert:#B33A2E;--sexample:#2C7A43;--sline:#D5DADB;--scard:#ECEDED;
+  --speso:300;--ft-peso:400;--ft-esp:.005em;--ft-sub:var(--sacc);--ft-pb:20px;
+  --bl-col:var(--sfg);--tp-peso:400;--sec-peso:400}
+/* Titulares grandes y pocas palabras: charla plenaria, o un póster. */
+.th-plenaria{--spie-bg:#0E6F7C;--spie-fg:#FFFFFF;--sbg:#FFFFFF;--sfg:#14181B;--smut:#5C646B;--sacc:#0E6F7C;
+  --sft-bg:transparent;--sft-fg:#14181B;
+  --sblock:#0E6F7C;--salert:#B03A2E;--sexample:#1F7A4C;--sline:#DADEE2;--scard:#EFF3F4;
+  --sz-cuerpo:28px;--slh:1.44;--speso:400;
+  --sz-ft:48px;--ft-peso:600;--ft-lh:1.06;--ft-esp:-.012em;--ft-pt:44px;--ft-pb:26px;
+  --sz-fts:24px;--sz-tp:66px;--sz-tpsub:27px;--sz-tpmeta:26px;--sz-sec:58px;--sz-pie:17px;
+  --ft-sub:var(--sacc-txt);--fbx:56px;--fbt:12px;--fbb:52px;--tp-px:104px;--sec-px:104px;--bl-gap:var(--e5)}
+/* Sans limpio y reglas finas: se lee como una figura de artículo. */
+.th-revista{--spie-bg:#235E8C;--spie-fg:#FFFFFF;--sbg:#FFFFFF;--sfg:#1B1D21;--smut:#61666E;--sacc:#235E8C;
+  --sft-bg:transparent;--sft-fg:#1B1D21;
+  --sblock:#235E8C;--salert:#A33027;--sexample:#1F6B45;--sline:#D2D6DC;--scard:#F3F5F7;
+  --sfam:'Source Sans 3',system-ui,sans-serif;--slh:1.5;
+  --sz-ft:31px;--ft-peso:600;--ft-pt:30px;--ft-pb:0px;--ft-regla:1px;--ft-regla-col:var(--sline);--ft-hueco:12px;
+  --fbx:48px;--fbt:26px;--fbb:52px;--sz-tp:46px;
+  --bl-m:'—';--bl-m1:'–';--bl-m2:'·';--bl-col:var(--sacc);--bl-pl:44px}
+/* El clásico de Beamer: barra azul arriba y pie de tres franjas. */
+.th-madrid{--spie-bg:#3333B3;--spie-fg:#FFFFFF;--sbg:#FFFFFF;--sfg:#111111;--smut:#555A66;--sacc:#3333B3;
+  --sft-bg:#3333B3;--sft-fg:#FFFFFF;
+  --sblock:#3333B3;--salert:#B02B2B;--sexample:#227A38;--sline:#D9D9E6;--scard:#F1F1F8;
+  --sfl1:#26267F;--sfl2:#4747BF;--sfl3:#8585D6;
+  --sz-ft:32px;--sz-fts:19px;--ft-pt:18px;--ft-pb:16px;--ft-sub:color-mix(in srgb,var(--sft-fg) 82%,transparent);
+  --fbx:36px;--fbt:26px;--fbb:56px;--radio:10px;--sz-tp:42px;
+  --bl-m1:'▹';--bl-col1:var(--sacc);--bl-col2:var(--sacc)}
+/* Granate y gris, al modo de la academia estadounidense. */
+.th-cambridge{--spie-bg:#87201F;--spie-fg:#FFFFFF;--sbg:#FFFFFF;--sfg:#191919;--smut:#575757;--sacc:#87201F;
+  --sft-bg:transparent;--sft-fg:#87201F;
+  --sblock:#87201F;--salert:#B02B2B;--sexample:#227A38;--sline:#DCD6D0;--scard:#F5F2EE;
+  --sfl1:#454545;--sfl2:#87201F;--sfl3:#C9C4BE;
+  --sz-ft:33px;--ft-pt:30px;--ft-pb:0px;--ft-regla:2px;--ft-hueco:12px;
+  --fbx:48px;--fbt:26px;--fbb:56px;--radio:8px;
+  --bl-m1:'▹';--bl-col1:var(--sacc);--bl-col2:var(--sacc)}
+/* Serifas de artículo, para cuando manda el texto. */
+.th-sobrio{--spie-bg:#1E3A6E;--spie-fg:#FFFFFF;--sbg:#FFFFFF;--sfg:#15171B;--smut:#585D68;--sacc:#1E3A6E;
+  --sft-bg:transparent;--sft-fg:#15171B;
+  --sblock:#15171B;--salert:#9C2B21;--sexample:#25603A;--sline:#C9CCD4;--scard:#F4F5F7;
+  --sfam:'STIX Two Text',Georgia,serif;--slh:1.52;
+  --sz-ft:32px;--ft-pt:32px;--ft-pb:0px;--ft-regla:1px;--ft-regla-col:var(--sfg);--ft-hueco:12px;
+  --fbx:52px;--fbt:28px;--fbb:52px;--tp-px:120px;
+  --bl-m:'•';--bl-m1:'–';--bl-m2:'·';--bl-col:var(--sfg)}
+/* Serifas, mucho margen y muy poco color: la puesta en escena de un tribunal. */
+.th-catedra{--spie-bg:#2E5241;--spie-fg:#FFFFFF;--sbg:#FFFFFF;--sfg:#16181C;--smut:#5A6068;--sacc:#2E5241;
+  --sft-bg:transparent;--sft-fg:#16181C;
+  --sblock:#16181C;--salert:#8C2F22;--sexample:#2E5241;--sline:#D3D5DA;--scard:#F5F5F3;
+  --sfam:'TXPagella',Palatino,'Palatino Linotype','Book Antiqua',Georgia,serif;
+  --sz-cuerpo:26px;--slh:1.52;--speso-b:700;
+  --sz-ft:33px;--ft-peso:700;--ft-pt:34px;--ft-pb:0px;--ft-regla:1px;--ft-regla-col:var(--sline);--ft-hueco:14px;
+  --fbx:60px;--fbt:30px;--fbb:56px;--tp-px:132px;--sec-px:132px;--tp-peso:700;
+  --bl-m:'—';--bl-m1:'–';--bl-m2:'·';--bl-col:var(--smut);--bl-pl:48px}
+/* Fondo hueso y tinta cálida: en una charla larga cansa menos que el blanco. */
+.th-papel{--spie-bg:#2B2723;--spie-fg:#F6F1E7;--sbg:#F6F1E7;--sfg:#2B2723;--smut:#6E655A;--sacc:#8C4A2A;
+  --sft-bg:transparent;--sft-fg:#2B2723;
+  --sblock:#2B2723;--salert:#9C3A22;--sexample:#41643C;--sline:#DCD3C2;--scard:#EFE8DA;
+  --sfam:'TXSchola','Century Schoolbook','New Century Schoolbook',Georgia,serif;
+  --sz-cuerpo:25px;--slh:1.52;--speso-b:700;
+  --sz-ft:32px;--ft-peso:700;--ft-pt:30px;--ft-pb:0px;--ft-regla:1.5px;--ft-regla-col:var(--sline);--ft-hueco:12px;
+  --fbx:52px;--fbt:28px;--fbb:52px;--tp-px:104px;--tp-peso:700;
+  --bl-m:'•';--bl-m1:'–';--bl-m2:'·';--bl-col:var(--sacc)}
+/* Alto contraste: negro sobre blanco, letra grande y una sola tinta fuerte.
+   Pensado para salas con luz encendida y cañones lavados. */
+.th-proyector{--spie-bg:#000000;--spie-fg:#FFFFFF;--sbg:#FFFFFF;--sfg:#000000;--smut:#2E2E2E;--sacc:#0B3FC4;
+  --sft-bg:#FFFFFF;--sft-fg:#000000;
+  --sblock:#000000;--salert:#B0141B;--sexample:#0E6032;--sline:#3A3A3A;--scard:#EDEFF3;
+  --speso:500;--speso-b:700;--sz-cuerpo:27px;--slh:1.44;
+  --sz-ft:37px;--ft-peso:700;--ft-pt:28px;--ft-pb:0px;--ft-regla:5px;--ft-hueco:14px;
+  --sz-fts:21px;--sz-tp:52px;--sz-tpsub:26px;--sz-tpmeta:24px;--sz-sec:48px;--sz-pie:17px;
+  --fbx:48px;--fbt:30px;--fbb:52px;--bl-gap:var(--e5)}
+/* Oscuro cálido, para salas a media luz. */
+.th-nocturno{--spie-bg:#11161B;--spie-fg:#F2F5F8;--sbg:#1B2127;--sfg:#E9EDF2;--smut:#A3B2BD;--sacc:#F09A4D;
+  --sft-bg:#11161B;--sft-fg:#F2F5F8;
+  --sblock:#DDE5EC;--salert:#E8705F;--sexample:#5BBF7E;--sline:#33404B;--scard:#242C34;
+  --speso:300;--ft-peso:400;--ft-esp:.005em;--ft-sub:var(--sacc);--ft-pb:20px;
+  --bl-col:var(--sfg);--tp-peso:400;--sec-peso:400}
+/* Oscuro azul, frío y contenido: la alternativa serena al Nocturno. */
+.th-indigo{--spie-bg:#0B1220;--spie-fg:#E4EBF6;--sbg:#101A2C;--sfg:#DCE4F2;--smut:#93A4C0;--sacc:#7FC2E0;
+  --sft-bg:#0B1220;--sft-fg:#E9EFF8;
+  --sblock:#25344C;--salert:#EE8B7C;--sexample:#78C79B;--sline:#2A3852;--scard:#182338;
+  --sz-ft:33px;--ft-peso:500;--ft-pt:26px;--ft-pb:20px;--ft-borde:3px;--ft-borde-col:var(--sacc);
+  --ft-sub:color-mix(in srgb,var(--sft-fg) 78%,transparent);
+  --fbx:48px;--fbt:28px;--fbb:48px}
+
+/* ---------- título del marco ----------
+   La misma regla para todos: barra de color (Metropolis, Nocturno, Madrid,
+   Índigo), rótulo con regla debajo (Cambridge, Sobrio, Cátedra, Revista,
+   Papel, Proyector) o rótulo a pelo (Plenaria). Cambia el relleno de las
+   variables, no el código. */
+.frametitle{flex:none;position:relative;background:var(--sft-bg);color:var(--sft-fg);
+  padding:var(--ft-pt) var(--fbx) var(--ft-pb);
+  border-bottom:var(--ft-borde) solid var(--ft-borde-col)}
+.ft-t{font-size:var(--sz-ft);font-weight:var(--ft-peso);line-height:var(--ft-lh);letter-spacing:var(--ft-esp);
+  border-bottom:var(--ft-regla) solid var(--ft-regla-col);padding-bottom:var(--ft-hueco)}
+.ft-s{font-size:var(--sz-fts);font-weight:400;line-height:1.3;color:var(--ft-sub);margin-top:var(--e2)}
+/* Madrid tiñe su barra con un degradado suave; sale del color del tema, así
+   que un acento propio la arrastra consigo. */
+.th-madrid .frametitle{background:linear-gradient(180deg,
+    color-mix(in srgb,var(--sft-bg) 84%,#FFFFFF) 0%,var(--sft-bg) 58%,
+    color-mix(in srgb,var(--sft-bg) 80%,#000000) 100%)}
+
+/* ---------- cuerpo del marco ---------- */
+.ly-frame{position:absolute;inset:0;display:flex;flex-direction:column}
+.fbody{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--e5);overflow:hidden;
+  padding:var(--fbt) calc(var(--fbx) * var(--padk,1)) var(--fbb);font-size:calc(1em * var(--sesc,1))}
+.fbody.pad-estrecho{--padk:.45}
+.fbody.pad-amplio{--padk:1.8}
+.fbody.ly-ancho{--padk:.45}
+.fbody.ly-ancho.pad-normal{--padk:.45}
+.fbody.ly-ancho.pad-amplio{--padk:1}
+.fbody.v-center{justify-content:center}
+.cols{display:flex;gap:var(--gap-col);flex:1;min-height:0}
+.col{display:flex;flex-direction:column;gap:var(--e5);min-width:0}
+
+/* ---------- pie de página ----------
+   Tres formas: las franjas de Madrid y Cambridge (.fl-cell), el pie sencillo
+   de los temas de papel (tres campos sueltos) y el número a secas. */
+.footline{position:absolute;left:0;right:0;bottom:0;display:flex;font-size:var(--sz-pie);line-height:1.2}
+.fl-cell{flex:1;padding:var(--e2) var(--e4);display:flex;align-items:center;justify-content:center;gap:var(--e2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Las tres franjas salen del acento: la primera oscurecida, la segunda es el
+   acento a secas y la tercera va aclarada. Por eso la tinta no puede ser
+   blanca a ciegas —sobre la franja clara daba 2,8:1—: las dos oscuras usan la
+   tinta que la app calcula para el acento y la clara, la del cuerpo. */
+.th-madrid .fl-cell:nth-child(1){background:var(--sfl1);color:var(--sacc-ink,#fff)}
+.th-madrid .fl-cell:nth-child(2){background:var(--sfl2);color:var(--sacc-ink,#fff)}
+.th-madrid .fl-cell:nth-child(3){background:var(--sfl3);color:var(--sfg)}
+.th-cambridge .fl-cell:nth-child(1){background:var(--sfl1);color:#fff}
+.th-cambridge .fl-cell:nth-child(2){background:var(--sfl2);color:var(--sacc-ink,#fff)}
+.th-cambridge .fl-cell:nth-child(3){background:var(--sfl3);color:#262626}
+/* El pie sencillo son tres <span> sueltos: se alinean con el margen del
+   cuerpo y no llevan barra. El pie a medida (.pie-x) trae los suyos. */
+.footline > span{flex:1;min-width:0;color:var(--smut);padding-bottom:var(--e4);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.footline > span:nth-child(2){text-align:center}
+.footline > span:last-child{text-align:right;padding-right:var(--fbx)}
+.footline > span:first-child{padding-left:var(--fbx)}
+.pagenum{position:absolute;right:var(--fbx);bottom:var(--e4);font-size:var(--sz-pie);color:var(--smut);
+  font-variant-numeric:tabular-nums}
+.fl-cell .fl-page,.footline > span.fl-page{font-variant-numeric:tabular-nums}
+
+/* ---------- portada ---------- */
+.ly-title{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 var(--tp-px)}
+.tp-title{font-size:var(--sz-tp);line-height:1.14;font-weight:var(--tp-peso,600)}
+.tp-sub{font-size:var(--sz-tpsub);margin-top:var(--e4);color:var(--smut);line-height:1.3}
+.tp-meta{margin-top:var(--e7);display:flex;flex-direction:column;gap:var(--e2)}
+.tp-auth{font-size:var(--sz-tpmeta)}
+.tp-inst{font-size:calc(var(--sz-tpmeta) - 4px);color:var(--smut)}
+.tp-date{font-size:calc(var(--sz-tpmeta) - 5px);color:var(--smut)}
+.tp-rule{width:380px;height:3px;background:var(--sacc);margin-top:var(--e5);border-radius:2px}
+.th-madrid .ly-title,.th-cambridge .ly-title,.th-sobrio .ly-title,
+.th-catedra .ly-title,.th-plenaria .ly-title{align-items:center;text-align:center}
+.th-madrid .tp-rule,.th-cambridge .tp-rule,.th-sobrio .tp-rule,.th-catedra .tp-rule{display:none}
+.th-plenaria .tp-rule{width:220px;height:5px;margin-top:var(--e6)}
+/* Madrid mete la portada en un panel de color. El panel se tiñe con el acento,
+   así que la tinta no puede ser blanca fija: va la del título, que la app
+   calcula contra ese mismo color. Con un acento claro, el panel se lee igual. */
+.th-madrid .tp-box{background:linear-gradient(180deg,
+    color-mix(in srgb,var(--sft-bg) 84%,#FFFFFF),color-mix(in srgb,var(--sft-bg) 78%,#000000));
+  color:var(--sft-fg);border-radius:14px;padding:var(--e6) var(--e7) calc(var(--e6) + var(--e1));max-width:960px}
+.th-madrid .tp-box .tp-sub,.th-madrid .tp-box .tp-inst,.th-madrid .tp-box .tp-date{
+  color:color-mix(in srgb,var(--sft-fg) 84%,transparent)}
+.th-cambridge .tp-title{color:var(--sacc)}
+.th-cambridge .tp-inst{font-style:italic}
+.th-sobrio .tp-title{border-top:2px solid var(--sfg);border-bottom:1px solid var(--sfg);padding:var(--e5) var(--e3)}
+.th-sobrio .tp-sub{font-style:italic;margin-top:var(--e5)}
+.th-sobrio .tp-inst,.th-catedra .tp-inst{font-variant:small-caps;letter-spacing:.04em}
+/* Cátedra: el rótulo va suelto y un filete fino separa quién lo firma. */
+.th-catedra .tp-sub{font-style:italic;margin-top:var(--e5)}
+.th-catedra .tp-meta{margin-top:var(--e8);padding-top:var(--e6);border-top:1px solid var(--sline);gap:var(--e3)}
+.th-proyector .tp-title{padding-bottom:var(--e5);border-bottom:6px solid var(--sacc)}
+.th-proyector .tp-rule{display:none}
+.th-papel .tp-title{padding-bottom:var(--e4);border-bottom:1.5px solid var(--sline)}
+.th-papel .tp-rule{display:none}
+
+/* ---------- diapositiva de sección ---------- */
+.ly-section{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 var(--sec-px)}
+.sec-kicker{font-size:19px;letter-spacing:.14em;text-transform:uppercase;color:var(--sacc-txt);font-weight:600}
+.sec-name{font-size:var(--sz-sec);font-weight:var(--sec-peso,600);line-height:1.12;margin-top:var(--e3)}
+.sec-prog{height:3px;background:color-mix(in srgb,var(--smut) 28%,transparent);margin-top:var(--e6);width:100%;border-radius:2px}
+.sec-prog i{display:block;height:100%;background:var(--sacc);border-radius:2px}
+.th-madrid .ly-section{align-items:stretch;padding:0}
+.th-madrid .sec-band{background:linear-gradient(180deg,
+    color-mix(in srgb,var(--sft-bg) 84%,#FFFFFF),color-mix(in srgb,var(--sft-bg) 78%,#000000));
+  color:var(--sft-fg);padding:var(--e7) var(--sec-px)}
+.th-madrid .sec-kicker{color:color-mix(in srgb,var(--sft-fg) 78%,transparent)}
+.th-madrid .sec-prog{display:none}
+.th-cambridge .ly-section,.th-sobrio .ly-section,.th-catedra .ly-section{align-items:center;text-align:center}
+.th-cambridge .sec-name{color:var(--sacc)}
+.th-cambridge .sec-prog,.th-sobrio .sec-prog,.th-catedra .sec-prog{display:none}
+.th-sobrio .sec-name,.th-catedra .sec-name{border-bottom:1px solid var(--sfg);padding-bottom:var(--e5)}
+.th-sobrio .sec-kicker,.th-catedra .sec-kicker{color:var(--smut)}
+.th-plenaria .sec-prog{height:5px}
+
+/* ---------- índice ---------- */
+.toc-list{list-style:none;margin:var(--e2) 0 0;padding:0;display:flex;flex-direction:column;gap:var(--e5);font-size:27px}
+.toc-list li{display:flex;align-items:baseline;gap:var(--e4)}
+.toc-num{color:var(--sacc-txt);font-weight:600;font-variant-numeric:tabular-nums;min-width:34px;text-align:right}
+.th-madrid .toc-num,.th-cambridge .toc-num{background:var(--sacc);color:var(--sacc-ink,#fff);font-size:19px;min-width:32px;
+  height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;text-align:center;
+  align-self:center;font-weight:600}
+
+/* ---------- texto y viñetas ---------- */
+.b-text{white-space:pre-wrap}
+.b-text.sz-s{font-size:.8em;color:var(--smut)}
+.b-text.sz-l{font-size:1.3em}
+.b-text.al-c{text-align:center}
+.b-text p,.bb-body p,.b-quote p{margin:0 0 .5em}
+.b-text p:last-child,.bb-body p:last-child{margin-bottom:0}
+ul.bl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--bl-gap)}
+ul.bl li{position:relative;padding-left:var(--bl-pl)}
+ul.bl li::before{position:absolute;left:var(--e2);top:0;content:var(--bl-m);color:var(--bl-col)}
+ul.bl li.lv1{margin-left:40px;font-size:.88em;padding-left:32px}
+ul.bl li.lv1::before{content:var(--bl-m1);color:var(--bl-col1)}
+ul.bl li.lv2{margin-left:76px;font-size:.8em;padding-left:28px;color:var(--smut)}
+ul.bl li.lv2::before{content:var(--bl-m2);color:var(--bl-col2);font-size:.8em;top:.2em}
+
+/* ---------- ecuaciones y reacciones ---------- */
+.b-math,.b-chem{text-align:center;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.b-math.sz-l .katex{font-size:1.45em}
+.b-math .katex-display,.b-chem .katex-display{margin:.12em 0}
+.math-err{font:15px var(--mono);color:#C0392B;background:rgba(192,57,43,.08);padding:8px 12px;border-radius:6px;
+  display:inline-block;white-space:pre-wrap}
+
+/* ---------- figuras ---------- */
+.b-image figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:var(--e3);min-width:0}
+.b-image .imgwrap{display:flex;justify-content:center;min-width:0}
+.b-image img{max-width:100%;height:auto;display:block}
+.b-image.imgframe img{border:1.5px solid var(--sline);padding:6px;background:#fff}
+.b-image figcaption{font-size:.72em;color:var(--smut);text-align:center;line-height:1.4;max-width:88%}
+.b-image figcaption .cap-label{font-weight:600;color:var(--sfg)}
+.img-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:70%;
+  aspect-ratio:4/3;border:2px dashed var(--sline);border-radius:8px;color:var(--smut);font-size:19px;
+  align-self:center;cursor:pointer;background:color-mix(in srgb,var(--scard) 55%,transparent)}
+.img-ph:hover{border-color:var(--sacc);color:var(--sacc-txt)}
+
+/* ---------- tablas al modo booktabs ---------- */
+.b-table{display:flex;flex-direction:column;align-items:center;gap:var(--e3);overflow-x:auto}
+.b-table .tab-caption{font-size:.72em;color:var(--smut);text-align:center;line-height:1.4}
+.b-table .tab-caption .cap-label{font-weight:600;color:var(--sfg)}
+table.btab{border-collapse:collapse;font-size:.85em;font-variant-numeric:tabular-nums;line-height:1.35}
+table.btab th,table.btab td{padding:var(--e3) var(--e5);border:none;text-align:center}
+table.btab.al-l th,table.btab.al-l td{text-align:left}
+table.btab thead th{border-top:2.2px solid var(--sfg);border-bottom:1.1px solid var(--sfg);font-weight:600}
+table.btab tbody tr:last-child td{border-bottom:2.2px solid var(--sfg)}
+table.btab.no-head tbody tr:first-child td{border-top:2.2px solid var(--sfg)}
+/* En una columna estrecha la tabla aprieta las celdas para no partir los rótulos. */
+.cols table.btab th,.cols table.btab td,
+.celda table.btab th,.celda table.btab td{padding:var(--e2) var(--e4)}
+
+/* ---------- cajas de Beamer ----------
+   Dos maneras: el rótulo relleno de color (Madrid, Cambridge, Proyector,
+   Plenaria) y el rótulo callado sobre una tarjeta (los demás). */
+.bb{border-radius:var(--radio);overflow:hidden;font-size:.92em}
+.bb-title{font-weight:600;padding:var(--e3) var(--e5);font-size:.96em;line-height:1.3}
+.bb-body{padding:var(--e4) var(--e5) calc(var(--e4) + var(--e1));line-height:1.46}
+.th-madrid .bb,.th-cambridge .bb{box-shadow:0 2px 6px rgba(15,15,60,.14)}
+.bb.k-block .bb-title{background:var(--sblock);color:#fff}
+.bb.k-alert .bb-title{background:var(--salert);color:#fff}
+.bb.k-example .bb-title{background:var(--sexample);color:#fff}
+.th-madrid .bb .bb-body,.th-cambridge .bb .bb-body,
+.th-proyector .bb .bb-body,.th-plenaria .bb .bb-body{background:var(--scard)}
+.th-proyector .bb{border:2px solid var(--sfg)}
+/* rótulo callado: el color va en la letra, no en el fondo */
+.th-metropolis .bb .bb-title,.th-revista .bb .bb-title,.th-papel .bb .bb-title{background:var(--scard);color:var(--sfg)}
+.th-metropolis .bb .bb-body,.th-revista .bb .bb-body,.th-papel .bb .bb-body{
+  background:color-mix(in srgb,var(--scard) 48%,transparent)}
+.th-metropolis .bb.k-alert .bb-title,.th-revista .bb.k-alert .bb-title,.th-papel .bb.k-alert .bb-title{color:var(--salert)}
+.th-metropolis .bb.k-example .bb-title,.th-revista .bb.k-example .bb-title,.th-papel .bb.k-example .bb-title{color:var(--sexample)}
+.th-nocturno .bb .bb-title{background:#2C363F;color:#F2F5F8}
+.th-nocturno .bb.k-alert .bb-title{color:#F5A99C}
+.th-nocturno .bb.k-example .bb-title{color:#8FD9AC}
+.th-nocturno .bb .bb-body{background:var(--scard)}
+.th-indigo .bb .bb-title{background:#25344C;color:var(--sfg)}
+.th-indigo .bb.k-alert .bb-title{color:var(--salert)}
+.th-indigo .bb.k-example .bb-title{color:var(--sexample)}
+.th-indigo .bb .bb-body{background:var(--scard)}
+/* rótulo con filete lateral: nada de relleno, solo una marca de color */
+.th-sobrio .bb,.th-catedra .bb{border-left:3.5px solid var(--sblock)}
+.th-sobrio .bb.k-alert,.th-catedra .bb.k-alert{border-left-color:var(--salert)}
+.th-sobrio .bb.k-example,.th-catedra .bb.k-example{border-left-color:var(--sexample)}
+.th-sobrio .bb .bb-title,.th-catedra .bb .bb-title{background:transparent;color:var(--sfg);padding:var(--e2) var(--e5) 0}
+.th-sobrio .bb .bb-body,.th-catedra .bb .bb-body{background:var(--scard);margin-top:var(--e2)}
+.th-sobrio .bb.k-alert .bb-title,.th-catedra .bb.k-alert .bb-title{color:var(--salert)}
+.th-sobrio .bb.k-example .bb-title,.th-catedra .bb.k-example .bb-title{color:var(--sexample)}
+
+/* ---------- quote / code / spacer ---------- */
+.b-quote blockquote{margin:0;padding:var(--e1) var(--e6);border-left:3.5px solid var(--sacc);font-style:italic;
+  color:var(--sfg);font-size:.95em}
+.b-quote .q-by{display:block;margin-top:var(--e3);font-style:normal;font-size:.72em;color:var(--smut);text-align:right}
+.b-code pre{margin:0;background:var(--scard);border:1px solid var(--sline);border-radius:6px;
+  padding:var(--e4) var(--e5);font:.64em/1.6 var(--mono);overflow-x:auto;color:var(--sfg);white-space:pre}
+.th-nocturno .b-code pre{background:#12181D}
+.th-indigo .b-code pre{background:#0C1424}
+.th-proyector .b-code pre{border-width:2px}
+.b-spacer{flex:none}
+.mode-edit .b-spacer{border:1.5px dashed color-mix(in srgb,var(--smut) 40%,transparent);border-radius:6px;
+  display:grid;place-items:center;color:var(--smut);font-size:13px}
+.mode-thumb .b-spacer,.mode-present .b-spacer,.mode-export .b-spacer{border:none;color:transparent}
+
+/* fragments (incremental reveal) */
+.mode-present .frag{visibility:hidden}
+.mode-present .frag.on{visibility:visible}
+.mode-edit .step-badge{position:absolute;top:-9px;right:-7px;background:var(--sacc);color:var(--sacc-ink,#fff);font-size:12px;
+  font-weight:600;font-family:'Fira Sans',sans-serif;padding:1px 8px;border-radius:99px;z-index:5}
+
+/* ---------- presentation overlay ---------- */
+.present-root{position:fixed;inset:0;background:#000;z-index:150;display:grid;place-items:center;overflow:hidden}
+.present-stage{transform-origin:center center}
+.p-counter{position:fixed;right:18px;bottom:12px;color:#fff;opacity:.5;font:500 14px var(--ui);
+  font-variant-numeric:tabular-nums;z-index:160}
+.p-progress{position:fixed;left:0;bottom:0;height:4px;width:100%;z-index:160;background:rgba(255,255,255,.14)}
+.p-progress i{display:block;height:100%;transition:width .25s ease}
+.p-notes{position:fixed;left:0;right:0;bottom:0;max-height:34dvh;overflow-y:auto;background:rgba(12,14,22,.93);
+  color:#E8EBF5;padding:16px 26px 22px;font-size:16px;line-height:1.55;z-index:170;border-top:2px solid rgba(255,255,255,.2)}
+.p-notes h4{margin:0 0 6px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#9AA3BC}
+.p-hint{position:fixed;left:50%;top:18px;transform:translateX(-50%);background:rgba(20,24,36,.85);color:#DDE2F0;
+  font-size:13px;padding:8px 16px;border-radius:99px;z-index:165;transition:opacity .4s;pointer-events:none}
+
+
+/* ================= diseños de acomodo del texto ================= */
+
+/* --- texto fluido en columnas --- */
+.flujo{column-gap:var(--gap-col);column-fill:balance;flex:1;min-height:0}
+.flujo.n2{column-count:2}
+.flujo.n3{column-count:3}
+.th-madrid .flujo,.th-cambridge .flujo{column-rule:1px solid var(--sline)}
+.flujo > .blk{break-inside:avoid;page-break-inside:avoid;margin-bottom:var(--e5)}
+.flujo > .blk:last-child{margin-bottom:0}
+.flujo ul.bl{gap:var(--e3)}
+.flujo .b-text{orphans:2;widows:2}
+
+/* --- enunciado --- */
+.ly-enunciado{align-items:center}
+.enunciado{display:flex;flex-direction:column;gap:var(--e5);align-items:center;text-align:center;
+  max-width:82%;margin:0 auto}
+.enunciado .b-text{font-size:1.32em;line-height:1.36}
+.enunciado .b-text.sz-l{font-size:1.72em}
+.enunciado .b-text.sz-s{font-size:.92em}
+.enunciado .blk{width:100%}
+.th-sobrio .enunciado .b-text{font-style:italic}
+
+/* --- barra lateral --- */
+.col.barra-lat{background:var(--scard);border-radius:var(--radio);padding:var(--e5);align-self:stretch;
+  border-left:3px solid var(--sacc)}
+.col.barra-lat .zona-tit{font-size:.72em;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--sacc-txt);font-weight:600;margin-bottom:var(--e4);line-height:1.3}
+.col.barra-lat .b-text{font-size:.88em}
+.col.barra-lat ul.bl{gap:var(--e3)}
+.col.barra-lat ul.bl li{padding-left:calc(var(--bl-pl) - 10px);font-size:.88em}
+.col.barra-lat ul.bl li::before{left:2px}
+
+/* --- comparación --- */
+.cols.comparacion{gap:var(--gap-col)}
+.comp-col{border-radius:var(--radio);overflow:hidden;background:var(--scard);align-self:stretch;
+  display:flex;flex-direction:column;flex:1 1 0;min-width:0}
+.comp-tit{padding:var(--e3) var(--e5);font-weight:600;font-size:.94em;line-height:1.3;color:#fff;
+  background:var(--sblock)}
+.comp-col.k1 .comp-tit{background:var(--sacc);color:var(--sacc-ink,#fff)}
+.th-metropolis .comp-tit{background:var(--sfg);color:var(--sbg)}
+.th-nocturno .comp-tit{background:#2C363F;color:#F2F5F8}
+.th-indigo .comp-tit{background:#25344C;color:var(--sfg)}
+
+/* ---------- los ocho temas nuevos ---------- */
+/* Una banda de ciruela a sangre en cada título, y el cuerpo sobre un papel
+   casi blanco: se reconoce de lejos y ordena la lectura. La banda sale del
+   acento, no de un color fijo, así que un acento propio se la lleva consigo y
+   la tinta de encima la calcula la app. */
+.th-banda{--spie-bg:#5B2B6E;--spie-fg:#FFFFFF;--sbg:#FAF8FB;--sfg:#1E1B24;--smut:#5E5766;--sacc:#5B2B6E;
+  --sft-bg:var(--sacc);--sft-fg:var(--sacc-ink,#FFFFFF);
+  --sblock:#5B2B6E;--salert:#B3382B;--sexample:#2E6B4A;--sline:#DFD8E4;--scard:#F0EBF3;
+  --sfam:'Source Sans 3',system-ui,sans-serif;
+  --sz-cuerpo:26px;--slh:1.5;--speso:400;--speso-b:600;
+  --sz-ft:35px;--ft-peso:600;--ft-lh:1.14;--ft-esp:-.008em;--ft-pt:34px;--ft-pb:30px;
+  --ft-borde:5px;--ft-borde-col:color-mix(in srgb,var(--sacc) 45%,#FFFFFF);
+  --ft-sub:color-mix(in srgb,var(--sft-fg) 80%,transparent);
+  --sz-fts:21px;--sz-tp:50px;--sz-tpsub:26px;--sz-tpmeta:24px;--sz-sec:50px;--sz-pie:16px;
+  --fbx:52px;--fbt:34px;--fbb:48px;--tp-px:96px;--sec-px:96px;--tp-peso:600;--sec-peso:600;
+  --bl-m:'▪';--bl-m1:'–';--bl-m2:'·';--bl-col:var(--sacc);--bl-pl:34px;--bl-gap:var(--e5)}
+/* Suizo: casi todo en un grafito, mucho margen y un rojo que aparece contadas
+   veces: la regla del título, la viñeta y el filete de la portada. El contraste
+   lo dan los pesos, no el color: el cuerpo en 300, los títulos en 700. */
+.th-bloque{--spie-bg:#1B1D21;--spie-fg:#FBFBF9;--sbg:#FBFBF9;--sfg:#1B1D21;--smut:#5B5F66;--sacc:#BE2418;
+  --sft-bg:transparent;--sft-fg:#1B1D21;
+  --sblock:#1B1D21;--salert:#BE2418;--sexample:#2E6B4A;--sline:#D7D8D4;--scard:#F1F1EE;
+  --speso:300;--speso-b:600;--sz-cuerpo:24px;--slh:1.62;
+  --sz-ft:32px;--ft-peso:700;--ft-lh:1.12;--ft-esp:-.012em;--ft-pt:38px;--ft-pb:0px;
+  --ft-regla:3px;--ft-regla-col:var(--sacc);--ft-hueco:14px;--ft-sub:var(--smut);
+  --sz-fts:16px;--sz-tp:46px;--sz-tpsub:23px;--sz-tpmeta:21px;--sz-sec:46px;--sz-pie:15px;
+  --fbx:96px;--fbt:34px;--fbb:58px;--tp-px:150px;--sec-px:150px;--tp-peso:700;--sec-peso:700;
+  --gap-col:var(--e7);
+  --bl-m:'▪';--bl-m1:'–';--bl-m2:'·';--bl-col:var(--sacc);--bl-col1:var(--sfg);--bl-pl:32px;--bl-gap:var(--e5)}
+/* Casi negro cálido —nada de azul— con tinta de hueso y una sola brasa de cobre:
+   la diapositiva que se agradece en una sala a oscuras al final del día. Es el
+   único oscuro con serifas, y su seña es que el filete va ENCIMA del título:
+   todos los demás temas lo ponen debajo. El cobre da 5,0:1 sobre el papel, de
+   sobra para el rótulo de sección y las viñetas; el hueso apagado, 7,8:1. */
+.th-carbon{--spie-bg:#0C0A07;--spie-fg:#F2E8D8;--sbg:#15110D;--sfg:#F2E8D8;--smut:#B6A58E;--sacc:#E2563C;
+  --sft-bg:transparent;--sft-fg:#F2E8D8;
+  --sblock:#2A2219;--salert:#F08A72;--sexample:#93C98D;--sline:#3B3229;--scard:#1E1913;
+  --sfam:'TXPagella',Palatino,'Palatino Linotype','Book Antiqua',Georgia,serif;
+  --sz-cuerpo:26px;--slh:1.54;--speso:400;--speso-b:700;
+  --sz-ft:35px;--ft-peso:400;--ft-lh:1.15;--ft-esp:.004em;--ft-pt:44px;--ft-pb:14px;--ft-regla:0px;
+  --sz-fts:21px;--ft-sub:var(--smut);
+  --sz-tp:52px;--sz-tpsub:27px;--sz-tpmeta:24px;--tp-peso:400;--sz-sec:48px;--sec-peso:400;--sz-pie:16px;
+  --fbx:64px;--fbt:30px;--fbb:56px;--tp-px:118px;--sec-px:118px;
+  --bl-m:'›';--bl-m1:'–';--bl-m2:'·';--bl-col:var(--sacc);--bl-pl:38px;--bl-gap:var(--e5)}
+/* Vino oscuro con jade: tres tonos de la misma ciruela —el canto, la banda del
+   título y el papel— y una sola tinta viva que corta. Es el tema para quien
+   quiere que su charla se recuerde de vista. El jade da 9,4:1 sobre el papel y
+   el secundario 7,8:1, que es justo donde los temas oscuros suelen fallar. */
+.th-ciruela{--spie-bg:#1B0F1E;--spie-fg:#F2E8F0;--sbg:#261629;--sfg:#F2E8F0;--smut:#BCA9C0;--sacc:#52D6A6;
+  --sft-bg:#1B0F1E;--sft-fg:#F2E8F0;
+  --sblock:#3A2440;--salert:#F2938E;--sexample:#E5C167;--sline:#43304A;--scard:#301C33;
+  --sfam:'Source Sans 3',system-ui,sans-serif;
+  --sz-cuerpo:26px;--slh:1.46;--speso:400;--speso-b:700;
+  --sz-ft:36px;--ft-peso:700;--ft-lh:1.1;--ft-esp:-.014em;--ft-pt:30px;--ft-pb:24px;
+  --ft-borde:1px;--ft-borde-col:var(--sline);--sz-fts:21px;--ft-sub:var(--sacc);
+  --sz-tp:56px;--sz-tpsub:27px;--sz-tpmeta:24px;--tp-peso:700;--sz-sec:52px;--sec-peso:700;--sz-pie:16px;
+  --fbx:58px;--fbt:30px;--fbb:52px;--tp-px:110px;--sec-px:110px;
+  --bl-m:'▪';--bl-m1:'▫';--bl-m2:'·';--bl-col:var(--sacc);--bl-col1:var(--sacc);--bl-pl:38px;--bl-gap:var(--e5)}
+/* Verde salvia tan desvaído que casi no se ve; la banda clara del título, cerrada
+   por un filete verde, es su seña. Mucho interlineado: es un tema para escuchar
+   una hora seguida sin cansarse. */
+.th-salvia{--spie-bg:#2B3A31;--spie-fg:#EBEFE9;--sbg:#EBEFE9;--sfg:#2B2A24;--smut:#5A6156;--sacc:#33654A;
+  --sft-bg:#DEE7DA;--sft-fg:#2B2A24;
+  --sblock:#33654A;--salert:#9C3B2A;--sexample:#4C6B2E;--sline:#CBD5C6;--scard:#DFE6DB;
+  --sfam:'Source Sans 3',system-ui,sans-serif;--sz-cuerpo:26px;--slh:1.56;--speso:400;--speso-b:600;
+  --sz-ft:32px;--ft-peso:600;--ft-lh:1.14;--ft-esp:.004em;--ft-pt:24px;--ft-pb:20px;
+  --ft-borde:2px;--ft-borde-col:var(--sacc);--sz-fts:20px;
+  --sz-tp:46px;--sz-tpsub:25px;--sz-tpmeta:23px;--tp-peso:600;--sz-sec:44px;--sec-peso:600;
+  --fbx:56px;--fbt:30px;--fbb:52px;--tp-px:108px;--sec-px:108px;--gap-col:var(--e7);
+  --bl-m:'–';--bl-m1:'·';--bl-m2:'·';--bl-col:var(--sacc);--bl-pl:38px;--bl-gap:var(--e5)}
+/* Arena cálida y la sans de Latin Modern, la letra que imprime LaTeX: la misma
+   en pantalla y en el PDF. El doble filete bajo el título, uno grueso de cobre y
+   otro fino, es lo que le da el aire de página impresa. */
+.th-arena{--spie-bg:#3A2E22;--spie-fg:#F2EADB;--sbg:#F2EADB;--sfg:#33291F;--smut:#6E6153;--sacc:#8A571C;
+  --sft-bg:transparent;--sft-fg:#33291F;
+  --sblock:#33291F;--salert:#9E3320;--sexample:#3E6B2C;--sline:#DCCFB4;--scard:#EAE1CE;
+  --sfam:'TXLatinSans','Latin Modern Sans','TXHeros',Helvetica,system-ui,sans-serif;
+  --sz-cuerpo:26px;--slh:1.48;--speso:400;--speso-b:700;
+  --sz-ft:33px;--ft-peso:700;--ft-lh:1.12;--ft-esp:.01em;--ft-pt:30px;--ft-pb:7px;
+  --ft-regla:3px;--ft-regla-col:var(--sacc);--ft-hueco:11px;
+  --ft-borde:1px;--ft-borde-col:color-mix(in srgb,var(--sacc) 38%,transparent);--sz-fts:20px;
+  --sz-tp:46px;--sz-tpsub:25px;--sz-tpmeta:23px;--tp-peso:700;--sz-sec:44px;--sec-peso:700;
+  --fbx:54px;--fbt:26px;--fbb:52px;--tp-px:112px;--sec-px:112px;
+  --bl-m:'▪';--bl-m1:'–';--bl-m2:'·';--bl-col:var(--sacc);--bl-pl:40px}
+/* Azul marino de estructura sobre un papel frío, y el latón entrando con
+   cuentagotas: la puesta en escena de una defensa o de una conferencia
+   invitada. El latón nunca es texto corrido —solo el trozo de regla bajo el
+   título, el filete de la portada, la barra de sección y las cifras del
+   índice—, y donde sí lleva letra se oscurece hasta 5,1:1. Las cajas son
+   tarjetas blancas que flotan sobre el papel azulado. Como el acento no toca
+   ni el título ni el pie, un acento propio del usuario cambia el oro y deja
+   la estructura de marino intacta. */
+.th-marino{--spie-bg:#16345E;--spie-fg:#F4F6FA;--sbg:#F4F6FA;--sfg:#15243D;--smut:#566276;--sacc:#B08A32;
+  --sacc-txt:color-mix(in srgb,var(--sacc) 65%,var(--sfg));--sft-bg:transparent;--sft-fg:#16345E;
+  --sblock:#16345E;--salert:#9B2A20;--sexample:#1F5C3D;--sline:#C8D2E0;--scard:#FFFFFF;
+  --sfam:'TXTermes','Times New Roman',Times,serif;
+  --sz-cuerpo:26px;--slh:1.5;--speso:400;--speso-b:700;
+  --sz-ft:34px;--ft-peso:700;--ft-lh:1.14;--ft-pt:32px;--ft-pb:0px;
+  --ft-regla:1.5px;--ft-regla-col:color-mix(in srgb,var(--sblock) 26%,transparent);--ft-hueco:14px;
+  --sz-fts:20px;--sz-tp:48px;--sz-tpsub:25px;--sz-tpmeta:23px;--sz-sec:44px;--sz-pie:16px;
+  --fbx:56px;--fbt:30px;--fbb:54px;--tp-px:116px;--sec-px:116px;--tp-peso:700;--sec-peso:700;
+  --bl-m:'▪';--bl-m1:'–';--bl-m2:'·';--bl-col:var(--sblock);--bl-col1:var(--sacc-txt);--bl-col2:var(--smut);
+  --bl-pl:38px;--bl-gap:var(--e4)}
+/* Fría, ligera y muy respirada, con tres azules emparentados en vez de un
+   acento único: el título en el más oscuro, las viñetas y las reglas en el
+   medio y los bloques en el azul acero. Para charlas con muchas figuras, donde
+   interesa que el marco acompañe y no compita: el acento a secas solo rellena
+   —en texto se oscurece por color-mix hasta 5,9:1— y la alerta y el ejemplo
+   son un frambuesa y un verde mar, fríos como el resto. */
+.th-acuarela{--spie-bg:#1D5C74;--spie-fg:#F7FAFB;--sbg:#F7FAFB;--sfg:#1E2A31;--smut:#5C6B75;--sacc:#2B7B9C;
+  --sacc-txt:color-mix(in srgb,var(--sacc) 76%,var(--sfg));--sft-bg:transparent;--sft-fg:#1D5C74;
+  --sblock:#4A6A9E;--salert:#A3324E;--sexample:#1F7160;--sline:#D8E3E9;--scard:#E8EFF3;
+  --sfam:'Fira Sans',system-ui,sans-serif;
+  --sz-cuerpo:24px;--slh:1.62;--speso:300;--speso-b:600;
+  --sz-ft:32px;--ft-peso:500;--ft-lh:1.18;--ft-esp:-.004em;--ft-pt:32px;--ft-pb:0px;
+  --ft-regla:1px;--ft-regla-col:var(--sline);--ft-hueco:14px;--ft-sub:var(--smut);
+  --sz-fts:20px;--sz-tp:46px;--sz-tpsub:25px;--sz-tpmeta:22px;--sz-sec:44px;--sz-pie:15px;
+  --fbx:64px;--fbt:26px;--fbb:56px;--tp-px:112px;--sec-px:112px;--gap-col:var(--e7);
+  --tp-peso:400;--sec-peso:400;
+  --bl-m:'•';--bl-m1:'–';--bl-m2:'·';--bl-col:var(--sacc);--bl-col1:var(--sblock);--bl-col2:var(--smut);
+  --bl-pl:34px;--bl-gap:var(--e5)}
+
+/* ---------- Banda: el mismo gesto en la portada y en las secciones ---------- */
+.th-banda .tp-rule{width:100%;height:12px;margin-top:var(--e6);border-radius:0}
+.th-banda .tp-meta{margin-top:var(--e7)}
+.th-banda .pagenum{color:var(--sacc-txt);font-weight:600}
+.th-banda .bb .bb-body{background:var(--scard)}
+/* La sección es la banda llevada al extremo: cruza la diapositiva entera. */
+.th-banda .ly-section{align-items:stretch;padding:0}
+.th-banda .sec-inner{background:var(--sacc);color:var(--sacc-ink,#FFFFFF);padding:var(--e7) var(--sec-px)}
+.th-banda .sec-kicker{color:color-mix(in srgb,var(--sacc-ink,#FFFFFF) 78%,transparent)}
+.th-banda .sec-prog{background:color-mix(in srgb,var(--sacc-ink,#FFFFFF) 30%,transparent)}
+.th-banda .sec-prog i{background:var(--sacc-ink,#FFFFFF)}
+/* ---------- Bloque: la retícula a la vista ---------- */
+/* el subtítulo del marco cae bajo la regla convertido en rótulo */
+.th-bloque .ft-s{text-transform:uppercase;letter-spacing:.14em;font-weight:500;margin-top:var(--e3)}
+.th-bloque .tp-title{letter-spacing:-.02em;line-height:1.06}
+.th-bloque .tp-rule{width:104px;height:8px;margin-top:var(--e6);border-radius:0}
+.th-bloque .tp-sub{margin-top:var(--e5)}
+.th-bloque .tp-meta{margin-top:var(--e8);padding-top:var(--e5);border-top:1px solid var(--sline);gap:var(--e2)}
+.th-bloque .sec-name{letter-spacing:-.018em}
+.th-bloque .sec-prog{height:2px;margin-top:var(--e7)}
+/* las cajas son retícula: un filete arriba, sin relleno ni tarjeta */
+.th-bloque .bb{border-top:2.5px solid var(--sfg)}
+.th-bloque .bb .bb-title{background:transparent;color:var(--sfg);padding:var(--e3) 0 0;font-weight:600}
+.th-bloque .bb .bb-body{background:transparent;padding:var(--e2) 0 var(--e3)}
+.th-bloque .bb.k-alert{border-top-color:var(--salert)}
+.th-bloque .bb.k-alert .bb-title{color:var(--salert)}
+.th-bloque .bb.k-example{border-top-color:var(--sexample)}
+.th-bloque .bb.k-example .bb-title{color:var(--sexample)}
+/* la comparación, la cuadrícula y los pasos siguen la misma retícula */
+.th-bloque .comp-col{background:transparent;border-top:2.5px solid var(--sfg)}
+.th-bloque .comp-col.k1{border-top-color:var(--sacc)}
+.th-bloque .comp-col .comp-tit{background:transparent;color:var(--sfg);padding:var(--e3) 0 0}
+.th-bloque .comp-cu{padding:var(--e2) 0 var(--e3)}
+.th-bloque .celda{border-top-color:var(--sfg)}
+.th-bloque .paso-cab{border-bottom-color:var(--sfg)}
+.th-bloque .paso-n{border-radius:0}
+/* Carbón: el filete de cobre va encima del rótulo, y el mismo gesto se repite
+   en la portada y en la sección para que todas las páginas se reconozcan. */
+.th-carbon .frametitle::before{content:'';position:absolute;left:var(--fbx);right:var(--fbx);top:22px;
+  height:1.5px;background:var(--sacc)}
+.th-carbon ul.bl li::before{font-size:1.15em;top:-.06em}
+.th-carbon .ft-s{font-style:italic}
+.th-carbon .tp-title{border-top:1.5px solid var(--sacc);padding-top:var(--e5)}
+.th-carbon .tp-rule{display:none}
+.th-carbon .tp-sub{font-style:italic}
+.th-carbon .tp-inst{font-variant:small-caps;letter-spacing:.05em}
+.th-carbon .tp-meta{margin-top:var(--e8)}
+.th-carbon .sec-name{border-top:1.5px solid var(--sacc);padding-top:var(--e4);margin-top:var(--e4)}
+.th-carbon .sec-prog{display:none}
+.th-carbon .bb .bb-title{background:var(--sblock);color:var(--sfg)}
+.th-carbon .bb .bb-body{background:var(--scard)}
+.th-carbon .bb.k-alert .bb-title{color:var(--salert)}
+.th-carbon .bb.k-example .bb-title{color:var(--sexample)}
+.th-carbon .comp-tit{background:var(--sblock);color:var(--sfg)}
+.th-carbon .b-code pre{background:#100D0A}
+/* Ciruela: un canto de jade recorre la diapositiva entera —portada, secciones y
+   marcos—; es lo que la hace reconocible desde el fondo de la sala. Va sobre
+   todo lo demás, pero el margen del cuerpo (58 px) lo deja siempre libre. */
+.th-ciruela.slide::after{content:'';position:absolute;left:0;top:0;bottom:0;width:9px;
+  background:var(--sacc);pointer-events:none;z-index:2}
+.th-ciruela .ft-s{font-weight:600;letter-spacing:.01em}
+.th-ciruela .tp-rule{width:280px;height:6px;margin-top:var(--e6)}
+.th-ciruela .tp-meta{margin-top:var(--e7)}
+.th-ciruela .sec-kicker{letter-spacing:.16em}
+.th-ciruela .sec-prog{height:6px}
+.th-ciruela .bb .bb-title{background:var(--sblock);color:var(--sfg)}
+.th-ciruela .bb .bb-body{background:var(--scard)}
+.th-ciruela .bb.k-alert .bb-title{color:var(--salert)}
+.th-ciruela .bb.k-example .bb-title{color:var(--sexample)}
+.th-ciruela .comp-tit{background:var(--sblock);color:var(--sfg)}
+.th-ciruela .b-code pre{background:#1D111F}
+.th-ciruela .col.barra-lat{border-left-width:4px}
+/* Las dos primeras van con las demás reglas de portada y sección (hacia la
+   línea 229, junto a .th-papel .tp-title). */
+.th-salvia .ly-section{background:var(--sft-bg)}
+.th-salvia .tp-rule{width:108px;height:10px;border-radius:0;margin-top:var(--e6)}
+
+/* Estas cuatro tienen que ir DESPUÉS de .bb.k-block/.k-alert/.k-example .bb-title
+   (es decir, tras el grupo de .th-sobrio/.th-catedra, hacia la línea 340):
+   comparten especificidad con ellas y gana la última. */
+.th-salvia .bb .bb-title{background:var(--scard);color:var(--sfg);border-bottom:2px solid var(--sblock)}
+.th-salvia .bb .bb-body{background:color-mix(in srgb,var(--scard) 55%,transparent)}
+.th-salvia .bb.k-alert .bb-title{color:var(--salert);border-bottom-color:var(--salert)}
+.th-salvia .bb.k-example .bb-title{color:var(--sexample);border-bottom-color:var(--sexample)}
+/* Las dos primeras, con las reglas de portada (hacia la línea 229, junto a
+   .th-papel .tp-title): la portada repite el doble filete del título. */
+.th-arena .tp-rule{width:100%;height:0;margin-top:var(--e5);border-radius:0;background:transparent;
+  border-top:4px solid var(--sacc);border-bottom:1px solid color-mix(in srgb,var(--sacc) 38%,transparent);
+  padding-top:6px}
+.th-arena .tp-inst{font-variant:small-caps;letter-spacing:.05em}
+
+/* Esta puede ir junto al grupo .th-madrid/.th-cambridge/.th-proyector/.th-plenaria
+   .bb .bb-body (hacia la línea 330), o añadir .th-arena a ese mismo selector. */
+.th-arena .bb .bb-body{background:var(--scard)}
+/* --- va en «título del marco», detrás de la regla de .th-madrid --- */
+/* La firma de Marino: una línea de tinta finísima bajo el título con un trozo
+   corto de latón montado encima, a la izquierda. */
+.th-marino .ft-t{position:relative}
+.th-marino .ft-t::after{content:'';position:absolute;left:0;bottom:-1.5px;width:76px;height:3px;
+  background:var(--sacc)}
+
+/* --- va en «portada», detrás de .th-papel .tp-rule --- */
+.th-marino .ly-title{align-items:center;text-align:center}
+.th-marino .tp-title{color:var(--sblock)}
+.th-marino .tp-rule{width:120px;height:2px;border-radius:0;margin-top:var(--e6)}
+.th-marino .tp-sub{font-style:italic;margin-top:var(--e5)}
+.th-marino .tp-inst{font-variant:small-caps;letter-spacing:.05em}
+.th-marino .tp-meta{margin-top:var(--e7);padding-top:var(--e5);border-top:1px solid var(--sline);gap:var(--e3)}
+
+/* --- va en «diapositiva de sección», detrás de .th-plenaria .sec-prog --- */
+/* La barra de avance se queda corta y centrada: el único latón de la pantalla. */
+.th-marino .ly-section{align-items:center;text-align:center}
+.th-marino .sec-name{color:var(--sblock)}
+.th-marino .sec-prog{width:200px;height:2px;margin-top:var(--e6);
+  background:color-mix(in srgb,var(--sblock) 16%,transparent)}
+
+/* --- va al final de «cajas de Beamer» --- */
+/* Tarjeta blanca con un canto de color arriba y el rótulo en versalitas. */
+.th-marino .bb{background:var(--scard);border:1px solid var(--sline);border-top:3px solid var(--sblock)}
+.th-marino .bb .bb-title{background:transparent;color:var(--sblock);font-variant:small-caps;
+  letter-spacing:.03em;font-size:1.02em;padding-bottom:var(--e1)}
+.th-marino .bb .bb-body{background:transparent}
+.th-marino .bb.k-alert{border-top-color:var(--salert)}
+.th-marino .bb.k-alert .bb-title{color:var(--salert)}
+.th-marino .bb.k-example{border-top-color:var(--sexample)}
+.th-marino .bb.k-example .bb-title{color:var(--sexample)}
+
+/* --- va al final de «diseños de acomodo», detrás de .paso-tit --- */
+/* Sobre el latón el blanco solo da 3,0:1: donde el acento es fondo, la tinta
+   va oscura (y cede a la que la app calcula si el usuario cambia el acento). */
+.th-marino .comp-col.k1 .comp-tit,.th-marino .paso-n{color:var(--sacc-ink,#231A05)}
+/* --- va en «título del marco», detrás de la regla de .th-madrid --- */
+/* La firma de Acuarela: la regla fina bajo el título lleva montado, a la
+   izquierda, un filete con los tres azules de la familia en tramos duros. */
+.th-acuarela .ft-t{position:relative}
+.th-acuarela .ft-t::after{content:'';position:absolute;left:0;bottom:-1px;width:144px;height:3px;
+  background:linear-gradient(90deg,var(--sft-fg) 0 48px,var(--sacc) 48px 96px,var(--sblock) 96px 144px)}
+
+/* --- va en «portada», detrás de .th-papel .tp-rule --- */
+/* El mismo filete de tres tramos, entero. El color de fondo se deja puesto
+   además de la imagen: el exportador a .pptx lee backgroundColor y así no se
+   queda sin filete. */
+.th-acuarela .tp-title{color:var(--sft-fg)}
+.th-acuarela .tp-rule{width:180px;height:4px;border-radius:0;margin-top:var(--e6);
+  background-image:linear-gradient(90deg,var(--sft-fg) 0 33.34%,var(--sacc) 33.34% 66.67%,
+    var(--sblock) 66.67% 100%)}
+.th-acuarela .tp-meta{margin-top:var(--e8)}
+
+/* --- va en «diapositiva de sección», detrás de .th-plenaria .sec-prog --- */
+.th-acuarela .sec-name{color:var(--sft-fg)}
+.th-acuarela .sec-prog{height:2px;background:color-mix(in srgb,var(--sacc) 18%,transparent)}
+
+/* --- va al final de «cajas de Beamer» --- */
+/* Rótulo sin relleno: solo un canto de color arriba y el cuerpo sobre la
+   tarjeta fría. Cada clase de caja trae su tono de la familia. */
+.th-acuarela .bb{border-top:2px solid var(--sblock)}
+.th-acuarela .bb .bb-title{background:transparent;color:var(--sblock);padding-bottom:0}
+.th-acuarela .bb .bb-body{background:var(--scard);margin-top:var(--e2)}
+.th-acuarela .bb.k-alert{border-top-color:var(--salert)}
+.th-acuarela .bb.k-alert .bb-title{color:var(--salert)}
+.th-acuarela .bb.k-example{border-top-color:var(--sexample)}
+.th-acuarela .bb.k-example .bb-title{color:var(--sexample)}
+.comp-cu{padding:var(--e4) var(--e5) var(--e5);display:flex;flex-direction:column;gap:var(--e4);flex:1;min-height:0}
+.comp-cu .b-text{font-size:.92em}
+.comp-cu ul.bl li{padding-left:calc(var(--bl-pl) - 8px)}
+.comp-cu ul.bl li::before{left:2px}
+
+/* --- tres columnas y pasos --- */
+.cols.tres{gap:var(--gap-col)}
+.cols.tres > .col{flex:1 1 0;min-width:0}
+.cols.tres .b-text,.cols.tres ul.bl li{font-size:.86em}
+.cols.tres ul.bl li{padding-left:calc(var(--bl-pl) - 10px)}
+.cols.tres ul.bl li::before{left:1px}
+.col-cu{display:flex;flex-direction:column;gap:var(--e4);min-width:0}
+.cols.pasos{gap:var(--e6)}
+.paso-cab{display:flex;align-items:center;gap:var(--e3);margin-bottom:var(--e4);
+  padding-bottom:var(--e3);border-bottom:2px solid var(--sacc)}
+.paso-n{flex:none;width:34px;height:34px;border-radius:50%;background:var(--sacc);color:var(--sacc-ink,#fff);
+  display:grid;place-items:center;font-size:.68em;font-weight:600;font-variant-numeric:tabular-nums}
+.paso-tit{font-weight:600;font-size:.82em;line-height:1.25}
+
+/* --- cuadrícula 2×2 --- */
+.cuadricula{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+  gap:var(--e5) var(--gap-col);flex:1;min-height:0}
+.celda{display:flex;flex-direction:column;gap:var(--e3);min-width:0;min-height:0;
+  border-top:2px solid var(--sacc);padding-top:var(--e3)}
+.celda-tit{font-weight:600;font-size:.82em;line-height:1.25;color:var(--sfg)}
+.celda-cu{display:flex;flex-direction:column;gap:var(--e3);min-width:0;overflow:hidden}
+.celda-cu .b-text,.celda-cu ul.bl li{font-size:.78em}
+.celda-cu ul.bl{gap:var(--e2)}
+.celda-cu ul.bl li{padding-left:calc(var(--bl-pl) - 12px)}
+.celda-cu ul.bl li::before{left:0}
+
+/* marcador de zona vacía */
+.zona-vacia{padding:22px 10px;font-size:15px;min-height:60px;aspect-ratio:auto}
+.mode-thumb .zona-vacia,.mode-present .zona-vacia,.mode-export .zona-vacia{display:none}
+
+/* ---------- logotipo institucional ---------- */
+.logo-img{display:block;max-width:100%;height:auto;object-fit:contain}
+.tp-logo{display:flex;justify-content:center;margin-bottom:26px}
+.tp-logo .logo-img{max-height:170px;max-width:60%}
+.tp-logo-esq{position:absolute;right:44px;top:34px;z-index:3}
+.tp-logo-esq .logo-img{height:92px;width:auto;max-width:340px}
+.th-madrid .tp-logo-esq .logo-img,.th-nocturno .tp-logo-esq .logo-img{height:82px}
+.pie-logo{position:absolute;right:var(--fbx);bottom:34px;z-index:3;pointer-events:none}
+.pie-logo .logo-img{height:42px;width:auto;max-width:250px;opacity:.92}
+.th-madrid .pie-logo,.th-cambridge .pie-logo{bottom:40px}
+.pie-nota{position:absolute;left:var(--fbx);bottom:36px;font-size:14px;color:var(--smut);
+  max-width:56%;line-height:1.25;letter-spacing:.01em}
+.th-madrid .pie-nota,.th-cambridge .pie-nota{bottom:42px}
+.mode-thumb .pie-nota{display:none}
+.mode-thumb .pie-logo .logo-img{height:40px}
+
+/* guía de inserción al arrastrar un bloque */
+.drop-linea{height:0;border-top:3px dashed var(--sacc);margin:6px 0;pointer-events:none;opacity:.9}
+.mode-edit [data-z].zona-activa{outline:2px dashed var(--sacc);outline-offset:6px;border-radius:6px}
+
+/* ---------- pie personalizable ---------- */
+.footline.pie-x{align-items:stretch;line-height:1.25}
+.footline.pie-x .fl-cell{flex:1;padding:8px 18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  background:none;color:inherit;justify-content:center}
+.footline.pie-x .fl-cell.fl-sola{flex:1;justify-content:center}
+.footline.pie-x.al-extremos .fl-cell:first-child{justify-content:flex-start;padding-left:var(--fbx)}
+.footline.pie-x.al-extremos .fl-cell:last-child{justify-content:flex-end;padding-right:var(--fbx)}
+.footline.pie-x.al-extremos .fl-cell.fl-sola{justify-content:center}
+.footline.pie-x .fl-logo-img{height:1.9em;width:auto;max-width:100%;object-fit:contain;display:block}
+.footline.pie-x.fo-ninguno{background:none;color:var(--smut)}
+/* «tenue» es un velo del acento sobre el papel, no una tarjeta gris */
+.footline.pie-x.fo-tenue{background:color-mix(in srgb,var(--sacc) 11%,transparent);color:var(--sfg)}
+.footline.pie-x.fo-acento{background:var(--sacc);color:var(--sacc-ink,#fff)}
+.footline.pie-x.fo-barra{background:var(--spie-bg);color:var(--spie-fg)}
+.footline.pie-x.rg-fina{border-top:1px solid var(--sline)}
+.footline.pie-x.rg-acento{border-top:2.5px solid var(--sacc)}
+.footline.pie-x.fo-acento.rg-fina,.footline.pie-x.fo-acento.rg-acento{border-top-color:rgba(255,255,255,.45)}
+.slide.con-barra .pie-logo{bottom:calc(var(--pieH,34px) + 9px)}
+.slide.con-barra .pagenum{bottom:calc(var(--pieH,34px) + 6px)}
+
+/* ---------- tipografías ----------
+   Latin Modern y TeX Gyre son las mismas que usa LaTeX; viajan dentro de la app,
+   así que la diapositiva en pantalla y el PDF exportado usan la misma letra. */
+/* el texto de Latin Modern no trae griegas ni signos de relación (tampoco el de LaTeX):
+   caen en Termes, que ya viaja incrustada y combina bien */
+.fu-lm{font-family:'TXLatinModern','Latin Modern Roman','TXTermes',Georgia,serif}
+.fu-termes{font-family:'TXTermes','Times New Roman',Times,serif}
+.fu-pagella{font-family:'TXPagella',Palatino,'Palatino Linotype','Book Antiqua',serif}
+.fu-schola{font-family:'TXSchola','Century Schoolbook','New Century Schoolbook',Georgia,serif}
+.fu-stix{font-family:'STIX Two Text',Georgia,serif}
+.fu-lmsans{font-family:'TXLatinSans','Latin Modern Sans','TXHeros',Helvetica,system-ui,sans-serif}
+.fu-heros{font-family:'TXHeros',Helvetica,Arial,sans-serif}
+.fu-fira{font-family:'Fira Sans',system-ui,sans-serif}
+.fu-source{font-family:'Source Sans 3',system-ui,sans-serif}
+/* Con la letra elegida a mano manda su tamaño, no el del tema; el
+   interlineado sube a la par que el del molde. */
+.slide.fu-lm{font-size:26.8px;line-height:1.46}
+.slide.fu-termes{font-size:26.8px;line-height:1.44}
+.slide.fu-pagella{font-size:25px;line-height:1.50}
+.slide.fu-schola{font-size:24.8px;line-height:1.50}
+.slide.fu-stix{font-size:25px;line-height:1.52}
+.slide.fu-lmsans{font-size:26.2px;line-height:1.48}
+.slide.fu-heros{font-size:25px;line-height:1.48}
+.slide.fu-fira{font-size:25px;line-height:1.48}
+.slide.fu-source{font-size:25px;line-height:1.50}
+/* con remates, los títulos de marco se ven mejor con un poco menos de peso */
+.slide.fu-lm .ft-t,.slide.fu-termes .ft-t,.slide.fu-pagella .ft-t,
+.slide.fu-schola .ft-t,.slide.fu-stix .ft-t{font-weight:700}
+.slide.fu-lm .tp-title,.slide.fu-termes .tp-title,.slide.fu-pagella .tp-title,
+.slide.fu-schola .tp-title,.slide.fu-stix .tp-title{font-weight:700}
+.slide.fu-lm .bb-title,.slide.fu-termes .bb-title,.slide.fu-pagella .bb-title,
+.slide.fu-schola .bb-title,.slide.fu-stix .bb-title{font-weight:700}
+
+/* ---------- guías de alineación ---------- */
+.guias{position:absolute;inset:0;pointer-events:none;z-index:8}
+.guias .g-v{position:absolute;top:0;bottom:0;width:0;border-left:1.5px dashed var(--sacc);opacity:.5}
+.guias .g-v.g-margen{border-left-style:solid;opacity:.28}
+.guias .g-v.g-centro{border-left-style:dotted;opacity:.35}
+.guias .g-v.g-borde{opacity:.95;border-left-width:2px}
+.guias .g-rotulo{position:absolute;top:6px;transform:translateX(-50%);background:var(--sacc);
+  color:var(--sacc-ink,#fff);font:600 13px/1 var(--ui),sans-serif;padding:4px 10px;border-radius:99px;
+  white-space:nowrap;letter-spacing:.01em}
+
+/* ---------- lápiz, puntero y salto ---------- */
+.p-tinta{position:absolute;left:0;top:0;pointer-events:none;z-index:9}
+.p-tinta.activo{pointer-events:auto;cursor:crosshair;touch-action:none}
+.p-punto{position:fixed;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;z-index:180;
+  pointer-events:none;background:radial-gradient(circle,rgba(255,60,40,.95) 0 32%,rgba(255,60,40,.28) 55%,transparent 70%);
+  box-shadow:0 0 14px 5px rgba(255,60,40,.35)}
+.present-root.con-puntero{cursor:none}
+.p-ir{position:fixed;left:50%;top:22px;transform:translateX(-50%);z-index:185;display:flex;align-items:center;gap:10px;
+  background:rgba(16,20,30,.94);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:10px 14px;
+  box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.p-ir-lb{font:600 12px var(--ui);color:#9AA3BC;letter-spacing:.06em;text-transform:uppercase}
+.p-ir-inp{background:transparent;border:none;outline:none;color:#EDF1FA;font:16px var(--ui);width:260px}
+.p-ir-pista{display:flex;gap:8px;max-width:44vw;overflow:hidden}
+.p-ir-op{font:12.5px var(--ui);color:#B9C2D8;background:rgba(255,255,255,.09);border-radius:99px;padding:3px 10px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.p-ir-op:first-child{background:rgba(255,255,255,.2);color:#fff}
+
+/* ---------- transiciones al pasar de diapositiva ---------- */
+@keyframes tp-fundido { from { opacity: 0 } to { opacity: 1 } }
+@keyframes tp-der { from { opacity: .15; transform: translateX(3.4%) } to { opacity: 1; transform: none } }
+@keyframes tp-izq { from { opacity: .15; transform: translateX(-3.4%) } to { opacity: 1; transform: none } }
+.present-stage > .slide.tr-fundido { animation: tp-fundido .26s ease-out both }
+.present-stage > .slide.tr-der { animation: tp-der .3s cubic-bezier(.22,.61,.36,1) both }
+.present-stage > .slide.tr-izq { animation: tp-izq .3s cubic-bezier(.22,.61,.36,1) both }
+.present-stage > .slide.tr-empuja-der { animation: tp-empuja-der .34s cubic-bezier(.22,.61,.36,1) both }
+.present-stage > .slide.tr-empuja-izq { animation: tp-empuja-izq .34s cubic-bezier(.22,.61,.36,1) both }
+.present-stage > .slide.tr-sube { animation: tp-sube .3s cubic-bezier(.22,.61,.36,1) both }
+.present-stage > .slide.tr-persiana { animation: tp-persiana .38s steps(1,end) both }
+.present-stage > .slide.tr-persianav { animation: tp-persianav .38s steps(1,end) both }
+.present-stage > .slide.tr-abrir { animation: tp-abrir .34s ease-out both }
+.present-stage > .slide.tr-cerrar { animation: tp-cerrar .34s ease-out both }
+.present-stage > .slide.tr-caja { animation: tp-caja .34s ease-out both }
+.present-stage > .slide.tr-destello { animation: tp-destello .42s ease-out both }
+@keyframes tp-empuja-der{ from{transform:translateX(100%)} to{transform:none} }
+@keyframes tp-empuja-izq{ from{transform:translateX(-100%)} to{transform:none} }
+@keyframes tp-sube{ from{opacity:.2;transform:translateY(46px)} to{opacity:1;transform:none} }
+@keyframes tp-persiana{
+  0%{clip-path:repeating-linear-gradient(to bottom,#000 0 0,transparent 0 12.5%)}
+  25%{clip-path:repeating-linear-gradient(to bottom,#000 0 3.2%,transparent 3.2% 12.5%)}
+  50%{clip-path:repeating-linear-gradient(to bottom,#000 0 6.4%,transparent 6.4% 12.5%)}
+  75%{clip-path:repeating-linear-gradient(to bottom,#000 0 9.6%,transparent 9.6% 12.5%)}
+  100%{clip-path:none} }
+@keyframes tp-persianav{
+  0%{clip-path:repeating-linear-gradient(to right,#000 0 0,transparent 0 12.5%)}
+  25%{clip-path:repeating-linear-gradient(to right,#000 0 3.2%,transparent 3.2% 12.5%)}
+  50%{clip-path:repeating-linear-gradient(to right,#000 0 6.4%,transparent 6.4% 12.5%)}
+  75%{clip-path:repeating-linear-gradient(to right,#000 0 9.6%,transparent 9.6% 12.5%)}
+  100%{clip-path:none} }
+@keyframes tp-abrir{ from{clip-path:inset(0 50% 0 50%)} to{clip-path:inset(0 0 0 0)} }
+@keyframes tp-cerrar{ from{clip-path:inset(50% 0 50% 0)} to{clip-path:inset(0 0 0 0)} }
+@keyframes tp-caja{ from{clip-path:inset(28% 32% 28% 32%);opacity:.35} to{clip-path:inset(0 0 0 0);opacity:1} }
+@keyframes tp-destello{
+  from{opacity:0;clip-path:polygon(0 0,0 0,-40% 100%,-40% 100%)}
+  to{opacity:1;clip-path:polygon(0 0,140% 0,100% 100%,-40% 100%)} }
+@media (prefers-reduced-motion: reduce) {
+  .present-stage > .slide[class*="tr-"] { animation: none!important; clip-path: none!important; transform: none!important }
+}
+
+/* ---------- el cursor se quita solo ---------- */
+.present-root.sin-cursor, .present-root.sin-cursor * { cursor: none }
+
+/* ---------- vista general (tecla O) ---------- */
+.pv-root{position:fixed;inset:0;z-index:170;background:rgba(8,10,16,.965);backdrop-filter:blur(4px);
+  display:flex;flex-direction:column;padding:0 0 14px}
+.pv-barra{display:flex;align-items:baseline;gap:14px;padding:14px 20px 10px;color:#E7EBF5;flex:none}
+.pv-tit{font:600 15px var(--ui)}
+.pv-ay{font:12.5px var(--ui);color:#9AA5BE}
+.pv-rej{flex:1;min-height:0;overflow:auto;padding:4px 18px 8px;
+  display:grid;gap:14px 12px;align-content:start;justify-content:center}
+.pv-cel{background:none;border:2px solid transparent;border-radius:9px;padding:3px;cursor:pointer;
+  display:flex;flex-direction:column;gap:5px;align-items:stretch;color:#C9D2E6}
+.pv-cel:hover{border-color:#5A6580}
+.pv-cel.actual{border-color:var(--acc)}
+.pv-cel.foco{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.18)}
+.pv-clip{overflow:hidden;border-radius:5px;background:#fff;position:relative;flex:none}
+.pv-pie{display:flex;gap:6px;align-items:baseline;font:12px var(--ui);min-width:0}
+.pv-pie b{font:600 11px var(--mono);color:#8B95AE;flex:none}
+.pv-pie span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+
+/* ---------- ensayo cronometrado ---------- */
+.p-ensayo{position:fixed;left:16px;top:14px;z-index:160;display:flex;align-items:center;gap:8px;
+  background:rgba(20,24,36,.86);color:#E9EEF9;border-radius:999px;padding:6px 13px 6px 10px;
+  font:600 13.5px var(--mono);letter-spacing:.01em;box-shadow:0 4px 18px rgba(0,0,0,.4)}
+.p-ensayo .pe-pt{color:#E2504B;font-size:11px;animation:pe-lat 2s ease-in-out infinite}
+.p-ensayo.pasado{background:rgba(120,32,28,.92)}
+@keyframes pe-lat { 0%,100%{opacity:1} 50%{opacity:.25} }
+@media (prefers-reduced-motion: reduce) { .p-ensayo .pe-pt{animation:none} }
+.ch-fit .ch-err{margin-left:.55em;opacity:.82}
+
+/* ---------- barra de escala de micrografías ---------- */
+.imgwrap{position:relative}
+.esc-capa{position:absolute;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:5px 7px;border-radius:3px;background:rgba(12,16,22,.55);pointer-events:none}
+.esc-capa.sin-fondo{background:none;padding:2px}
+.esc-abajo-der{right:2.5%;bottom:3.5%}
+.esc-abajo-izq{left:2.5%;bottom:3.5%}
+.esc-arriba-der{right:2.5%;top:3.5%}
+.esc-arriba-izq{left:2.5%;top:3.5%}
+.esc-barra{height:5px;background:#fff;border-radius:1px;box-shadow:0 0 0 1px rgba(0,0,0,.45);min-width:12px}
+.esc-rot{font:600 15px var(--ui);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7);line-height:1;white-space:nowrap}
+.mode-thumb .esc-rot{font-size:13px}
+
+/* ---------- estructura química y montaje ---------- */
+.b-estruct, .b-montaje{display:flex;flex-direction:column;align-items:center}
+.est-wrap, .mont-wrap{margin:0 auto;max-width:100%}
+.est-svg, .mont-svg{display:block;width:100%;height:auto;color:var(--sfg);font-family:inherit}
+.est-vacia{border:1.5px dashed var(--sline,#c9cfda);border-radius:6px;padding:26px 14px;text-align:center;
+  color:var(--smut);font-size:.72em}
+
+/* ---------- teorema y figura geométrica ---------- */
+.teo{border-left:3px solid var(--sacc);padding:.34em 0 .34em .8em;margin:.2em 0;position:relative}
+.teo-cab{display:flex;gap:.45em;align-items:baseline;margin-bottom:.12em}
+.teo-cab b{color:var(--sacc-txt);font-weight:600}
+.teo-tit{color:var(--smut);font-style:italic}
+.teo-it .teo-cuerpo{font-style:italic}
+.teo-cuerpo p{margin:.16em 0}
+.teo-cuerpo p:first-child{margin-top:0}
+.teo-cuerpo p:last-child{margin-bottom:0}
+.teo-demostracion{border-left-color:var(--smut)}
+.teo-demostracion .teo-cab b{color:var(--smut);font-style:italic;font-weight:500}
+.teo-qed{position:absolute;right:.1em;bottom:.3em;color:var(--smut);font-size:.9em}
+.b-geo{display:flex;flex-direction:column;align-items:center}
+.geo-wrap{margin:0 auto;max-width:100%}
+.geo-svg{display:block;width:100%;height:auto;color:var(--sfg);font-family:inherit}
+
+/* ---------- galería de figuras en la diapositiva ---------- */
+.b-galeria{width:100%}
+.gal-fig{margin:0 auto;display:block}
+.gal-rej{display:grid;align-items:end}
+.gal-rej.gal-tira{grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}
+.gal-rej.gal-mosaico{grid-template-columns:1.5fr 1fr;grid-auto-rows:auto}
+.gal-rej.gal-mosaico .gal-grande{grid-row:1 / span 3}
+.gal-celda{display:flex;flex-direction:column;gap:.22em;min-width:0}
+.gal-img{display:block;line-height:0}
+.gal-img img{width:100%;height:auto;display:block}
+.gal-cap{font-size:.64em;line-height:1.35;color:var(--smut);text-align:center}
+
+/* ---------- citas al pie de la diapositiva ---------- */
+.slide-citas{margin-top:auto;padding-top:.6em;display:flex;flex-wrap:wrap;gap:.25em 1.4em;
+  font-size:.52em;line-height:1.35;color:var(--smut);opacity:.9}
+.sc-n{font-weight:700;opacity:.75}
+.b-refs{width:100%}
+.refs-lista{margin:0;padding-left:1.6em;font-size:.68em;line-height:1.5}
+.refs-lista li{margin-bottom:.42em}
+.refs-lista.refs-densa{font-size:.56em;line-height:1.4;columns:1}
+
+/* ---------- capa de tapas y señales sobre una figura ---------- */
+.fig-capas{position:absolute;inset:0;pointer-events:none}
+.fig-capa{position:absolute;inset:0;width:100%;height:100%}
+
+/* ---------- marcas de cita dentro del texto ---------- */
+.cita-m{color:var(--sacc-txt,inherit);white-space:nowrap}
+sup.cita-m{font-size:.62em;line-height:0;vertical-align:super}
+.cita-rota{color:#B3261E;border-bottom:1px dotted currentColor}
+.refs-lista.refs-alfa{list-style:none;padding-left:0}
+.refs-lista.refs-alfa li{text-indent:-1.2em;padding-left:1.2em}
+
+/* ---------- recorrido del ojo ---------- */
+.slide{position:relative}
+svg.mirada-capa{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:9}
+.mirada-linea{fill:none;stroke:#E8961E;stroke-width:4;stroke-dasharray:10 8;opacity:.85}
+.mirada-p{fill:#E8961E;opacity:.9}
+.mirada-p.primero{fill:#C0392B}
+.mirada-n{fill:#fff;font:700 22px sans-serif}
+div.mirada-ley{position:absolute;left:12px;right:12px;bottom:10px;z-index:9;pointer-events:none;
+  background:rgba(20,20,30,.82);color:#fff;border-radius:9px;padding:7px 11px;font:13px/1.4 system-ui,sans-serif}
+div.mirada-ley .mirada-av{color:#FFD27A}
+div.mirada-ley small{display:block;opacity:.7;font-size:11px}
+
+/* ---------- figuras vivas ---------- */
+.chart-holder.con-despues{position:relative}
+.despues-capa{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:opacity .35s}
+.despues-capa img,.despues-capa svg{width:100%;height:auto;display:block}
+.despues-capa.frag{opacity:0}
+.despues-capa.frag.on{opacity:1}
+.despues-capa.despues-borde{outline:2px dashed var(--sacc,#3B44B6);outline-offset:-2px;background:var(--sbg,#fff)}
+.despues-rot{position:absolute;top:6px;right:8px;font:600 11px system-ui,sans-serif;color:var(--sacc,#3B44B6);background:var(--sbg,#fff);padding:1px 6px;border-radius:9px}
+svg.chart-morph{position:absolute;inset:0;width:100%;height:auto}
+.imgwrap{position:relative}
+.imgwrap .despues-capa img{object-fit:contain;height:100%}
+g.capa.frag{opacity:0}
+g.capa.frag.on{opacity:1;transition:opacity .45s}
+.mode-edit g.capa,.mode-thumb g.capa,.mode-export g.capa{opacity:1}
+.sello-fuente{font:11px/1.35 var(--mono,monospace);color:var(--smut);margin-top:var(--e1);text-align:center;letter-spacing:.01em}
+/* ---------- derivación ---------- */
+.b-deriv{display:flex;flex-direction:column;gap:2px}
+.deriv-paso{display:flex;align-items:baseline;gap:14px;position:relative}
+.deriv-eq{flex:1;min-width:0}
+.deriv-eq .katex-display{margin:.25em 0}
+.deriv-por{flex:none;max-width:38%;font-size:.72em;color:var(--smut);font-style:italic;line-height:1.35}
+.deriv-paso.frag{opacity:0}
+.deriv-paso.frag.on{opacity:1}
+/* ---------- glosas y niveles ---------- */
+.glosa{border-bottom:1.5px dotted var(--sacc,#3B44B6);cursor:help}
+.slide-glosas{margin-top:auto;padding-top:var(--e2);font-size:.66em;color:var(--smut);display:flex;
+  flex-wrap:wrap;gap:var(--e1) var(--e5);border-top:1px solid var(--sline)}
+.slide-glosas b{color:var(--sacc-txt);font-weight:600}
+/* ---------- subtítulos ---------- */
+.p-subt{position:fixed;left:50%;bottom:5vh;transform:translateX(-50%);max-width:82vw;z-index:160;
+  background:rgba(0,0,0,.78);color:#fff;font:500 clamp(18px,2.6vw,34px)/1.35 system-ui,sans-serif;
+  padding:.35em .8em;border-radius:.4em;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+
+/* ================= acomodos nuevos ================= */
+/* --- figura a sangre: la imagen llena el cuerpo, el texto va encima --- */
+.fbody.ly-sangre{--padk:0;padding:0;position:relative;overflow:hidden}
+.sangre{position:absolute;inset:0;display:block}
+.sangre-fig{position:absolute;inset:0}
+.sangre-fig .blk{margin:0;height:100%;width:100%}
+.sangre-fig figure,.sangre-fig .imgwrap,.sangre-fig .chart-holder{width:100%!important;height:100%;margin:0}
+.sangre-fig img,.sangre-fig video{width:100%;height:100%;object-fit:cover;display:block;border-radius:0}
+.sangre-fig figcaption,.sangre-fig .chart-cap{display:none}
+.sangre-fig svg{width:100%;height:100%}
+.sangre-banda{position:absolute;left:0;right:0;bottom:0;padding:var(--e7) var(--fbx) var(--fbb);
+  background:linear-gradient(to top,rgba(8,12,18,.88),rgba(8,12,18,.7) 58%,rgba(8,12,18,0));
+  color:#fff;display:flex;flex-direction:column;gap:var(--e3)}
+.sangre-banda .b-text,.sangre-banda ul.bl li,.sangre-banda .bb-title{color:#fff}
+.sangre-banda ul.bl li::before{color:#fff;opacity:.8}
+.sangre .zona-vacia{position:relative;margin:auto;width:70%}
+
+/* --- figura con pie ancho --- */
+.cols.piefigura{gap:var(--gap-col)}
+.col.pf-fig{flex:0 0 66%;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:var(--e3)}
+.col.pf-pie{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:var(--e4);justify-content:center;
+  border-left:2px solid var(--sacc);padding-left:var(--e5)}
+.col.pf-pie .b-text,.col.pf-pie ul.bl li{font-size:.8em;line-height:1.5}
+.col.pf-fig figcaption{display:none}
+
+/* --- zigzag --- */
+.zigzag{display:flex;flex-direction:column;gap:var(--e5);flex:1;min-height:0}
+.zz-fila{flex:1 1 0;min-height:0;align-items:center;gap:var(--gap-col)}
+.zz-fila > .col{flex:1 1 0;min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:var(--e3);overflow:hidden}
+.zz-fila > .col.zz-txt{flex:0 0 42%}
+.zz-txt .b-text,.zz-txt ul.bl li{font-size:.84em}
+
+/* --- pantalla partida --- */
+.fbody.ly-partida{--padk:0;padding:0}
+.partida{display:flex;flex:1;min-height:0;gap:0}
+.pt-lado{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:var(--e4);
+  padding:var(--e5) calc(var(--fbx) * .78) var(--fbb)}
+.pt-lado.k0{background:color-mix(in srgb,var(--sacc) 9%,transparent)}
+.pt-lado.k1{background:color-mix(in srgb,var(--sfg) 6%,transparent);border-left:1px solid var(--sline,rgba(128,128,128,.28))}
+.pt-tit{font-weight:600;font-size:.9em;color:var(--sacc-txt);letter-spacing:.01em}
+.pt-lado.k1 .pt-tit{color:var(--sfg);opacity:.82}
+.pt-cu{display:flex;flex-direction:column;gap:var(--e4);min-width:0;overflow:hidden;flex:1}
+
+/* --- tres filas --- */
+.filas{display:flex;flex-direction:column;gap:var(--e5);flex:1;min-height:0}
+.fl-fila{display:flex;gap:var(--e5);align-items:center;flex:1 1 0;min-height:0;
+  border-top:1px solid var(--sline,rgba(128,128,128,.22));padding-top:var(--e4)}
+.fl-fila:first-child{border-top:0;padding-top:0}
+.fl-rot{flex:0 0 21%;font-weight:600;font-size:.84em;color:var(--sacc-txt);line-height:1.3;padding-top:.1em}
+.fl-cu{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:var(--e3);overflow:hidden;justify-content:center}
+.fl-cu .b-text,.fl-cu ul.bl li{font-size:.82em}
+
+/* --- cuadrícula 3×2 --- */
+.rejilla6{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;
+  gap:var(--e5) var(--e6);flex:1;min-height:0}
+.rejilla6 .celda-cu .b-text,.rejilla6 .celda-cu ul.bl li{font-size:.72em}
+.rejilla6 .celda-tit{font-size:.76em}
+
+/* --- dato grande --- */
+.dato{display:flex;flex-direction:column;align-items:center;gap:var(--e3);text-align:center;width:100%}
+.dt-num{font-weight:700;font-size:3.6em;line-height:1;color:var(--sacc-txt);letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums}
+.dt-rot{font-size:1.02em;color:var(--sfg);opacity:.9;max-width:76%}
+.dt-cu{display:flex;flex-direction:column;align-items:center;gap:var(--e3);margin-top:var(--e5);max-width:80%;width:100%}
+.dt-cu .b-text{font-size:.76em;color:var(--smut);text-align:center}
+
+/* --- cita destacada --- */
+.cita-caja{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;position:relative;
+  padding-left:.9em}
+.ct-comilla{position:absolute;left:-.16em;top:-.34em;font:700 3.1em/1 Georgia,'STIX Two Text',serif;
+  color:var(--sacc);opacity:.28;pointer-events:none}
+.ct-cu{display:flex;flex-direction:column;gap:var(--e3);width:100%}
+.ct-cu .b-text{font-size:1.22em;line-height:1.48;font-style:italic;color:var(--sfg)}
+.ct-autor{align-self:flex-end;font-size:.8em;color:var(--smut);margin-top:var(--e4)}
+.ct-autor::before{content:'— '}
+.ct-autor.is-empty::before{content:''}
+/* Una gráfica se dibuja con el alto que le pide el ancho del cuerpo, sin saber
+   cuánto sitio queda debajo del título. En los temas de titulares grandes
+   —Plenaria, sobre todo, con dos líneas a 48 px— eso se comía el eje de abajo.
+   Aquí encoge para caber: el dibujo mantiene su proporción y se centra. */
+.fbody .blk.b-chart{min-height:0}
+.fbody .blk.b-chart .chart-holder{min-height:0;max-height:100%}
+.fbody .blk.b-chart .chart-box{min-height:0;max-height:100%;grid-template-rows:auto minmax(0,1fr) auto}
+.fbody .blk.b-chart .ch-svg{height:100%;min-height:0}
+
+/* La figura no puede desbordar su fila: se contiene sin recortarse. */
+.zz-fila .blk,.col.pf-fig .blk{max-height:100%;min-height:0}
+.zz-fila figure,.col.pf-fig figure{max-height:100%;min-height:0;display:flex;flex-direction:column;margin:0}
+.zz-fila .imgwrap,.col.pf-fig .imgwrap,.zz-fila .chart-holder,.col.pf-fig .chart-holder{min-height:0;max-height:100%}
+.zz-fila .imgwrap img,.col.pf-fig .imgwrap img{max-height:100%;object-fit:contain}
+.zz-fila .smart-box,.col.pf-fig .smart-box{max-height:100%}
+
+

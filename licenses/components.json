@@ -1,0 +1,65 @@
+[
+  {
+    "name": "@floating-ui/core",
+    "version": "1.8.0",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/floating-ui/floating-ui.git",
+      "directory": "packages/core"
+    }
+  },
+  {
+    "name": "@floating-ui/dom",
+    "version": "1.8.0",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/floating-ui/floating-ui.git",
+      "directory": "packages/dom"
+    }
+  },
+  {
+    "name": "lucide",
+    "version": "1.41.0",
+    "license": "ISC",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/lucide-icons/lucide.git",
+      "directory": "packages/lucide"
+    }
+  },
+  {
+    "name": "@rdkit/rdkit",
+    "version": "2025.3.4-1.0.0",
+    "license": "BSD-3-Clause",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/rdkit/rdkit-js.git"
+    }
+  },
+  {
+    "name": "kekule",
+    "version": "1.0.4",
+    "license": null,
+    "repository": null
+  },
+  {
+    "name": "3dmol",
+    "version": "2.5.5",
+    "license": "BSD-3-Clause",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/3dmol/3Dmol.js.git"
+    }
+  },
+  {
+    "name": "plotly.js-basic-dist-min",
+    "version": "4.0.0",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/plotly/plotly.js.git"
+    }
+  }
+]

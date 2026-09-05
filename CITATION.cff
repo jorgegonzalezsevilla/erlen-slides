@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "Si utilizas Erlen Slides en tu trabajo, cita esta versión del software."
+type: software
+title: "Erlen Slides: Scientific presentations"
+version: 0.1.0
+date-released: 2026-09-05
+authors:
+  - family-names: "González Sevilla"
+    given-names: "Jorge"
+repository-code: "https://github.com/jorgegonzalezsevilla/erlen-slides"
+url: "https://github.com/jorgegonzalezsevilla/erlen-slides"
+license: AGPL-3.0-only
+abstract: "Editor libre de presentaciones científicas en el navegador, con ecuaciones, química, gráficas, exportaciones y ejemplos editables."
+keywords:
+  - scientific presentations
+  - chemistry
+  - LaTeX
+  - open science

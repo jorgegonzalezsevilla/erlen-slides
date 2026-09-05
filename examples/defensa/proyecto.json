@@ -1,0 +1,180 @@
+{
+  "v": 1,
+  "meta": {
+    "title": "Defensa de tesis",
+    "short": "Defensa de tesis",
+    "subtitle": "Ejemplo didáctico · datos ilustrativos",
+    "authors": "",
+    "institute": "",
+    "date": "",
+    "theme": "marino",
+    "aspect": "169",
+    "numbers": true,
+    "footline": true
+  },
+  "slides": [
+    {
+      "id": "example-defensa-1",
+      "layout": "title",
+      "title": "",
+      "blocks": [],
+      "notes": "Ejemplo didáctico. Sustituye contenido y datos por los de tu trabajo. No atribuir estas cifras a un experimento.",
+      "min": 0.5
+    },
+    {
+      "id": "example-defensa-2",
+      "layout": "content",
+      "title": "La pregunta que guía el trabajo",
+      "blocks": [
+        {
+          "id": "example-defensa-3",
+          "type": "text",
+          "text": "¿Puede una modificación del material mejorar su estabilidad?",
+          "size": "l",
+          "align": "left"
+        },
+        {
+          "id": "example-defensa-4",
+          "type": "text",
+          "text": "Caso de uso ilustrativo. Define aquí el sistema, la comparación y el alcance.",
+          "size": "s",
+          "align": "left"
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    },
+    {
+      "id": "example-defensa-5",
+      "layout": "content",
+      "title": "Una estrategia explícita",
+      "blocks": [
+        {
+          "id": "example-defensa-6",
+          "type": "smart",
+          "kind": "proceso",
+          "w": 95,
+          "caption": "",
+          "anim": "fade",
+          "items": [
+            {
+              "t": "Definir una comparación controlada"
+            },
+            {
+              "t": "Caracterizar ambos materiales"
+            },
+            {
+              "t": "Medir estabilidad"
+            },
+            {
+              "t": "Evaluar incertidumbre"
+            }
+          ]
+        }
+      ],
+      "notes": "Explica las decisiones y los controles, no solo los nombres de las técnicas.",
+      "min": 1.5
+    },
+    {
+      "id": "example-defensa-7",
+      "layout": "content",
+      "title": "Mostrar la evidencia",
+      "blocks": [
+        {
+          "id": "example-defensa-8",
+          "type": "table",
+          "header": true,
+          "align": "c",
+          "caption": "Ejemplo de organización de resultados; no evidencia experimental.",
+          "rows": [
+            [
+              "Condición",
+              "Respuesta normalizada",
+              "Naturaleza"
+            ],
+            [
+              "Control",
+              "1.00",
+              "Ilustrativa"
+            ],
+            [
+              "Modificación A",
+              "1.08",
+              "Ilustrativa"
+            ],
+            [
+              "Modificación B",
+              "0.97",
+              "Ilustrativa"
+            ]
+          ]
+        }
+      ],
+      "notes": "Datos o modelos didácticos: reemplazar antes de presentar resultados propios.",
+      "min": 1.5
+    },
+    {
+      "id": "example-defensa-9",
+      "layout": "content",
+      "title": "Interpretación y límites",
+      "blocks": [
+        {
+          "id": "example-defensa-10",
+          "type": "bullets",
+          "items": [
+            {
+              "t": "Distinguir contribución, observación e hipótesis.",
+              "lvl": 0
+            },
+            {
+              "t": "Las diferencias de esta tabla no demuestran significación.",
+              "lvl": 0
+            },
+            {
+              "t": "Explicar qué limitaciones cambian la conclusión.",
+              "lvl": 0
+            }
+          ],
+          "step": false
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    },
+    {
+      "id": "example-defensa-11",
+      "layout": "content",
+      "title": "Antes de compartir",
+      "blocks": [
+        {
+          "id": "example-defensa-12",
+          "type": "bullets",
+          "items": [
+            {
+              "t": "Pregunta e hipótesis explícitas",
+              "lvl": 0
+            },
+            {
+              "t": "Métodos suficientes para reproducir la comparación",
+              "lvl": 0
+            },
+            {
+              "t": "Datos y referencias propios, comprobados",
+              "lvl": 0
+            }
+          ],
+          "step": false
+        },
+        {
+          "id": "example-defensa-13",
+          "type": "text",
+          "text": "Conserva el proyecto JSON y revisa la exportación final.",
+          "size": "s",
+          "align": "left"
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    }
+  ]
+}

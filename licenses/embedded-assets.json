@@ -1,0 +1,18 @@
+[
+  {
+    "file": "src/css/fuentes-tx.css",
+    "sha256": "7ca7296ff5b6fda891033954aedecbde19437d91e51b895ebd40874ffae2eea5"
+  },
+  {
+    "file": "src/css/fuentes-katex.css",
+    "sha256": "d5454210749aa132169d6cb6bdef720e4e7a444c27b7f8cfea5ed8fb0fe378ae"
+  },
+  {
+    "file": "vendor/katex.min.js",
+    "sha256": "2ec26e326d3b141856db1c4d46c07ac3618923c7032d4fcf65f66718ea5cda00"
+  },
+  {
+    "file": "vendor/mhchem.min.js",
+    "sha256": "cdf8174ee9a8113fcecc79cf24209754554e080efe19b767940c9aec5864a834"
+  }
+]

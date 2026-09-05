@@ -1,0 +1,148 @@
+% ===================================================================
+%  Generado por Erlen
+%  Compílalo en Overleaf, o localmente con dos pasadas de pdflatex.
+% ===================================================================
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{Boadilla}
+% El papel verde grisáceo y la banda clara del título no vienen de fábrica: se fijan a mano, como en Papel.
+\definecolor{salviaPapel}{HTML}{EBEFE9}
+\definecolor{salviaBanda}{HTML}{DEE7DA}
+\definecolor{salviaTinta}{HTML}{2B2A24}
+\definecolor{salviaAcento}{HTML}{33654A}
+\setbeamercolor{background canvas}{bg=salviaPapel}
+\setbeamercolor{normal text}{fg=salviaTinta}
+\setbeamercolor{structure}{fg=salviaAcento}
+\setbeamercolor{frametitle}{bg=salviaBanda,fg=salviaTinta}
+% El filete verde que cierra la banda pediría redefinir la plantilla del frametitle: en el PDF la banda va sin él.
+% En pantalla la letra es Source Sans; para que el PDF coincida, añade \usepackage[default]{sourcesanspro}.
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% Español: se carga solo si babel-spanish está instalado (Overleaf lo trae).
+\IfFileExists{spanish.ldf}{\usepackage[spanish,es-nodecimaldot]{babel}}{}
+\usepackage{amsmath,amssymb}
+\usepackage[version=4]{mhchem}
+\usepackage{booktabs}
+\definecolor{erlenacento}{HTML}{33654A}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, calc}
+\renewcommand{\figurename}{Figura}
+\renewcommand{\tablename}{Tabla}
+\usepackage{siunitx}
+\sisetup{per-mode=symbol, range-units=single}
+\setbeamertemplate{navigation symbols}{}
+% Algunos temas (Metropolis entre ellos) insertan solos una diapositiva al
+% empezar cada sección. Erlen ya emite la suya, así que se desactiva la
+% automática: de otro modo cada sección saldría dos veces y la numeración
+% del PDF dejaría de coincidir con la de la app.
+\AtBeginSection{}
+\AtBeginSubsection{}
+
+\title[Reunión de laboratorio]{Reunión de laboratorio}
+\subtitle{Ejemplo didáctico · datos ilustrativos}
+\date{\today}
+
+\begin{document}
+
+% --- diapositiva 1 ---
+\begin{frame}[plain]
+  \transdissolve[duration=0.25]
+  \titlepage
+\end{frame}
+\note{%
+  {\scriptsize\textbf{Tiempo previsto: 0:30 min}}\par\medskip
+  Ejemplo didáctico. Sustituye contenido y datos por los de tu trabajo. No atribuir estas cifras a un experimento.\par
+}
+
+% --- diapositiva 2 ---
+\begin{frame}{La pregunta que guía el trabajo}
+  \transdissolve[duration=0.25]
+  {\large ¿Qué decisión experimental conviene tomar esta semana?}
+  \medskip
+
+  {\small Caso de uso ilustrativo. Define aquí el sistema, la comparación y el alcance.}
+\end{frame}
+\note{%
+  {\scriptsize\textbf{Tiempo previsto: 1:30 min}}\par\medskip
+}
+
+% --- diapositiva 3 ---
+\begin{frame}{Una estrategia explícita}
+  \transdissolve[duration=0.25]
+  \begin{figure}
+    \centering
+    \definecolor{sa0f}{HTML}{CFDCE6}
+    \definecolor{sa1f}{HTML}{9DB7CC}
+    \definecolor{sa2f}{HTML}{6B93B2}
+    \definecolor{sa3f}{HTML}{396E98}
+    \definecolor{sat1843819360}{HTML}{15181C}
+    \definecolor{sat1226267613}{HTML}{FFFFFF}
+    % Con babel-spanish las palabras largas se parten solas y el texto respira mejor.
+    \begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+      \draw[fill=sa0f, draw=none] (0.000,0.000) -- (2.226,0.000) -- (2.518,-1.254) -- (2.226,-2.508) -- (0.000,-2.508) -- cycle;
+      \draw[fill=sa1f, draw=none] (2.644,0.000) -- (4.870,0.000) -- (5.162,-1.254) -- (4.870,-2.508) -- (2.644,-2.508) -- (2.936,-1.254) -- cycle;
+      \draw[fill=sa2f, draw=none] (5.288,0.000) -- (7.514,0.000) -- (7.806,-1.254) -- (7.514,-2.508) -- (5.288,-2.508) -- (5.580,-1.254) -- cycle;
+      \draw[fill=sa3f, draw=none] (7.932,0.000) -- (10.157,0.000) -- (10.450,-1.254) -- (10.157,-2.508) -- (7.932,-2.508) -- (8.224,-1.254) -- cycle;
+      \node[text=sat1843819360, align=center, text width=1.75cm, inner sep=1pt] at (1.113,-1.254) {\bfseries Revisar la pregunta};
+      \node[text=sat1843819360, align=center, text width=1.75cm, inner sep=1pt] at (3.976,-1.254) {\bfseries Comparar resultados y controles};
+      \node[text=sat1843819360, align=center, text width=1.75cm, inner sep=1pt] at (6.620,-1.254) {\bfseries Identificar el bloqueo};
+      \node[text=sat1226267613, align=center, text width=1.75cm, inner sep=1pt] at (9.264,-1.254) {\bfseries Asignar una siguiente prueba};
+    \end{tikzpicture}
+  \end{figure}
+\end{frame}
+\note{%
+  {\scriptsize\textbf{Tiempo previsto: 1:30 min}}\par\medskip
+  Explica las decisiones y los controles, no solo los nombres de las técnicas.\par
+}
+
+% --- diapositiva 4 ---
+\begin{frame}{Mostrar la evidencia}
+  \transdissolve[duration=0.25]
+  \begin{table}
+    \centering
+    \caption{Tablero de ejemplo para una reunión de equipo.}
+    \begin{tabular}{ccc}
+      \toprule
+      \textbf{Actividad} & \textbf{Estado ilustrativo} & \textbf{Siguiente acción} \\
+      \midrule
+      Preparación & Completa & Verificar registro \\
+      Control negativo & Pendiente & Programar corrida \\
+      Análisis & Preliminar & Revisar exclusiones \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+\note{%
+  {\scriptsize\textbf{Tiempo previsto: 1:30 min}}\par\medskip
+  Datos o modelos didácticos: reemplazar antes de presentar resultados propios.\par
+}
+
+% --- diapositiva 5 ---
+\begin{frame}{Interpretación y límites}
+  \transdissolve[duration=0.25]
+  \begin{itemize}
+    \item Separar lo terminado de lo validado.
+    \item Una corrida sin controles puede orientar, pero no confirmar.
+    \item Registrar responsable y criterio de cierre en las notas.
+  \end{itemize}
+\end{frame}
+\note{%
+  {\scriptsize\textbf{Tiempo previsto: 1:30 min}}\par\medskip
+}
+
+% --- diapositiva 6 ---
+\begin{frame}{Antes de compartir}
+  \transdissolve[duration=0.25]
+  \begin{itemize}
+    \item Fecha, versión y enlaces a archivos
+    \item Controles faltantes y causas de exclusión
+    \item Responsable, plazo y criterio de éxito
+  \end{itemize}
+  \medskip
+
+  {\small Conserva el proyecto JSON y revisa la exportación final.}
+\end{frame}
+\note{%
+  {\scriptsize\textbf{Tiempo previsto: 1:30 min}}\par\medskip
+}
+
+\end{document}

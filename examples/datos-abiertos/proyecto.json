@@ -1,0 +1,185 @@
+{
+  "v": 1,
+  "meta": {
+    "title": "Plan de datos abiertos",
+    "short": "Plan de datos abiertos",
+    "subtitle": "Ejemplo didáctico · datos ilustrativos",
+    "authors": "",
+    "institute": "",
+    "date": "",
+    "theme": "arena",
+    "aspect": "169",
+    "numbers": true,
+    "footline": true
+  },
+  "slides": [
+    {
+      "id": "example-datos-abiertos-1",
+      "layout": "title",
+      "title": "",
+      "blocks": [],
+      "notes": "Ejemplo didáctico. Sustituye contenido y datos por los de tu trabajo. No atribuir estas cifras a un experimento.",
+      "min": 0.5
+    },
+    {
+      "id": "example-datos-abiertos-2",
+      "layout": "content",
+      "title": "La pregunta que guía el trabajo",
+      "blocks": [
+        {
+          "id": "example-datos-abiertos-3",
+          "type": "text",
+          "text": "¿Qué necesita otra persona para reutilizar este conjunto de datos?",
+          "size": "l",
+          "align": "left"
+        },
+        {
+          "id": "example-datos-abiertos-4",
+          "type": "text",
+          "text": "Caso de uso ilustrativo. Define aquí el sistema, la comparación y el alcance.",
+          "size": "s",
+          "align": "left"
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    },
+    {
+      "id": "example-datos-abiertos-5",
+      "layout": "content",
+      "title": "Una estrategia explícita",
+      "blocks": [
+        {
+          "id": "example-datos-abiertos-6",
+          "type": "smart",
+          "kind": "proceso",
+          "w": 95,
+          "caption": "",
+          "anim": "fade",
+          "items": [
+            {
+              "t": "Inventariar archivos"
+            },
+            {
+              "t": "Revisar permisos y privacidad"
+            },
+            {
+              "t": "Escribir el diccionario"
+            },
+            {
+              "t": "Publicar una versión citable"
+            }
+          ]
+        }
+      ],
+      "notes": "Explica las decisiones y los controles, no solo los nombres de las técnicas.",
+      "min": 1.5
+    },
+    {
+      "id": "example-datos-abiertos-7",
+      "layout": "content",
+      "title": "Mostrar la evidencia",
+      "blocks": [
+        {
+          "id": "example-datos-abiertos-8",
+          "type": "table",
+          "header": true,
+          "align": "c",
+          "caption": "Estructura ilustrativa; revisar derechos antes de publicar.",
+          "rows": [
+            [
+              "Archivo de ejemplo",
+              "Contenido",
+              "Descripción necesaria"
+            ],
+            [
+              "mediciones.csv",
+              "Tabla numérica",
+              "Unidades y valores faltantes"
+            ],
+            [
+              "analisis.py",
+              "Transformaciones",
+              "Entorno y comando"
+            ],
+            [
+              "README.md",
+              "Contexto",
+              "Origen y límites"
+            ],
+            [
+              "LICENSE",
+              "Permisos",
+              "Licencia elegida"
+            ]
+          ]
+        }
+      ],
+      "notes": "Datos o modelos didácticos: reemplazar antes de presentar resultados propios.",
+      "min": 1.5
+    },
+    {
+      "id": "example-datos-abiertos-9",
+      "layout": "content",
+      "title": "Interpretación y límites",
+      "blocks": [
+        {
+          "id": "example-datos-abiertos-10",
+          "type": "bullets",
+          "items": [
+            {
+              "t": "Un repositorio público no reemplaza una licencia clara.",
+              "lvl": 0
+            },
+            {
+              "t": "Excluir información personal o confidencial.",
+              "lvl": 0
+            },
+            {
+              "t": "Relacionar cada figura con su versión de datos.",
+              "lvl": 0
+            }
+          ],
+          "step": false
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    },
+    {
+      "id": "example-datos-abiertos-11",
+      "layout": "content",
+      "title": "Antes de compartir",
+      "blocks": [
+        {
+          "id": "example-datos-abiertos-12",
+          "type": "bullets",
+          "items": [
+            {
+              "t": "Diccionario, formatos abiertos y checksums",
+              "lvl": 0
+            },
+            {
+              "t": "Consentimientos y permisos que correspondan",
+              "lvl": 0
+            },
+            {
+              "t": "Versión, licencia y cita del depósito",
+              "lvl": 0
+            }
+          ],
+          "step": false
+        },
+        {
+          "id": "example-datos-abiertos-13",
+          "type": "text",
+          "text": "Conserva el proyecto JSON y revisa la exportación final.",
+          "size": "s",
+          "align": "left"
+        }
+      ],
+      "notes": "",
+      "min": 1.5
+    }
+  ]
+}

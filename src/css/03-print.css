@@ -1,0 +1,11 @@
+/* ==== 03-print.css ==== */
+/* ================= Print (PDF vectorial vía imprimir) ================= */
+#printArea{display:none}
+@media print{
+  #printArea{display:block}
+  .pr-page{page-break-after:always;break-after:page;overflow:hidden;page-break-inside:avoid}
+  .pr-page:last-child{page-break-after:auto;break-after:auto}
+  .pr-page .slide{border-radius:0}
+}
+
+

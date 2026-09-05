@@ -1,0 +1,350 @@
+/* ==== 04-viva.css ==== */
+/* ================= contenido vivo: gráficas, video, animaciones ================= */
+
+/* ---------- gráficas ---------- */
+.b-chart{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.chart-holder{display:flex;justify-content:center;min-width:0;max-width:100%}
+.chart-box{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto auto;
+  width:100%;align-items:center;font-size:.78em;line-height:1.25}
+.ch-title{grid-column:1/3;grid-row:1;text-align:center;font-weight:600;color:var(--sfg);
+  font-size:1.06em;margin-bottom:4px}
+.ch-ylab{grid-column:1;grid-row:2;color:var(--sfg);justify-self:center;padding-right:2px}
+.ch-ylab span{display:block;writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
+.ch-svg{grid-column:2;grid-row:2;width:100%;height:auto;display:block;overflow:visible}
+.ch-xlab{grid-column:2;grid-row:3;text-align:center;color:var(--sfg);margin-top:2px;min-height:0}
+.ch-fit{grid-column:1/3;grid-row:1;text-align:center;color:var(--sfg);font-size:.95em;margin-bottom:3px;
+  font-variant-numeric:tabular-nums}
+.chart-box:has(.ch-title) .ch-fit{grid-row:auto}
+.chart-prev .chart-box{font-size:13px}
+.chart-cap{font-size:.72em;color:var(--smut);text-align:center;line-height:1.35;max-width:88%}
+.chart-cap .cap-label{font-weight:600;color:var(--sfg)}
+.chart-svg text{font-family:inherit}
+
+/* trazo que se dibuja */
+@keyframes drawLine{from{stroke-dashoffset:var(--dash)}to{stroke-dashoffset:0}}
+.mode-present .frag.an-draw .chart-draw,
+.mode-present .an-draw .chart-draw{stroke-dasharray:var(--dash);stroke-dashoffset:var(--dash)}
+.mode-present .frag.an-draw.on .chart-draw,
+.chart-draw.play{animation:drawLine 1.1s ease-out forwards}
+
+/* ---------- deslizadores ---------- */
+.sliders{display:flex;flex-wrap:wrap;gap:6px 22px;justify-content:center;align-items:center;
+  font-size:.6em;color:var(--smut);max-width:92%}
+.sliders .sl{display:flex;align-items:center;gap:8px}
+.sl-name{color:var(--sfg);min-width:1.6em;text-align:right}
+.sliders input[type=range]{width:150px;accent-color:var(--sacc);height:18px;cursor:pointer}
+.sl-val{font-variant-numeric:tabular-nums;color:var(--sfg);min-width:3.4em;text-align:left}
+.mode-present .sliders{font-size:.55em}
+.mode-present .sliders input[type=range]{width:170px;height:26px}
+.mode-thumb .sliders,.mode-export .sliders{display:none}
+
+/* ---------- video y GIF ---------- */
+.b-video figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+.vid-wrap{position:relative;display:flex;justify-content:center;min-width:0}
+.vid-wrap video,.vid-wrap img{max-width:100%;height:auto;display:block;border-radius:4px;background:#000}
+.vid-still{width:100%;aspect-ratio:16/9;display:grid;place-items:center;background:var(--scard);
+  border:1.5px solid var(--sline);border-radius:6px;color:var(--smut);font-size:38px}
+.vid-badge{position:absolute;left:8px;bottom:8px;background:rgba(18,22,30,.78);color:#fff;
+  font-size:14px;padding:2px 9px;border-radius:99px;letter-spacing:.02em}
+.b-video figcaption{font-size:.72em;color:var(--smut);text-align:center;line-height:1.35;max-width:88%}
+.b-video figcaption .cap-label{font-weight:600;color:var(--sfg)}
+
+/* ---------- efectos de entrada ---------- */
+.mode-present .frag{visibility:hidden}
+.mode-present .frag.on{visibility:visible}
+/* ---------- efectos de entrada ----------
+   Cada bloque lleva su duración en --an-ms y su retardo en --an-ret, así que
+   la velocidad se cambia sin tocar el CSS. */
+.mode-present .frag{--an-ms:360ms;--an-ret:0ms}
+.mode-present .frag[class*="an-"]{transition-duration:var(--an-ms);transition-delay:var(--an-ret);
+  transition-timing-function:cubic-bezier(.22,.61,.36,1)}
+.mode-present .frag.an-fade{opacity:0;transition-property:opacity}
+.mode-present .frag.an-fade.on{opacity:1}
+.mode-present .frag.an-surgir{opacity:0;filter:blur(7px);transform:scale(.985);transition-property:opacity,filter,transform}
+.mode-present .frag.an-surgir.on{opacity:1;filter:none;transform:none}
+.mode-present .frag.an-up{opacity:0;transform:translateY(24px);transition-property:opacity,transform}
+.mode-present .frag.an-up.on{opacity:1;transform:none}
+.mode-present .frag.an-down{opacity:0;transform:translateY(-24px);transition-property:opacity,transform}
+.mode-present .frag.an-down.on{opacity:1;transform:none}
+.mode-present .frag.an-left{opacity:0;transform:translateX(-36px);transition-property:opacity,transform}
+.mode-present .frag.an-left.on{opacity:1;transform:none}
+.mode-present .frag.an-right{opacity:0;transform:translateX(36px);transition-property:opacity,transform}
+.mode-present .frag.an-right.on{opacity:1;transform:none}
+.mode-present .frag.an-zoom{opacity:0;transform:scale(.88);transition-property:opacity,transform}
+.mode-present .frag.an-zoom.on{opacity:1;transform:none}
+.mode-present .frag.an-alejar{opacity:0;transform:scale(1.12);transition-property:opacity,transform}
+.mode-present .frag.an-alejar.on{opacity:1;transform:none}
+.mode-present .frag.an-rebote{opacity:0;transform:translateY(26px)}
+.mode-present .frag.an-rebote.on{opacity:1;transform:none;
+  animation:tp-rebote var(--an-ms) cubic-bezier(.34,1.56,.64,1) var(--an-ret) both}
+.mode-present .frag.an-barrido{clip-path:inset(0 100% 0 0);opacity:.001;transition-property:clip-path,opacity}
+.mode-present .frag.an-barrido.on{clip-path:inset(0 0 0 0);opacity:1}
+.mode-present .frag.an-cortina{clip-path:inset(0 0 100% 0);opacity:.001;transition-property:clip-path,opacity}
+.mode-present .frag.an-cortina.on{clip-path:inset(0 0 0 0);opacity:1}
+.mode-present .frag.an-voltear{opacity:0;transform:perspective(700px) rotateX(-72deg);transform-origin:top center;
+  transition-property:opacity,transform}
+.mode-present .frag.an-voltear.on{opacity:1;transform:none}
+.mode-present .frag.an-destacar{opacity:0;transition-property:opacity}
+.mode-present .frag.an-destacar.on{opacity:1;
+  animation:tp-destacar calc(var(--an-ms) * 2.4) ease-out var(--an-ret) both}
+.mode-present .frag.an-none{transition:none}
+@keyframes tp-rebote{ 0%{opacity:0;transform:translateY(26px)} 60%{opacity:1;transform:translateY(-6px)} 100%{opacity:1;transform:none} }
+@keyframes tp-destacar{ 0%{opacity:0;transform:scale(.96)}
+  32%{opacity:1;transform:scale(1.035);filter:drop-shadow(0 0 14px var(--ft,rgba(235,129,27,.65)))}
+  100%{opacity:1;transform:none;filter:none} }
+@media (prefers-reduced-motion:reduce){
+  .mode-present .frag{transition:none!important;transform:none!important;opacity:1;
+    filter:none!important;clip-path:none!important;animation:none!important}
+  .mode-present .frag:not(.on){visibility:hidden;opacity:0}
+  .chart-draw{animation:none!important;stroke-dashoffset:0!important}
+}
+
+/* ---------- editor de datos ---------- */
+.data-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media (max-width:920px){.data-grid{grid-template-columns:1fr}}
+.chart-prev{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;
+  display:flex;align-items:center;justify-content:center;min-height:210px;overflow:hidden}
+.chart-prev svg{max-width:100%;height:auto}
+textarea.field.paste-area{width:100%;min-height:200px;height:200px;font:12.5px/1.5 var(--mono);
+  white-space:pre;overflow:auto;tab-size:8;resize:vertical}
+.kind-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}
+.kind-opt{border:1.5px solid var(--line);border-radius:9px;background:var(--panel);cursor:pointer;
+  padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--ink)}
+.kind-opt:hover{border-color:var(--acc);background:var(--accSoft)}
+.kind-opt.on{border-color:var(--acc);box-shadow:0 0 0 2.5px var(--accSoft)}
+.kind-opt .lb{font-size:11.5px;font-weight:600;color:var(--mut)}
+.kind-opt.on .lb{color:var(--acc)}
+.kind-opt svg{display:block}
+.param-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.param-row .p-name{width:74px;font-family:var(--mono);font-size:12.5px}
+.param-row .p-num{width:74px;font-family:var(--mono);font-size:12.5px}
+.curve-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.curve-row .c-name{width:104px}
+.curve-row .c-expr{flex:1;font-family:var(--mono);font-size:12.5px}
+.model-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:7px}
+.model-card{border:1px solid var(--line);border-radius:9px;background:var(--panel);cursor:pointer;
+  padding:9px 11px;text-align:left;color:var(--ink)}
+.model-card:hover{border-color:var(--acc);background:var(--accSoft)}
+.model-card b{display:block;font-size:13px}
+.model-card span{font-size:11.5px;color:var(--mut);line-height:1.35}
+.fnhelp{font-size:11.5px;color:var(--faint);line-height:1.5}
+.fnhelp code{font-family:var(--mono);background:var(--panel2);border:1px solid var(--line);
+  border-radius:4px;padding:0 4px;color:var(--ink)}
+
+/* ---------- SmartArt ---------- */
+.b-smart{display:flex;flex-direction:column;align-items:center;gap:9px;min-width:0}
+.smart-box{position:relative;flex:none;max-width:100%}
+.smart-svg{display:block;width:100%;height:auto;overflow:visible}
+.smart-rot{position:absolute;transform:translate(-50%,-50%);text-align:center;line-height:1.22;
+  display:flex;flex-direction:column;gap:.16em;pointer-events:none;font-size:.74em}
+.smart-rot.al-izq{text-align:left;transform:translate(-50%,-50%)}
+.smart-rot .sr-t{font-weight:600}
+.smart-rot .sr-d{font-size:.78em;opacity:.85;font-weight:400}
+.smart-rot.es-num{font-size:.62em}
+.smart-rot.es-num .sr-t{font-weight:700;font-variant-numeric:tabular-nums}
+.th-metropolis .smart-rot .sr-t{font-weight:500}
+.smart-cap{font-size:.72em;color:var(--smut);text-align:center;line-height:1.35;max-width:88%}
+.smart-cap .cap-label{font-weight:600;color:var(--sfg)}
+
+/* editor */
+.smart-prev{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;
+  display:flex;align-items:center;justify-content:center;min-height:230px;overflow:hidden}
+.smart-prev{align-items:flex-start;font-family:'Fira Sans',system-ui,sans-serif;color:var(--ink)}
+.smart-prev .smart-box{max-width:100%}
+.sk-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:10px}
+@media (max-width:820px){.sk-grid{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:920px){.sk-grid{grid-template-columns:repeat(3,1fr)}}
+.sk-opt{border:1.5px solid var(--line);border-radius:9px;background:var(--panel);cursor:pointer;
+  padding:9px 3px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--ink)}
+.sk-opt:hover{border-color:var(--acc);background:var(--accSoft)}
+.sk-opt.on{border-color:var(--acc);box-shadow:0 0 0 2.5px var(--accSoft)}
+.sk-opt .lb{font-size:11px;font-weight:600;color:var(--mut);text-align:center;line-height:1.2}
+.sk-opt.on .lb{color:var(--acc)}
+.sk-opt svg{display:block;color:var(--acc)}
+.item-row{display:flex;align-items:flex-start;gap:7px;margin-bottom:9px}
+.item-row .ir-n{width:20px;text-align:center;font:600 12px var(--mono);color:var(--faint);flex:none;padding-top:8px}
+.ir-campos{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.ir-campos .ir-t{width:100%}
+.ir-campos .ir-d{width:100%;font-size:12.5px;color:var(--mut)}
+.ir-btns{display:flex;flex-direction:column;gap:2px;flex:none}
+.ir-btns .icon-btn{width:26px;height:24px}
+
+/* ---------- índice de respaldo para preguntas ---------- */
+/* Por encima de la presentación, que vive en z-index 150. */
+.preg-fondo{position:fixed;inset:0;z-index:220;background:rgba(8,11,15,.72);display:grid;place-items:center;padding:24px}
+.preg-caja{background:#15191F;color:#E8EDF2;border-radius:16px;width:min(920px,94vw);max-height:86vh;
+  display:flex;flex-direction:column;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.preg-cab{padding:16px 20px 10px;display:flex;flex-direction:column;gap:2px}
+.preg-cab b{font-size:16px}
+.preg-cab span{font-size:12.5px;opacity:.62}
+.preg-busca{margin:0 20px 12px;background:#1E242C;border-color:#2C3540;color:#E8EDF2}
+.preg-lista{flex:1;overflow:auto;padding:0 20px 12px;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:12px;align-content:start}
+.preg-item{background:none;border:1px solid #2C3540;border-radius:11px;padding:7px;cursor:pointer;
+  display:flex;flex-direction:column;gap:6px;color:inherit;text-align:left}
+.preg-item:hover{border-color:#EB811B}
+.preg-clip{overflow:hidden;border-radius:6px;background:#fff;position:relative}
+.preg-t{display:flex;gap:7px;align-items:baseline;font-size:11.5px;min-width:0}
+.preg-t b{color:#EB811B;flex:none}
+.preg-t span{opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.preg-vacio{grid-column:1/-1;opacity:.6;font-size:13px}
+.preg-pie{padding:10px 20px 16px;font-size:11.5px;opacity:.5;border-top:1px solid #232A33}
+
+/* ---------- acabados de SmartArt ---------- */
+.sa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}
+.sa-opt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 6px;
+  border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--mut);cursor:pointer}
+.sa-opt:hover{border-color:var(--acc);color:var(--acc)}
+.sa-opt.on{border-color:var(--acc);background:var(--accSoft);color:var(--acc)}
+.sa-opt .lb{font-size:11px;font-weight:600}
+.ir-btns .icon-btn.on{color:var(--acc);background:var(--accSoft)}
+/* Editorial: la tipografía carga con la jerarquía, así que respira más. */
+.smart-box.sa-editorial .smart-rot{font-size:.76em}
+.smart-box.sa-editorial .smart-rot .sr-t{font-weight:650;letter-spacing:.005em}
+.smart-box.sa-editorial .smart-rot .sr-d{opacity:.72}
+.smart-box.sa-contorno .smart-rot .sr-t{font-weight:650}
+
+/* ================= editor de reacciones (81-quimica.js) =================
+   El diálogo respira por secciones y no por líneas: cada bloque se separa con
+   aire de la escala y, cuando hace falta marcar un territorio, con un cambio
+   suave de fondo. El color fuerte queda para lo que se pulsa y para el aviso
+   de que la reacción no cuadra. */
+.modal.modal-quim{width:min(1040px,100%)}
+.qz-cuerpo{display:flex;flex-direction:column;gap:var(--e5,24px)}
+.qz-mirador{display:flex;flex-direction:column;gap:var(--e1,4px)}
+.qz-vacio{color:var(--faint);font-size:var(--t2,14px)}
+.qz-sec{display:flex;flex-direction:column;gap:var(--e2,8px)}
+.qz-sec-cab{display:flex;align-items:baseline;gap:var(--e2,8px);flex-wrap:wrap}
+.qz-ayuda{font-size:var(--t1,12.5px);color:var(--faint);font-weight:400}
+.qz-herr{display:flex;flex-direction:column;gap:var(--e6,32px)}
+/* Una reacción es más ancha que una ecuación suelta; si la casilla es estrecha
+   la fórmula se encoge hasta no leerse. */
+.modal-quim .tpl-grid{grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:var(--e2,8px)}
+.modal-quim .tpl{padding:var(--e3,12px) var(--e2,8px) var(--e2,8px);gap:var(--e2,8px);min-height:76px}
+
+/* ---------- panel de análisis ---------- */
+/* Cerrado es una línea de datos; abierto, un informe. El mismo aire por los
+   cuatro lados aguanta los dos estados sin verse apretado en ninguno. */
+.qz-an{background:var(--panel2);border-radius:var(--r3,12px);padding:var(--e4,16px);
+  display:flex;flex-direction:column;gap:var(--e4,16px)}
+.qz-cinta{display:flex;flex-wrap:wrap;align-items:center;gap:var(--e2,8px) var(--e5,24px)}
+.qz-cinta-2{gap:var(--e2,8px) var(--e4,16px)}
+.qz-dato{display:inline-flex;align-items:baseline;gap:var(--e1,4px);font-size:var(--t2,14px);min-width:0}
+.qz-dato b{font-size:var(--t0,11px);font-weight:700;letter-spacing:var(--ls-rotulo,.13em);
+  text-transform:uppercase;color:var(--faint)}
+.qz-dato b:empty{display:none}
+.qz-dato>span{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.qz-flojo>span{color:var(--mut);font-weight:400}
+.qz-nombre>span{color:var(--mut);font-weight:500;font-style:italic}
+.qz-bien>span{color:var(--ok);font-weight:600}
+.qz-bien::before{content:'✓';color:var(--ok);font-weight:700;margin-right:var(--e1,4px)}
+.qz-mal{display:flex;flex-direction:column;gap:var(--e1,4px);flex:1 1 240px;min-width:0;
+  color:var(--warn);font-size:var(--t2,14px);font-weight:600;line-height:1.4}
+.qz-ajustar{align-self:center;flex:none}
+.qz-mas{margin-left:auto;flex:none;border:none;background:none;color:var(--acc);cursor:pointer;
+  font:700 var(--t1,12.5px)/1.2 var(--ui);padding:var(--e1,4px) var(--e2,8px);border-radius:var(--r1,6px)}
+.qz-mas:hover{background:var(--accSoft)}
+.qz-det{display:flex;flex-direction:column;gap:var(--e4,16px)}
+.qz-det:empty{display:none}
+.qz-an .hint{margin-top:0}
+
+/* composición: la barra dice el porcentaje en masa y su color, la familia */
+.qz-comp{display:flex;flex-direction:column;gap:var(--e2,8px)}
+.qz-comp-fila{--fh:220;display:grid;grid-template-columns:2.6em 2.6em minmax(50px,1fr) 4.4em;
+  align-items:center;gap:var(--e2,8px);font-size:var(--t2,14px)}
+.qz-comp-fila b{font-weight:700;color:hsl(var(--fh) calc(var(--qz-fs) + 12%) var(--qz-fi))}
+.qz-comp-n{color:var(--faint);font-size:var(--t1,12.5px);font-variant-numeric:tabular-nums}
+.qz-barra{display:block;height:8px;background:var(--panel3);border-radius:99px;overflow:hidden}
+.qz-barra i{display:block;height:100%;border-radius:99px;background:hsl(var(--fh) 40% var(--qz-fb))}
+.qz-pct{text-align:right;color:var(--mut);font-size:var(--t1,12.5px);font-variant-numeric:tabular-nums}
+
+/* estados de oxidación */
+.qz-eos{display:flex;flex-wrap:wrap;gap:var(--e2,8px)}
+.qz-eo{display:inline-flex;align-items:baseline;gap:var(--e1,4px);background:var(--panel);
+  border-radius:var(--r1,6px);padding:var(--e1,4px) var(--e2,8px);font-size:var(--t2,14px);
+  font-variant-numeric:tabular-nums;color:var(--ink)}
+.qz-eo b{font-weight:700}
+
+/* especies de una reacción, lado a lado */
+.qz-lados{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--e4,16px)}
+.qz-lado{display:flex;flex-direction:column;gap:var(--e1,4px);min-width:0}
+.qz-lado>.panel-label{margin-bottom:var(--e1,4px)}
+.qz-esp{display:grid;grid-template-columns:2.8em minmax(0,1fr) 5.2em;align-items:center;
+  gap:var(--e2,8px);font-size:var(--t2,14px)}
+.qz-esp-c{text-align:right;color:var(--faint);font-variant-numeric:tabular-nums}
+.qz-esp-f{min-width:0;overflow-x:auto;overflow-y:hidden}
+.qz-esp-m{text-align:right;color:var(--mut);font-variant-numeric:tabular-nums}
+/* Aquí la línea sí delimita: separa los sumandos de su total. */
+.qz-esp-tot{margin-top:var(--e1,4px);padding-top:var(--e2,8px);border-top:1px solid var(--line)}
+.qz-esp-tot .qz-esp-f,.qz-esp-tot .qz-esp-m{font-weight:600;color:var(--ink)}
+
+/* ---------- atajos en grupos ---------- */
+.qz-atajos{display:flex;flex-wrap:wrap;gap:var(--e3,12px) var(--e5,24px)}
+.qz-atajo-g{display:flex;flex-direction:column;gap:var(--e2,8px)}
+.qz-atajo-n{font-size:var(--t0,11px);font-weight:700;letter-spacing:var(--ls-rotulo,.13em);
+  text-transform:uppercase;color:var(--faint)}
+.qz-atajos .chips{margin-bottom:0;gap:var(--e1,4px)}
+
+/* ---------- buscador del diccionario ---------- */
+.qz-busca{display:flex;flex-direction:column;gap:var(--e2,8px)}
+.qz-res{display:flex;flex-wrap:wrap;gap:var(--e2,8px)}
+.qz-res .hint{flex:1 1 100%;margin-top:0}
+.qz-hit{display:inline-flex;align-items:center;gap:var(--e2,8px);padding:var(--e1,4px) var(--e3,12px)}
+.qz-hit-n{font-weight:600}
+.qz-hit-f{color:var(--acc)}
+.qz-hit-f .katex{font-size:.95em}
+
+/* ---------- tabla periódica ---------- */
+.qz-desp{align-self:flex-start}
+.qz-tp-caja{overflow-x:auto;overflow-y:hidden}
+.qz-tp-caja.plegada{display:none}
+.qz-tp{display:flex;flex-direction:column;gap:var(--e2,8px);min-width:660px;padding:var(--e2,8px) 1px}
+.qz-rej{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:var(--e1,4px)}
+.qz-rej-f{margin-top:var(--e2,8px)}
+/* Única excepción a la escala de espaciado, y a conciencia: dentro de una
+   casilla de 33 px no cabe el aire de --e1. Son dieciocho columnas que tienen
+   que caber a la vez, así que la casilla manda sobre la escala; el aire de la
+   tabla —entre casillas, con la leyenda— sí sale de --e1 y --e2. */
+.qz-el{--fh:220;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  min-height:38px;padding:3px 2px;border:none;border-radius:var(--r1,6px);cursor:pointer;
+  font-family:var(--ui);line-height:1;transition:box-shadow .12s;
+  background:hsl(var(--fh) var(--qz-fs) var(--qz-fl));color:hsl(var(--fh) calc(var(--qz-fs) + 12%) var(--qz-fi))}
+.qz-el i{font-style:normal;font-size:8.5px;opacity:.6;font-variant-numeric:tabular-nums}
+.qz-el b{font-size:13.5px;font-weight:700}
+.qz-el:hover{box-shadow:inset 0 0 0 2px var(--acc)}
+.qz-hueco{cursor:default;font-size:9px;color:var(--faint);background:transparent;
+  box-shadow:inset 0 0 0 1px var(--line2)}
+.qz-hueco:hover{box-shadow:inset 0 0 0 1px var(--line2)}
+.qz-ley{display:flex;flex-wrap:wrap;gap:var(--e1,4px) var(--e4,16px);padding-top:var(--e1,4px)}
+.qz-ley-i{--fh:220;display:inline-flex;align-items:center;gap:var(--e1,4px);color:var(--mut);
+  font-size:var(--t0,11px);letter-spacing:.03em}
+.qz-ley-i::before{content:'';width:10px;height:10px;border-radius:3px;flex:none;
+  background:hsl(var(--fh) var(--qz-fs) var(--qz-fl))}
+
+/* Tono por familia. Diez matices repartidos por la rueda, todos con la misma
+   saturación baja: informan sin gritar. La luminosidad la pone el tema. */
+:root{--qz-fs:44%;--qz-fl:90%;--qz-fi:29%;--qz-fb:50%}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--qz-fs:32%;--qz-fl:25%;--qz-fi:80%;--qz-fb:62%}
+}
+:root[data-theme="dark"]{--qz-fs:32%;--qz-fl:25%;--qz-fi:80%;--qz-fb:62%}
+.qz-f-alc{--fh:8}
+.qz-f-alt{--fh:38}
+.qz-f-mtl{--fh:70}
+.qz-f-hal{--fh:132}
+.qz-f-nom{--fh:186}
+.qz-f-tra{--fh:226}
+.qz-f-nob{--fh:268}
+.qz-f-lan{--fh:305}
+.qz-f-act{--fh:340}
+.qz-f-des{--fh:226}
+/* Los metales del bloque p se quedan en un gris de acero: liberan sitio en la
+   rueda para que los diez matices restantes se distingan de verdad. */
+.qz-f-pos{--fh:215;--qz-fs:13%;--qz-fb:44%}
+
+@media (max-width:920px){
+  .qz-cuerpo{gap:var(--e4,16px)}
+  .qz-herr{gap:var(--e5,24px)}
+  .qz-atajos{gap:var(--e3,12px) var(--e4,16px)}
+  .qz-mas{margin-left:0}
+}
