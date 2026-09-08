@@ -84,7 +84,7 @@
           "id": "example-espectroscopia-8",
           "type": "chart",
           "kind": "linea",
-          "data": "Número de onda\tIntensidad\n0\t0.002\n1\t0.044\n2\t0.458\n3\t1.000\n4\t0.458\n5\t0.044\n6\t0.002",
+          "data": "Número de onda\tIntensidad\n0\t0.001\n1\t0.044\n2\t0.458\n3\t1.000\n4\t0.458\n5\t0.044\n6\t0.001",
           "xlabel": "Coordenada espectral (u.a.)",
           "ylabel": "Intensidad normalizada",
           "title": "",

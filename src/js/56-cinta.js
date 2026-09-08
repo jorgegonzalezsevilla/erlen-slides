@@ -328,7 +328,9 @@ function aplicaDisposicion() {
   pintaCinta();
   if (enCinta()) closeDrawerSiProcede();
   renderInspector();
-  if (typeof ajustaZoom === 'function') { try { ajustaZoom(); } catch (e) { } }
+  /* Cambiar de disposición cambia el ancho disponible: sin volver a ajustar,
+     el lienzo se queda con la escala anterior hasta el siguiente redibujo. */
+  if (S.deck) { S.zoom = null; renderCanvas(); }
 }
 function closeDrawerSiProcede() {
   if (document.body.classList.contains('panel-temporal')) return;

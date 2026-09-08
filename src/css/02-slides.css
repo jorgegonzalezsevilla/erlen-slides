@@ -731,8 +731,13 @@ table.btab.no-head tbody tr:first-child td{border-top:2.2px solid var(--sfg)}
 .celda-cu ul.bl li{padding-left:calc(var(--bl-pl) - 12px)}
 .celda-cu ul.bl li::before{left:0}
 
-/* marcador de zona vacía */
-.zona-vacia{padding:22px 10px;font-size:15px;min-height:60px;aspect-ratio:auto}
+/* marcador de zona vacía: es el botón que crea el texto, así que se comporta
+   como tal (foco visible incluido) */
+.zona-vacia{padding:22px 10px;font-size:15px;min-height:60px;aspect-ratio:auto;gap:4px;text-align:center}
+.zona-vacia .zv-t{line-height:1.35}
+.zona-vacia .zv-s{font-size:.78em;opacity:.75}
+.zona-vacia:hover .zv-s{opacity:1}
+.zona-vacia:focus-visible{outline:2px solid var(--sacc);outline-offset:2px}
 .mode-thumb .zona-vacia,.mode-present .zona-vacia,.mode-export .zona-vacia{display:none}
 
 /* ---------- logotipo institucional ---------- */

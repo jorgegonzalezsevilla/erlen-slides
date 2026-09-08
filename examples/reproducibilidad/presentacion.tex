@@ -85,14 +85,14 @@
 }
 
 % --- diapositiva 4 ---
-\begin{frame}{Mostrar la evidencia}
+\begin{frame}[fragile]{Mostrar la evidencia}
   \transdissolve[duration=0.25]
   \begin{semiverbatim}
   from statistics import mean
   
   # Datos ilustrativos, sin dependencias externas
   y = [1.0, 1.1, 0.9]
-  print(f"Media: {mean(y):.3f}")
+  print(f"Media: \{mean(y):.3f\}")
   # Salida esperada: Media: 1.000
   \end{semiverbatim}
   \medskip

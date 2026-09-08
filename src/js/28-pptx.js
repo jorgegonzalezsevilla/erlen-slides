@@ -113,16 +113,20 @@ async function exportPPTX() {
       '<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>' +
       formas.join('') + '</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>');
 
+    /* Las diapositivas fuera de la rama no se escriben: numerar por posición
+       exportada, no por índice del mazo, o el paquete referencia archivos que
+       no existen y PowerPoint lo da por dañado. */
+    const num = slidesXml.length;
     const tieneNota = !!(sl.notes && sl.notes.trim());
     conNotas.push(tieneNota);
     const rels = [rel('rId1', 'slideLayout', '../slideLayouts/slideLayout1.xml')];
     relsSlide.forEach(x => rels.push(rel(x.rid, 'image', x.destino)));
-    if (tieneNota) rels.push(rel('rIdN', 'notesSlide', '../notesSlides/notesSlide' + (i + 1) + '.xml'));
-    archivos.push({ nombre: 'ppt/slides/_rels/slide' + (i + 1) + '.xml.rels', datos: relsDe(rels) });
+    if (tieneNota) rels.push(rel('rIdN', 'notesSlide', '../notesSlides/notesSlide' + num + '.xml'));
+    archivos.push({ nombre: 'ppt/slides/_rels/slide' + num + '.xml.rels', datos: relsDe(rels) });
     if (tieneNota) {
-      archivos.push({ nombre: 'ppt/notesSlides/notesSlide' + (i + 1) + '.xml', datos: notasXml(sl.notes) });
-      archivos.push({ nombre: 'ppt/notesSlides/_rels/notesSlide' + (i + 1) + '.xml.rels',
-        datos: relsDe([rel('rId1', 'notesMaster', '../notesMasters/notesMaster1.xml'), rel('rId2', 'slide', '../slides/slide' + (i + 1) + '.xml')]) });
+      archivos.push({ nombre: 'ppt/notesSlides/notesSlide' + num + '.xml', datos: notasXml(sl.notes) });
+      archivos.push({ nombre: 'ppt/notesSlides/_rels/notesSlide' + num + '.xml.rels',
+        datos: relsDe([rel('rId1', 'notesMaster', '../notesMasters/notesMaster1.xml'), rel('rId2', 'slide', '../slides/slide' + num + '.xml')]) });
     }
   }
   wb.innerHTML = '';
@@ -130,7 +134,7 @@ async function exportPPTX() {
   slidesXml.forEach((x, i) => archivos.push({ nombre: 'ppt/slides/slide' + (i + 1) + '.xml', datos: x }));
   medios.forEach(md => archivos.push({ nombre: 'ppt/media/' + md.nombre, datos: md.bytes }));
 
-  const n = deck.slides.length;
+  const n = slidesXml.length;   /* diapositivas realmente escritas */
   const relsPres = [rel('rId1', 'slideMaster', 'slideMasters/slideMaster1.xml')];
   for (let i = 0; i < n; i++) relsPres.push(rel('rIdS' + (i + 1), 'slide', 'slides/slide' + (i + 1) + '.xml'));
   relsPres.push(rel('rIdNM', 'notesMaster', 'notesMasters/notesMaster1.xml'));

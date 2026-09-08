@@ -80,6 +80,10 @@ function mountToolbar() {
   add('⚙', 'Propiedades en el panel', () => { S.tab = 'bloque'; renderInspector(); openDrawer(true); });
   add('✕', 'Eliminar bloque', () => delBlock(S.selBlock), 'tb-danger');
   el.append(bar);
+  if (ARRASTRA_CUERPO[f.block.type]) {
+    el.classList.add('blk-movible');
+    el.addEventListener('pointerdown', ev => arrastraCuerpo(ev, f.block.id, el));
+  }
   montaManija(el, f.block);
   /* Si arriba no cabe, la barra se mete dentro del bloque: así nunca tapa
      el título del marco ni se queda fuera del alcance del ratón. */
@@ -273,6 +277,9 @@ function iniciaArrastre(ev, id) {
   if (!id || ev.button > 0) return;
   ev.preventDefault(); ev.stopPropagation();
   const asa = ev.currentTarget;
+  /* Los movimientos se escuchan en el documento: la captura del puntero falla
+     en algunos navegadores y con lápiz, y entonces el bloque dejaba de recibir
+     eventos en cuanto el cursor salía de él. */
   try { asa.setPointerCapture(ev.pointerId); } catch (e) {}
   let activo = false;
   const x0 = ev.clientX, y0 = ev.clientY;
@@ -289,9 +296,9 @@ function iniciaArrastre(ev, id) {
     apuntaDestino(e.clientX, e.clientY);
   };
   const suelta = e => {
-    asa.removeEventListener('pointermove', mueve);
-    asa.removeEventListener('pointerup', suelta);
-    asa.removeEventListener('pointercancel', cancela);
+    document.removeEventListener('pointermove', mueve);
+    document.removeEventListener('pointerup', suelta);
+    document.removeEventListener('pointercancel', cancela);
     if (_chip) { _chip.remove(); _chip = null; }
     document.body.classList.remove('arrastra-bloque');
     if (!activo) { limpiaMarcas(); dragBlk = null; return; }
@@ -301,16 +308,16 @@ function iniciaArrastre(ev, id) {
     else if (dest) moveBlockToSlide(id, S.cur, dest.z, dest.i);
   };
   const cancela = () => {
-    asa.removeEventListener('pointermove', mueve);
-    asa.removeEventListener('pointerup', suelta);
-    asa.removeEventListener('pointercancel', cancela);
+    document.removeEventListener('pointermove', mueve);
+    document.removeEventListener('pointerup', suelta);
+    document.removeEventListener('pointercancel', cancela);
     if (_chip) { _chip.remove(); _chip = null; }
     document.body.classList.remove('arrastra-bloque');
     limpiaMarcas(); dragBlk = null;
   };
-  asa.addEventListener('pointermove', mueve);
-  asa.addEventListener('pointerup', suelta);
-  asa.addEventListener('pointercancel', cancela);
+  document.addEventListener('pointermove', mueve);
+  document.addEventListener('pointerup', suelta);
+  document.addEventListener('pointercancel', cancela);
 }
 
 /* Decide qué hay bajo el dedo: una zona del lienzo o una miniatura. */
@@ -351,14 +358,79 @@ function marcaDestino(cont, y) {
   _destino = { z, i: idx };
 }
 
+/* Crea un texto en la zona que el usuario está mirando y deja el cursor
+   dentro: escribir es lo primero que se intenta al abrir una diapositiva. */
+function nuevoTextoEnZona(z) {
+  const n = zonasDe(curSlide().layout);
+  S.insCol = n ? clamp((+z || 0) + 1, 1, n) : 1;
+  addBlockToSlide('text', S.insCol);
+  enfocaBloque(S.selBlock);
+}
+/* Pone el cursor al final del texto recién creado. */
+function enfocaBloque(id) {
+  if (!id) return;
+  const blk = $(`#stageInner .blk[data-bid="${id}"]`);
+  const el = blk && (blk.matches('[data-edit]') ? blk : blk.querySelector('[data-edit]'));
+  if (!el) return;
+  el.focus();
+  try {
+    const r = document.createRange(); r.selectNodeContents(el); r.collapse(false);
+    const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+  } catch (e) {}
+}
+/* Los bloques que no llevan texto dentro se arrastran agarrándolos, sin tener
+   que apuntar al asa de la barra. */
+const ARRASTRA_CUERPO = { image: 1, chart: 1, func: 1, video: 1, smart: 1, estruct: 1, montaje: 1, geo: 1, galeria: 1 };
+/* El arrastre no empieza hasta que el puntero se mueve de verdad: así un clic
+   sigue siendo un clic (seleccionar, doble clic para editar) y solo al mover
+   se toma el bloque. */
+function arrastraCuerpo(ev, id, el) {
+  if (ev.button > 0 || !id) return;
+  if (ev.target.closest('.blk-toolbar, .ancho-asa, [data-edit], .sliders, button, input, a')) return;
+  const x0 = ev.clientX, y0 = ev.clientY;
+  /* Se captura el puntero desde el principio: sin ello, en cuanto el cursor
+     sale del bloque los movimientos dejan de llegar y el arrastre no arranca. */
+  try { el.setPointerCapture(ev.pointerId); } catch (e) {}
+  const quita = () => {
+    document.removeEventListener('pointermove', mueve);
+    document.removeEventListener('pointerup', quita);
+    document.removeEventListener('pointercancel', quita);
+  };
+  const mueve = e => {
+    if (Math.abs(e.clientX - x0) < 5 && Math.abs(e.clientY - y0) < 5) return;
+    quita();
+    iniciaArrastre({ button: 0, pointerId: e.pointerId, clientX: e.clientX, clientY: e.clientY,
+      currentTarget: el, preventDefault() {}, stopPropagation() {} }, id);
+  };
+  document.addEventListener('pointermove', mueve);
+  document.addEventListener('pointerup', quita);
+  document.addEventListener('pointercancel', quita);
+}
+
 function initCanvasEvents() {
   const inner = $('#stageInner');
+  /* Arrastrar una imagen dispara el arrastre nativo del navegador, que cancela
+     el puntero a media gesto. El lienzo tiene el suyo propio, con sus guías. */
+  inner.addEventListener('dragstart', e => e.preventDefault());
   inner.addEventListener('mousedown', e => {
     if (e.target.closest('.sliders')) { e.stopPropagation(); return; }
+    /* En mousedown y no en click: al soltar el ratón ya se ha ido el foco del
+       texto anterior, y ese guardado vuelve a dibujar el lienzo, de modo que
+       el clic caería sobre un marcador que ya no existe. */
+    const nz = e.target.closest('[data-nueva-z]');
+    if (nz) { e.preventDefault(); nuevoTextoEnZona(nz.dataset.nuevaZ); return; }
     const blk = e.target.closest('.blk');
     if (blk && blk.dataset.bid && blk.dataset.bid !== S.selBlock) selectBlock(blk.dataset.bid);
+    /* Insertar va a la columna donde acabas de hacer clic, no siempre a la primera. */
+    const zc = e.target.closest('[data-z]');
+    if (zc) {
+      const n = zonasDe(curSlide().layout);
+      const z = clamp((+zc.dataset.z || 0) + 1, 1, Math.max(1, n));
+      if (n > 1 && S.insCol !== z) { S.insCol = z; if (S.tab === 'insert') renderInspector(); }
+    }
   });
   inner.addEventListener('click', e => {
+    if (e.target.closest('[data-nueva-z]')) return;
     const blk = e.target.closest('.blk');
     if (!blk) { if (!e.target.closest('.blk-toolbar')) selectBlock(null); return; }
     const f = findBlock(blk.dataset.bid); if (!f) return;
@@ -370,7 +442,12 @@ function initCanvasEvents() {
     }
   });
   inner.addEventListener('dblclick', e => {
-    const blk = e.target.closest('.blk'); if (!blk) return;
+    const blk = e.target.closest('.blk');
+    if (!blk) {
+      const zc = e.target.closest('[data-z]');
+      if (zc && !e.target.closest('[data-edit]')) nuevoTextoEnZona(zc.dataset.z);
+      return;
+    }
     const f = findBlock(blk.dataset.bid); if (!f) return;
     if (f.block.type === 'math') openEqEditor(f.block);
     else if (f.block.type === 'chem') openChemEditor(f.block);
@@ -384,6 +461,12 @@ function initCanvasEvents() {
     else if (f.block.type === 'geo') openGeometria(f.block);
     else if (f.block.type === 'galeria') openGaleria(f.block);
   });
+  /* El texto de ayuda («Texto…») se pinta con una clase que solo se recalcula
+     al redibujar: mientras escribes, se quita en cuanto hay algo escrito. */
+  inner.addEventListener('input', e => {
+    const el = e.target.closest('[data-edit]');
+    if (el) el.classList.toggle('is-empty', !el.textContent.trim());
+  });
   inner.addEventListener('focusin', e => {
     const el = e.target.closest('[data-edit]');
     if (el) enterRaw(el);
@@ -395,6 +478,8 @@ function initCanvasEvents() {
     leaveRaw(el, rel ? rel.dataset.ek : null);
   });
   inner.addEventListener('keydown', e => {
+    const nz = e.target.closest('[data-nueva-z]');
+    if (nz && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); nuevoTextoEnZona(nz.dataset.nuevaZ); return; }
     const el = e.target.closest('[data-edit]');
     if (!el) return;
     const ek = el.dataset.ek, p = ekParts(ek);

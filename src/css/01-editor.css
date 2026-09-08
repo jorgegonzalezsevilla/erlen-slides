@@ -613,6 +613,10 @@ input.field.cp-inp{font-size:var(--t3);padding:var(--e3)}
 .av-lista li{margin-bottom:3px}
 
 /* ---------- manija de anchura ---------- */
+.mode-edit .blk.blk-movible.sel{cursor:move}
+.mode-edit .blk img,.mode-edit .blk svg{-webkit-user-drag:none;user-select:none}
+body.arrastra-bloque,body.arrastra-bloque *{cursor:grabbing!important}
+.ancho-asa.asa-izq{right:auto;left:-7px}
 .ancho-asa{position:absolute;right:-7px;top:50%;width:14px;height:44px;margin-top:-22px;
   border:1.5px solid var(--acc);background:var(--panel);border-radius:var(--r1);cursor:ew-resize;
   padding:0;touch-action:none;z-index:12;box-shadow:0 2px 8px rgba(20,25,45,.22)}

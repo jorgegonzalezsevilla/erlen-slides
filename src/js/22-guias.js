@@ -61,13 +61,18 @@ function pintaGuias(cont, pct, etiqueta) {
   capa.append(h('span', { class: 'g-rotulo', style: `left:${cen}px` }, etiqueta));
 }
 
-/* Manija de anchura sobre el bloque seleccionado. */
+/* Manijas de anchura sobre el bloque seleccionado: una a cada lado, como se
+   espera de una figura, y la figura crece o encoge por su centro. */
 function montaManija(el, b) {
   if (!CON_ANCHO[b.type]) return;
   const dentro = el.querySelector(SEL_ANCHO[b.type]);
   if (!dentro) return;
+  manijaLado(el, b, dentro, 1);
+  manijaLado(el, b, dentro, -1);
+}
+function manijaLado(el, b, dentro, lado) {
   const k = clamp(1 / effZoom(), 0.6, 2.4);
-  const manija = h('button', { class: 'ancho-asa', title: 'Arrastra para cambiar la anchura',
+  const manija = h('button', { class: 'ancho-asa' + (lado < 0 ? ' asa-izq' : ''), title: 'Arrastra para cambiar la anchura',
     'aria-label': 'Cambiar la anchura', style: `transform:scale(${k})` });
   manija.addEventListener('click', e => e.stopPropagation());
   manija.addEventListener('pointerdown', ev => {
@@ -80,7 +85,7 @@ function montaManija(el, b) {
     const lista = imanes(b.id);
     document.body.classList.add('arrastra-ancho');
     const mueve = e => {
-      const d = (e.clientX - x0) / Math.max(1, anchoCont) * 200;   /* crece por los dos lados */
+      const d = lado * (e.clientX - x0) / Math.max(1, anchoCont) * 200;   /* crece por los dos lados */
       let v = clamp(w0 + d, 15, 100);
       const im = ajusta(v, lista);
       if (im) v = im.v;

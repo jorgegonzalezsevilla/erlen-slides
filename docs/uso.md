@@ -4,7 +4,7 @@
 
 En Inicio elige **Nueva presentación**, **Explorar ejemplos** o **Importar proyecto**. Un documento nuevo empieza con una portada vacía. Pon un título y añade diapositivas desde la tira lateral. Puedes reordenarlas, cambiar el diseño o abrir la vista general.
 
-Haz clic sobre el texto de la diapositiva para editar. El panel derecho separa Insertar, Diapositiva, Diseño y las propiedades del bloque seleccionado. Las ecuaciones reciben LaTeX; las reacciones reciben sintaxis mhchem. Por ejemplo: `A = \\varepsilon l c` en la documentación representa la orden LaTeX `A = \varepsilon l c` que debes escribir en el editor.
+Haz clic sobre el texto de la diapositiva para editar, o sobre una zona vacía —incluida cada columna o celda de los diseños de varias zonas— para escribir ahí mismo; el doble clic en el hueco de una zona añade otro texto. Una figura seleccionada se arrastra agarrándola y se estrecha o ensancha con las manijas de sus lados. El panel derecho separa Insertar, Diapositiva, Diseño y las propiedades del bloque seleccionado. Las ecuaciones reciben LaTeX; las reacciones reciben sintaxis mhchem. Por ejemplo: `A = \\varepsilon l c` en la documentación representa la orden LaTeX `A = \varepsilon l c` que debes escribir en el editor.
 
 ## Gráficas y química
 
@@ -30,7 +30,7 @@ Usa Presentar o F5. Avanza con las flechas; Esc vuelve al editor. N muestra nota
 | PDF | Compartir una copia visual | Usa Imprimir/Guardar como PDF y revisa tamaño, fondos y recortes |
 | PPTX | Abrir en software de presentaciones | Algunos elementos complejos se convierten en imágenes; revisa tipografías y alineación en el programa destino |
 | Beamer / TEX | Continuar un flujo con LaTeX | Requiere una distribución de LaTeX; temas y elementos especiales pueden diferir de la vista web |
-| HTML | Presentar en un navegador | Revisa la copia exportada y la disponibilidad de recursos que hayas incorporado |
+| HTML | Imprimir desde el navegador cuando el cuadro de impresión falla | Se ofrece dentro de Exportar → PDF como «Archivo imprimible (.html)»: es una copia paginada para imprimir, no un modo de presentación |
 
 No se ha certificado compatibilidad visual idéntica con todas las versiones de PowerPoint ni con todos los motores LaTeX. La validación específica de esta publicación está en [validacion.md](validacion.md).
 

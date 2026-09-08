@@ -16,6 +16,16 @@ function texEscapeNota(s) {
   });
   return texEscape(con).replace(/\u0001(\d+)\u0001/g, (_, i) => macros[+i]);
 }
+/* Las matemáticas se copian literalmente al .tex: es lo que las hace útiles y
+   también la vía por la que un proyecto ajeno podría colar órdenes de archivo
+   o de shell en tu compilación. Estas primitivas no aparecen en ninguna
+   ecuación legítima (KaTeX ni las admite), así que se retiran y se avisa. */
+const TEX_PROHIBIDO = /\\(?:@@input|inputlineno|input|include|subfile|openin|openout|write18|writeln|write|readline|read|catcode|csname|endcsname|immediate|directlua|latelua|ShellEscape|lstinputlisting|verbatiminput|usepackage|RequirePackage|special|newread|newwrite|escapechar|endlinechar)(?![a-zA-Z])/g;
+let TEX_RETIRADO = 0;
+function texMate(s) {
+  return String(s == null ? '' : s).replace(/[\r\n]+/g, ' ')
+    .replace(TEX_PROHIBIDO, m => { TEX_RETIRADO++; return '\\text{[' + m.slice(1) + ' retirado]}'; });
+}
 let TEX_EN_TITULO = false;
 function texInline(s) {
   let out = '', buf = '', inM = false, i = 0;
@@ -27,7 +37,7 @@ function texInline(s) {
     const c = s[i];
     if (c === '\\' && s[i + 1] === '$') { buf += '\\$'; i += 2; continue; }
     if (c === '$') {
-      out += inM ? '$' + buf + '$' : texEscapeNota(buf);
+      out += inM ? '$' + texMate(buf) + '$' : texEscapeNota(buf);
       buf = ''; inM = !inM; i++; continue;
     }
     buf += c; i++;
@@ -69,9 +79,16 @@ function figTex(b) {
   return `\\erlenescala{${w}}{${figName(b)}}{${frac.toFixed(4)}}{${texEscape(e.largo + ' ' + (e.unidad || 'µm'))}}`;
 }
 const zt = (sl, i) => ((sl.zt || [])[i] || '');
+/* Beamer exige [fragile] en todo frame con un entorno verbatim; sin él el .tex
+   no compila («Runaway argument… ended by \end{frame}»). */
+const frameConCodigo = sl => CLAVES_ZONA.some(k => (sl[k] || []).some(b => b && b.type === 'code'));
 /* Abre un frame respetando título, subtítulo y el margen elegido. */
 function abreFrame(sl) {
-  const opt = sl.pad === 'estrecho' || sl.layout === 'ancho' ? '[t]' : '';
+  const estrecho = sl.pad === 'estrecho' || sl.layout === 'ancho';
+  const partes = [];
+  if (estrecho) partes.push('t');
+  if (frameConCodigo(sl)) partes.push('fragile');
+  const opt = partes.length ? '[' + partes.join(',') + ']' : '';
   TEX_EN_TITULO = true;
   const cab = '\\begin{frame}' + opt + '{' + texInline(sl.title || '') +
     (sl.subtitle ? '}{' + texInline(sl.subtitle) : '') + '}';
@@ -311,10 +328,10 @@ function texBlocks(arr, ind) {
       }
       case 'math':
         if (typeof conDerivacion === 'function' && conDerivacion(b)) { L.push(derivacionTex(b, p)); break; }
-        if (b.tex) L.push(p + '\\begin{equation*}\n' + p + '  ' + b.tex + '\n' + p + '\\end{equation*}');
+        if (b.tex) L.push(p + '\\begin{equation*}\n' + p + '  ' + texMate(b.tex) + '\n' + p + '\\end{equation*}');
         break;
       case 'chem':
-        if (b.tex) L.push(p + '\\begin{center}\n' + p + '  \\ce{' + b.tex + '}\n' + p + '\\end{center}');
+        if (b.tex) L.push(p + '\\begin{center}\n' + p + '  \\ce{' + texMate(b.tex) + '}\n' + p + '\\end{center}');
         break;
       case 'teorema':
         L.push(teoremaTex(b, p));
@@ -385,7 +402,11 @@ function texBlocks(arr, ind) {
         L.push(p + '\\begin{quote}\n' + p + '  ' + texInline(b.text) + (b.by ? '\n' + p + '  \\par\\hfill\\textit{--- ' + texInline(b.by) + '}' : '') + '\n' + p + '\\end{quote}');
         break;
       case 'code':
-        L.push(p + '\\begin{semiverbatim}\n' + String(b.text || '').split('\n').map(l => p + l).join('\n') + '\n' + p + '\\end{semiverbatim}');
+        /* En semiverbatim la barra y las llaves siguen activas: se escapan o
+           el código del usuario se lee como comandos LaTeX inexistentes. */
+        L.push(p + '\\begin{semiverbatim}\n' + String(b.text || '').split('\n')
+          .map(l => p + l.replace(/\\/g, '\u0001').replace(/\{/g, '\\{').replace(/\}/g, '\\}').replace(/\u0001/g, '\\textbackslash{}'))
+          .join('\n') + '\n' + p + '\\end{semiverbatim}');
         break;
       case 'spacer':
         L.push(p + `\\vspace{${((b.hpx || 24) / 28).toFixed(1)}em}`);
@@ -395,7 +416,7 @@ function texBlocks(arr, ind) {
         const lines = [p + '\\begin{figure}', p + '  \\centering'];
         if (b.type === 'func') {
           lines.push(p + '  % Curvas evaluadas por Erlen:');
-          (b.curves || []).forEach(cv => lines.push(p + '  %   ' + (cv.name || 'y') + ' = ' + String(cv.expr || '').replace(/\n/g, ' ')));
+          (b.curves || []).forEach(cv => lines.push(p + '  %   ' + String(cv.name || 'y').replace(/[\r\n]+/g, ' ') + ' = ' + String(cv.expr || '').replace(/[\r\n]+/g, ' ')));
           if ((b.params || []).length) lines.push(p + '  %   con ' + b.params.map(q => q.name + ' = ' + q.value).join(', '));
         }
         if (b.type === 'chart' && b.despues && b.despues.data) {
@@ -529,6 +550,7 @@ function notaTex(sl) {
 
 function toBeamer(deck) {
   if (typeof sincronizaBib === 'function') sincronizaBib(deck);
+  TEX_RETIRADO = 0;
   const m = deck.meta;
   const th = temaDe(deck);
   const hasChem = deck.slides.some(sl => CLAVES_ZONA.reduce((a,z)=>a.concat(sl[z]||[]),[]).some(b => b.type === 'chem'));
@@ -958,6 +980,8 @@ function toBeamer(deck) {
     const i = L.indexOf('%%UNIDADES%%');
     if (i >= 0) L.splice(i, 1, ...declaraUnidades(L.join('\n')));
   }
+  if (TEX_RETIRADO && typeof toast === 'function')
+    toast('Se retiraron ' + TEX_RETIRADO + ' órdenes de LaTeX que leen archivos o ejecutan programas. Revisa esas ecuaciones antes de compilar.', 'warn');
   const tr = transDe(m);
   if (!tr.tex) return L.join('\n');
   const fuera = [];

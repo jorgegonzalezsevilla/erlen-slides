@@ -111,7 +111,7 @@ function parseTable(text) {
   const com = (sample.match(/,/g) || []).length;
   let sep, decimalComma = false;
   if (tab > 0) sep = /\t/;
-  else if (semi > 0) { sep = /;/; decimalComma = com > 0; }
+  else if (semi > 0) sep = /;/;
   else if (com > 0) sep = /,/;
   else sep = /\s+/;
   const num = s => {
@@ -122,6 +122,13 @@ function parseTable(text) {
     return isFinite(v) ? v : NaN;
   };
   const cells = lines.map(l => l.trim().split(sep).map(c => c.trim()));
+  /* La coma decimal del Excel en español llega con tabuladores tan a menudo
+     como con punto y coma: se decide por la forma de la celda («0,004»), no
+     por el separador de columnas. Con la coma de separador no cabe la duda. */
+  if (sep.source !== ',') {
+    const ES_DECIMAL = /^[+-]?\d{1,3}(?:\.\d{3})*,\d+$|^[+-]?\d+,\d+$/;
+    decimalComma = cells.some(r => r.some(c => ES_DECIMAL.test(c.replace(/["'\s]/g, ''))));
+  }
   const ncol = Math.max(...cells.map(r => r.length));
   let headers = null, start = 0;
   const first = cells[0];
