@@ -5,6 +5,18 @@
    mano. Antes de cargarlo se revisa y se repara, y lo que no se reconoce se
    reporta en vez de dejar el editor a medias. */
 
+/* Rutas de imagen/vídeo. Se admite lo incrustado (data:) y lo remoto, pero un
+   recurso remoto de un proyecto ajeno avisa a su servidor de que lo abriste:
+   se anotan los dominios para poder decirlo antes de dibujar nada. */
+let SANEA_REMOTOS = [];
+function srcSeguro(v, avisos) {
+  const s = typeof v === 'string' ? v.trim() : '';
+  if (!s) return '';
+  if (!/^data:|^https?:/i.test(s)) { avisos.push('una imagen traía una ruta que no se puede abrir'); return ''; }
+  if (/^https?:/i.test(s)) { try { SANEA_REMOTOS.push(new URL(s).host); } catch (e) { SANEA_REMOTOS.push('otro servidor'); } }
+  return s;
+}
+
 function saneaBloque(b, avisos, deck) {
   if (!b || typeof b !== 'object') return null;
   const tipos = BLOCK_DEFS.map(x => x.id);
@@ -53,7 +65,8 @@ function saneaBloque(b, avisos, deck) {
     const g = b.gal && typeof b.gal === 'object' ? b.gal : {};
     b.gal = {
       imgs: (Array.isArray(g.imgs) ? g.imgs : []).filter(x => x && typeof x.src === 'string' && x.src)
-        .slice(0, 8).map(x => ({ src: x.src, cap: String(x.cap || '').slice(0, 90), alt: String(x.alt || '').slice(0, 160) })),
+        .slice(0, 8).map(x => ({ src: srcSeguro(x.src, avisos), cap: String(x.cap || '').slice(0, 90), alt: String(x.alt || '').slice(0, 160) }))
+        .filter(x => x.src),
       modo: GK_MODO[g.modo] ? g.modo : 'rejilla',
       cols: clamp(+g.cols || 2, 1, 4), letras: g.letras !== false, hueco: clamp(+g.hueco || 8, 0, 30)
     };
@@ -77,7 +90,7 @@ function saneaBloque(b, avisos, deck) {
   }
   if (b.type === 'chart' || b.type === 'image') {
     if (b.despues && typeof b.despues === 'object') {
-      b.despues = b.type === 'chart' ? { data: String(b.despues.data || '') } : { src: String(b.despues.src || '') };
+      b.despues = b.type === 'chart' ? { data: String(b.despues.data || '') } : { src: srcSeguro(b.despues.src, avisos) };
       if (!(b.despues.data || b.despues.src)) delete b.despues;
     } else delete b.despues;
   }
@@ -143,13 +156,15 @@ function saneaBloque(b, avisos, deck) {
   }
   if ((b.type === 'chart' || b.type === 'func') && b.ar != null) b.ar = clamp(+b.ar || 0.62, 0.2, 1.4);
   if (b.w != null) b.w = clamp(+b.w || 70, 10, 100);
-  if (typeof b.src === 'string' && b.src && !/^data:|^https?:/.test(b.src)) { avisos.push('una imagen traía una ruta que no se puede abrir'); delete b.src; }
+  if (b.src != null) { const v = srcSeguro(b.src, avisos); if (v) b.src = v; else delete b.src; }
+  if (b.poster != null) { const v = srcSeguro(b.poster, avisos); if (v) b.poster = v; else delete b.poster; }
   return b;
 }
 
 /* Revisa el mazo entero. Devuelve {deck, avisos} o {error}. */
 function saneaDeck(bruto) {
   const avisos = [];
+  SANEA_REMOTOS = [];
   if (!bruto || typeof bruto !== 'object') return { error: 'El archivo no contiene un proyecto de Erlen.' };
   const d = deepCopy(bruto);
   if (!Array.isArray(d.slides) || !d.slides.length) return { error: 'El archivo no trae diapositivas.' };
@@ -166,6 +181,7 @@ function saneaDeck(bruto) {
   if (d.meta.aspect !== '43') d.meta.aspect = '169';
   if (d.meta.fuente && !FU[d.meta.fuente]) { avisos.push('la tipografía «' + d.meta.fuente + '» no existe'); delete d.meta.fuente; }
   if (d.meta.acento && !/^#[0-9a-fA-F]{6}$/.test(d.meta.acento)) { avisos.push('el color de acento no era válido'); delete d.meta.acento; }
+  if (d.meta.logo != null) { const v = srcSeguro(d.meta.logo, avisos); if (v) d.meta.logo = v; else delete d.meta.logo; }
   d.meta.pie = pieDe(d.meta);
   d.meta.notas = notasDe(d.meta);
   /* Referencias: solo las que tienen algo dentro, y sin identificadores repetidos. */
@@ -225,6 +241,12 @@ function saneaDeck(bruto) {
   if (!limpias.length) return { error: 'Ninguna diapositiva del archivo se pudo leer.' };
   d.slides = limpias;
   d.v = 1;
+  if (SANEA_REMOTOS.length) {
+    const hosts = Array.from(new Set(SANEA_REMOTOS));
+    avisos.push('el proyecto carga ' + SANEA_REMOTOS.length + ' imagen(es) desde ' +
+      hosts.slice(0, 3).join(', ') + (hosts.length > 3 ? ' y otros' : '') +
+      ': ese servidor sabrá cuándo lo abres. Descarga esas figuras e insértalas si no quieres avisarle.');
+  }
   return { deck: d, avisos };
 }
 

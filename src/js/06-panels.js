@@ -136,8 +136,13 @@ function updateChrome() {
   $('#slidePos').textContent = `Diapositiva ${S.cur + 1} de ${S.deck.slides.length}`;
   $('#undoBtn').toggleAttribute('disabled', !S.undo.length);
   $('#redoBtn').toggleAttribute('disabled', !S.redo.length);
+  /* Se compara en vez de mirar el foco: mientras escribes, campo y mazo ya
+     coinciden y no se toca el cursor; si difieren con el foco puesto es que el
+     mazo cambió por otra vía (deshacer, abrir otro proyecto) y el campo tiene
+     que seguirlo, o la siguiente tecla reescribiría el título viejo encima. */
   const ti = $('#deckTitleInput');
-  if (document.activeElement !== ti) ti.value = S.deck.meta.title || '';
+  const titulo = S.deck.meta.title || '';
+  if (ti.value !== titulo) ti.value = titulo;
 }
 
 /* ---------- panel derecho ---------- */
