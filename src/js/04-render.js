@@ -314,8 +314,15 @@ function renderSlide(deck, idx, mode, stepShown) {
     } else {
       /* ---- zonas ---- */
       const bloquesDe = (i, ancho) => (sl[CLAVES_ZONA[i]] || []).filter(x => typeof bloqueVisible !== 'function' || bloqueVisible(x, deck)).map(x => renderBlock(x, ancho));
+      /* La zona vacía es el sitio donde uno hace clic esperando escribir, como
+         en cualquier programa de diapositivas: se comporta como un botón que
+         crea el texto ahí mismo y deja el cursor dentro. */
       const vacia = (i, texto) => edit && !(sl[CLAVES_ZONA[i]] || []).length
-        ? h('div', { class: 'img-ph zona-vacia', style: 'width:100%;aspect-ratio:auto' }, texto) : null;
+        ? h('div', { class: 'img-ph zona-vacia', 'data-nueva-z': String(i), role: 'button', tabindex: '0',
+            title: 'Haz clic para escribir aquí', style: 'width:100%;aspect-ratio:auto' },
+            h('span', { class: 'zv-t' }, texto),
+            h('span', { class: 'zv-s' }, 'Haz clic para escribir'))
+        : null;
       const ztEd = i => edit
         ? { 'data-edit': '', 'data-ek': 'zt:' + i, 'data-ph': 'Encabezado…', contenteditable: 'plaintext-only', spellcheck: 'true', lang: 'es' } : {};
       const zt = i => (sl.zt || [])[i] || '';
