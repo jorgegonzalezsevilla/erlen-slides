@@ -96,8 +96,9 @@ function renderSlide(deck, idx, mode, stepShown) {
       case 'table': {
         const rows = b.rows || [];
         const tbl = h('table', { class: `btab${b.align === 'l' ? ' al-l' : ''}${b.header ? '' : ' no-head'}` });
+        const numCols = columnasNumericas(rows, !!b.header);
         const mk = (r, ri, tag) => h('tr', null, r.map((c, ci) =>
-          h(tag, Object.assign({ class: emptyCls(c).trim(), html: inlineRich(c) }, ed(`b:${b.id}:cell:${ri},${ci}`, '·', true))) ));
+          h(tag, Object.assign({ class: (emptyCls(c) + (numCols[ci] ? ' num' : '')).trim(), html: inlineRich(c) }, ed(`b:${b.id}:cell:${ri},${ci}`, '·', true))) ));
         if (b.header && rows.length) tbl.append(h('thead', null, mk(rows[0], 0, 'th')));
         tbl.append(h('tbody', null, rows.slice(b.header ? 1 : 0).map((r, i) => mk(r, i + (b.header ? 1 : 0), 'td'))));
         const wrap = h('div', { class: 'blk b-table' });

@@ -112,9 +112,10 @@
         label style={font=\small},
         tick label style={font=\footnotesize}
       ]
-        \addplot[serieA, line width=1pt, mark=none, smooth] coordinates {
+        \addplot[only marks, mark=*, mark size=1.9pt, serieA] coordinates {
         (0,0.01) (1,0.13) (2,0.25) (3,0.37) (4,0.49) 
         };
+        \addplot[serieA, line width=.9pt, mark=none, domain=0:4, samples=2, forget plot] {0.12*x + 0.01};
       \end{axis}
     \end{tikzpicture}
     \caption{Datos ilustrativos para explicar el método; sustituir por mediciones propias.}

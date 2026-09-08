@@ -247,7 +247,12 @@ function chartToPgf(b, p) {
     const pts = s.pts.map(([x, y]) => [x, y + offStep * (series.length - 1 - i)]);
     let style;
     if (kind === 'barras') style = `[fill=${col}, draw=${col}]`;
-    else if (kind === 'linea') style = `[${col}, line width=1pt, mark=none, smooth]`;
+    else if (kind === 'linea') {
+      /* Los puntos se marcan igual que en pantalla: si en el editor se ven las
+         mediciones, en el PDF también. */
+      const conPuntos = b.type !== 'func' && (b.puntos == null ? pts.length <= 30 : !!b.puntos);
+      style = `[${col}, line width=1pt, mark=${conPuntos ? mk + ', mark size=1.7pt' : 'none'}, smooth]`;
+    }
     else style = `[only marks, mark=${mk}, mark size=1.9pt, ${col}]`;
     /* Por capas: cada serie es un overlay, en el mismo orden que en pantalla. */
     if (porCapas && pts.some(q => isFinite(q[1]))) L.push(p + '    \\only<+->{');
@@ -374,7 +379,10 @@ function texBlocks(arr, ind) {
         const rows = b.rows || [];
         if (!rows.length) break;
         const n = rows[0].length;
-        const col = (b.align === 'l' ? 'l' : 'c').repeat(n).split('').join('');
+        /* Las columnas de cifras van a la derecha, como en pantalla. */
+        const numCols = columnasNumericas(rows, !!b.header);
+        const base = b.align === 'l' ? 'l' : 'c';
+        const col = Array.from({ length: n }, (_, i) => numCols[i] ? 'r' : base).join('');
         const lines = [];
         lines.push(p + '\\begin{table}');
         lines.push(p + '  \\centering');

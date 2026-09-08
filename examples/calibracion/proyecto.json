@@ -83,7 +83,7 @@
         {
           "id": "example-calibracion-8",
           "type": "chart",
-          "kind": "linea",
+          "kind": "ajuste",
           "data": "Concentración\tAbsorbancia\n0\t0.010\n1\t0.130\n2\t0.250\n3\t0.370\n4\t0.490",
           "xlabel": "Concentración (mg/L)",
           "ylabel": "Absorbancia (UA)",

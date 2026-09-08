@@ -262,9 +262,20 @@ function renderChart(b, deck, mode, availPx) {
   let xmax = b.xminAuto === false && isFinite(+b.xmax0) ? +b.xmax0 : Math.max(...allX);
   if (isFunc) { xmin = +b.xmin; xmax = +b.xmax; }
   if (b.xrev) { const t = xmin; xmin = xmax; xmax = t; }
-  let ymin = Math.min(...ys), ymax = Math.max(...ys);
+  let ymin = Math.min(...ys), ymax = Math.max(...ys), pasoY = 0;
   if (b.yminAuto === false) { if (isFinite(+b.ymin0)) ymin = +b.ymin0; if (isFinite(+b.ymax0)) ymax = +b.ymax0; }
-  else { const pad = (ymax - ymin || 1) * 0.08; ymin -= pad; ymax += pad; if (kind === 'barras') ymin = Math.min(0, ymin); }
+  else {
+    /* Con un margen ciego del 8 % el último tick se quedaba por debajo del dato
+       más alto y el máximo de la serie no se podía leer en el eje. Se redondea
+       el rango a la marca siguiente: el eje termina justo en un tick, que ya
+       hace de margen, y el extremo de los datos queda rotulado. */
+    pasoY = niceTicks(ymin, ymax, 5).step;
+    const y0 = Math.floor(ymin / pasoY + 1e-9) * pasoY;
+    const y1 = Math.ceil(ymax / pasoY - 1e-9) * pasoY;
+    ymin = y0 === ymin && y0 !== 0 ? y0 - pasoY : y0;
+    ymax = y1 === ymax ? y1 + (kind === 'barras' ? 0 : pasoY) : y1;
+    if (kind === 'barras') ymin = Math.min(0, ymin);
+  }
   /* Ejes fijados desde fuera: el antes/después y las capas necesitan que el
      marco no salte entre un estado y otro. */
   if (b._ejes) { if (isFinite(b._ejes.xmin)) xmin = b._ejes.xmin; if (isFinite(b._ejes.xmax)) xmax = b._ejes.xmax; if (isFinite(b._ejes.ymin)) ymin = b._ejes.ymin; if (isFinite(b._ejes.ymax)) ymax = b._ejes.ymax; }
@@ -278,7 +289,11 @@ function renderChart(b, deck, mode, availPx) {
 
   /* --- rejilla y ejes --- */
   const tx = niceTicks(Math.min(xmin, xmax), Math.max(xmin, xmax), 6);
-  const ty = niceTicks(ymin, ymax, 5);
+  /* Con el rango ya redondeado se conserva el mismo paso: recalcularlo sobre
+     el rango ensanchado dejaría la mitad de las marcas. */
+  const ty = pasoY ? { step: pasoY, ticks: (() => {
+    const t = []; for (let v = Math.ceil(ymin / pasoY - 1e-9) * pasoY; v <= ymax + pasoY * 1e-9; v += pasoY) t.push(Math.abs(v) < pasoY * 1e-9 ? 0 : v);
+    return t; })() } : niceTicks(ymin, ymax, 5);
   const g = sv('g');
   if (b.grid !== false) {
     ty.ticks.forEach(v => g.append(sv('line', { x1: padL, x2: padL + iw, y1: sy(v).toFixed(1), y2: sy(v).toFixed(1), stroke: P.grid, 'stroke-width': 1 })));
@@ -368,6 +383,13 @@ function renderChart(b, deck, mode, availPx) {
       const path = sv('path', { d: d.join(''), fill: 'none', stroke: col, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' });
       if (b.anim === 'draw' && (mode === 'present' || mode === 'edit')) path.classList.add('chart-draw');
       destino.append(path);
+      /* Una curva sin puntos no deja ver dónde se midió. Con pocos datos son
+         mediciones y se marcan; con muchos es un registro continuo y estorban.
+         La casilla «Marcar los puntos» decide cuando el usuario quiere otra cosa. */
+      if (b.puntos == null ? pts.length <= 30 : !!b.puntos) {
+        pts.forEach(([x, y]) => destino.append(sv('path',
+          { d: markerPath(mk, sx(x), sy(y), 5), fill: col, stroke: P.surface, 'stroke-width': 2 })));
+      }
       if (b.area) {
         const base = sy(Math.max(ymin, Math.min(0, ymax)));
         destino.append(sv('path', { d: d.join('') + `L${sx(pts[pts.length - 1][0]).toFixed(1)},${base}L${sx(pts[0][0]).toFixed(1)},${base}z`, fill: col, opacity: 0.1 }));

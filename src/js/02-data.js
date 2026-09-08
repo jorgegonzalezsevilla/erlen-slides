@@ -185,6 +185,29 @@ const ZT_DEF = {
   barra: ['Datos clave', '']
 };
 
+/* Una columna de una tabla es numérica si todas sus celdas con contenido lo
+   son. Esas se alinean a la derecha: es como se leen las cifras y como se
+   comparan de una fila a otra. Acepta el menos tipográfico, la coma decimal,
+   los miles y la notación científica. */
+const ES_NUMERO_CELDA = /^[+\-\u2212\u00B1]?\s*\d{1,3}(?:[ .]\d{3})*(?:[.,]\d+)?(?:\s*[\u00D7x]\s*10\^?[+\-\u2212]?\d+|[eE][+-]?\d+)?\s*%?$/;
+function columnasNumericas(rows, conCabecera) {
+  const filas = Array.isArray(rows) ? rows : [];
+  const cuerpo = filas.slice(conCabecera ? 1 : 0);
+  const n = filas.reduce((m, r) => Math.max(m, Array.isArray(r) ? r.length : 0), 0);
+  const out = [];
+  for (let c = 0; c < n; c++) {
+    let hay = false, todas = true;
+    for (const r of cuerpo) {
+      const v = String((r || [])[c] == null ? '' : (r || [])[c]).trim();
+      if (!v) continue;
+      hay = true;
+      if (!ES_NUMERO_CELDA.test(v)) { todas = false; break; }
+    }
+    out.push(hay && todas);
+  }
+  return out;
+}
+
 const BLOCK_DEFS = [
   { id: 'text',    name: 'Texto',        ic: 'T',  grp: 'base' },
   { id: 'bullets', name: 'Viñetas',      ic: '≔',  grp: 'base' },

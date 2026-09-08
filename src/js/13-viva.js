@@ -59,6 +59,9 @@ function openChartEditor(b) {
       h('input', { type: 'checkbox', checked: b[key] !== undefined ? !!b[key] : !!def, onchange: e => { b[key] = e.target.checked; paintOpts(); draw(); } }), label);
     opts.append(chk('grid', 'Rejilla de fondo', true));
     if (b.kind === 'linea') {
+      /* Por omisión se marcan los puntos cuando son pocos: pocos datos son
+         mediciones y hay que verlas; muchos son un registro continuo. */
+      opts.append(chk('puntos', 'Marcar los puntos medidos', (parseTable(b.data || '').rows.length || 0) <= 30));
       opts.append(chk('offset', 'Apilar series con desplazamiento (espectros comparados)'));
       opts.append(chk('area', 'Rellenar bajo la curva'));
       if (b.offset) {
