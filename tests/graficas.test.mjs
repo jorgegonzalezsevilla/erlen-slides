@@ -28,6 +28,20 @@ test('The vertical axis reaches the data it is drawing',async()=>{const{dom,run,
  assert.deepEqual(errors,[]);
 }finally{dom.window.close();}});
 
+test('The left margin follows the tick labels instead of a fixed guess',async()=>{const{dom,run,errors}=await editor();try{
+ run("wsNueva();addSlide('content')");
+ /* El eje vertical se dibuja justo en el margen: su x dice cuánto se reservó. */
+ const margen=data=>+run(`(()=>{const b=Object.assign(newBlock('chart'),{data:${JSON.stringify(data)},kind:'linea'});
+   const g=renderChart(b,S.deck,'export',900);
+   const ejes=[...g.querySelectorAll('line')].filter(l=>l.getAttribute('x1')===l.getAttribute('x2'));
+   return Math.min(...ejes.map(l=>+l.getAttribute('x1')))})()`);
+ const corto=margen('x\ty\n0\t0.01\n2\t0.25\n4\t0.49');
+ const largo=margen('x\ty\n0\t1200\n2\t18400\n4\t35600');
+ assert.ok(corto<largo,'«0,1» no necesita el mismo pasillo que «40000»: '+corto+' vs '+largo);
+ assert.ok(corto>=46&&largo<=118,'el margen se queda dentro de los límites: '+corto+' y '+largo);
+ assert.deepEqual(errors,[]);
+}finally{dom.window.close();}});
+
 test('Numbers in a table line up on the right, on screen and in Beamer',async()=>{const{dom,run,errors}=await editor();try{
  run(`wsNueva();addSlide('content');
   (()=>{const b=Object.assign(newBlock('table'),{header:true,rows:[['Condición','Respuesta','Naturaleza'],['Control','1.00','Ilustrativa'],['A','1.08','Ilustrativa'],['B','0.97','Ilustrativa']]});

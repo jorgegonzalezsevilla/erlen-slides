@@ -17,16 +17,23 @@ function pintaPreparacion() {
   const total = errores + avisos + pendientes;
   if (!total) {
     el.className = 'prep-ind lista';
-    el.append(h('i', { class: 'prep-pt' }), h('span', null, 'Lista para presentar'));
+    /* En una pantalla estrecha el rótulo completo se cortaba a media palabra:
+       la parte prescindible se oculta en vez de recortarse. */
+    el.append(h('i', { class: 'prep-pt' }), h('span', null, 'Lista',
+      h('span', { class: 'only-wide-i' }, ' para presentar')));
     el.title = 'La revisión no encuentra nada que arreglar.';
     return;
   }
   el.className = 'prep-ind' + (errores ? ' con-error' : ' con-aviso');
   const p = [];
-  if (errores) p.push(errores + (errores === 1 ? ' problema' : ' problemas'));
-  if (avisos) p.push(avisos + (avisos === 1 ? ' aviso' : ' avisos'));
-  if (pendientes) p.push(pendientes + (pendientes === 1 ? ' pendiente' : ' pendientes'));
-  el.append(h('i', { class: 'prep-pt' }), h('span', null, p.join(' · ')));
+  if (errores) p.push([errores, errores === 1 ? ' problema' : ' problemas']);
+  if (avisos) p.push([avisos, avisos === 1 ? ' aviso' : ' avisos']);
+  if (pendientes) p.push([pendientes, pendientes === 1 ? ' pendiente' : ' pendientes']);
+  /* Igual con las cuentas: en estrecho quedan las cifras, que es lo que se mira. */
+  const texto = h('span', null);
+  p.forEach(([n, nombre], i) => texto.append(
+    i ? h('span', null, ' · ') : null, String(n), h('span', { class: 'only-wide-i' }, nombre)));
+  el.append(h('i', { class: 'prep-pt' }), texto);
   el.title = 'Qué falta para que esté lista. Clic para verlo diapositiva por diapositiva.';
 }
 /* La revisión recorre todo el mazo y no es gratis: se recalcula en reposo. */

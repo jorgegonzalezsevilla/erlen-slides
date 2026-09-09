@@ -231,9 +231,12 @@ function renderChart(b, deck, mode, availPx) {
   });
 
   const FS = 19, FSL = 20;
-  const padL = 72, padR = 26, padT = 16;
+  /* El margen izquierdo lo pide el rótulo de tick más largo; fijarlo en 72
+     dejaba un pasillo vacío con «0,1» y apretaba el eje con «1,2×10⁻³». */
+  let padL = 72;
+  const padR = 26, padT = 16;
   const padB = 48 + (series.length > 1 && !(kind === 'linea' && b.offset) && b.legend !== false ? 34 : 0);
-  const iw = W - padL - padR, ih = H - padT - padB;
+  let iw = W - padL - padR, ih = H - padT - padB;
 
   /* desplazamiento vertical entre series (apilar espectros) */
   const offsetMode = !isFunc && kind === 'linea' && !!b.offset;
@@ -294,6 +297,11 @@ function renderChart(b, deck, mode, availPx) {
   const ty = pasoY ? { step: pasoY, ticks: (() => {
     const t = []; for (let v = Math.ceil(ymin / pasoY - 1e-9) * pasoY; v <= ymax + pasoY * 1e-9; v += pasoY) t.push(Math.abs(v) < pasoY * 1e-9 ? 0 : v);
     return t; })() } : niceTicks(ymin, ymax, 5);
+  {
+    const anchoTick = ty.ticks.reduce((m, v) => Math.max(m, fmtTick(v, ty.step).replace(/10\^/, '10').length), 1);
+    padL = Math.round(clamp(26 + anchoTick * FS * 0.55, 46, 118));
+    iw = W - padL - padR;
+  }
   const g = sv('g');
   if (b.grid !== false) {
     ty.ticks.forEach(v => g.append(sv('line', { x1: padL, x2: padL + iw, y1: sy(v).toFixed(1), y2: sy(v).toFixed(1), stroke: P.grid, 'stroke-width': 1 })));
