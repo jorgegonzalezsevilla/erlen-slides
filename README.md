@@ -14,7 +14,7 @@ Escribe ecuaciones, dibuja química, explica datos y prepara tu próxima charla.
 
 ![Editor con una calibración ilustrativa](docs/images/editor.png)
 
-- **Comunicación científica:** ecuaciones LaTeX, reacciones, estructuras químicas, tablas, gráficas con datos editables, diagramas y montajes de laboratorio.
+- **Comunicación científica:** ecuaciones LaTeX, reacciones, estructuras químicas, tablas, gráficas con datos editables —con barras de error y ejes logarítmicos—, diagramas y montajes de laboratorio.
 - **Preparación:** notas del orador, tiempos, revisión del contenido, orden de diapositivas y modos de ensayo/presentación.
 - **Archivos propios:** biblioteca local, proyecto JSON, plantillas personales, identidad institucional y copias de recuperación.
 - **Exportaciones:** PDF mediante impresión, PowerPoint, fuente Beamer y HTML imprimible. Cada formato tiene [límites documentados](docs/uso.md#exportaciones).

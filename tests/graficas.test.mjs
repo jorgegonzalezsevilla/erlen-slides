@@ -64,3 +64,96 @@ test('The build ships its own tab icon',()=>{
  const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
  assert.match(html,/<link rel="icon" href="data:image\/svg\+xml,/,'sin favicon incrustado cada carga deja un 404');
 });
+
+/* Una medida sin su incertidumbre es media medida, y la incertidumbre llega
+   pegada a los datos: en la columna de al lado. Estas pruebas sostienen que
+   esa columna no se dibuja como una serie más y que la barra que produce dice
+   lo mismo en pantalla que en el PDF. */
+const CON_ERROR = 'C\tAbsorbancia\t±\n0\t0.004\t0.002\n2\t0.118\t0.006\n4\t0.229\t0.009\n6\t0.347\t0.011\n8\t0.452\t0.015\n10\t0.571\t0.018';
+
+test('A column of uncertainty is a bar, not one more series',async()=>{const{dom,run,errors}=await editor();try{
+ run("wsNueva();addSlide('content')");
+ const ss=JSON.parse(run(`JSON.stringify(chartSeries({type:'chart',data:${JSON.stringify(CON_ERROR)}}))`));
+ assert.equal(ss.length,1,'«±» no es una serie: '+ss.map(s=>s.name).join(', '));
+ assert.equal(ss[0].tieneError,true);
+ assert.deepEqual(ss[0].pts[1],[2,0.118,0.006],'la barra viaja con su punto');
+ /* Y al revés: una columna con nombre de magnitud sigue siendo una serie. En
+    un laboratorio «E» es un potencial y «u» una velocidad. */
+ const noSon=JSON.parse(run(`JSON.stringify(['E','u','s','Señal','Error estándar','sd','± A','desv'].map(esColumnaError))`));
+ assert.deepEqual(noSon,[false,false,false,false,true,true,true,true]);
+ assert.deepEqual(errors,[]);
+}finally{dom.window.close();}});
+
+test('The error bar is drawn whole, on screen and in Beamer',async()=>{const{dom,run,errors}=await editor();try{
+ run("wsNueva();addSlide('content')");
+ const r=JSON.parse(run(`JSON.stringify((()=>{const b=Object.assign(newBlock('chart'),{data:${JSON.stringify(CON_ERROR)},kind:'dispersion'});
+   const g=renderChart(b,S.deck,'export',900);
+   const barras=[...g.querySelectorAll('g[stroke-width="1.6"]')];
+   const tapas=barras.flatMap(x=>[...x.querySelectorAll('line')]).filter(l=>l.getAttribute('y1')===l.getAttribute('y2'));
+   const ys=[...g.querySelectorAll('line')].map(l=>+l.getAttribute('y1'));
+   return {barras:barras.length, tapas:tapas.length, arriba:Math.min(...ys), tex:chartToPgf(b,'')};})())`));
+ assert.equal(r.barras,6,'una barra por medida');
+ assert.equal(r.tapas,12,'y dos topes en cada barra');
+ assert.ok(r.arriba>0,'ninguna barra se sale por arriba del marco: '+r.arriba);
+ assert.match(r.tex,/error bars\/\.cd, y dir=both, y explicit/,'el PDF no declara las barras');
+ assert.match(r.tex,/\(2,0\.118\) \+- \(0,0\.006\)/,'cada punto lleva su barra al PDF');
+ assert.deepEqual(errors,[]);
+}finally{dom.window.close();}});
+
+/* En un eje logarítmico solo caben los positivos, la recta de un ajuste es la
+   del logaritmo —la linealización de siempre— y las marcas van por décadas. */
+const DECAE = 't\tc\n0\t100\n10\t61\n20\t37\n30\t22\n40\t14\n50\t8.2';
+
+test('A logarithmic axis draws only what has a logarithm',async()=>{const{dom,run,errors}=await editor();try{
+ run("wsNueva();addSlide('content')");
+ const r=JSON.parse(run(`JSON.stringify((()=>{const b=Object.assign(newBlock('chart'),{data:'x\\ty\\n1\\t10\\n2\\t0\\n3\\t-5\\n4\\t1000',kind:'dispersion',logY:true});
+   const g=renderChart(b,S.deck,'export',900);
+   const esc=escalasChart(b,'dispersion',false);
+   return {malos:g.outerHTML.includes('NaN'), marcas:g.querySelectorAll('path[fill]:not([fill="none"])').length,
+     rotulos:[...g.querySelectorAll('text')].map(t=>t.textContent),
+     vale:[[1,10],[2,0],[3,-5]].map(p=>esc.vale(p))};})())`));
+ assert.equal(r.malos,false,'un logaritmo imposible no puede acabar en el atributo de un nodo');
+ assert.equal(r.marcas,2,'el cero y el negativo no se dibujan; los otros dos sí');
+ assert.deepEqual(r.vale,[true,false,false]);
+ assert.ok(r.rotulos.includes('10')&&r.rotulos.includes('1000'),'el eje se rotula por décadas: '+JSON.stringify(r.rotulos));
+ assert.deepEqual(errors,[]);
+}finally{dom.window.close();}});
+
+test('On a log axis the fit is the fit of the log, in both outputs',async()=>{const{dom,run,errors}=await editor();try{
+ run("wsNueva();addSlide('content')");
+ const r=JSON.parse(run(`JSON.stringify((()=>{const b=Object.assign(newBlock('chart'),{data:${JSON.stringify(DECAE)},kind:'ajuste',logY:true});
+   const g=renderChart(b,S.deck,'export',900);
+   const pts=chartSeries(b)[0].pts;
+   const enLog=linFit(pts.map(([x,y])=>[x,Math.log10(y)]));
+   const crudo=linFit(pts);
+   return {pendiente:enLog.m, crudo:crudo.m, texto:[...g.querySelectorAll('.ch-fit')].map(d=>d.textContent).join(' '),
+     tex:chartToPgf(b,'')};})())`));
+ assert.match(r.tex,/ymode=log/,'el PDF no pone el eje en logaritmo');
+ const m=/\\log_\{10\} y = (-?[\d.]+)\\,x/.exec(r.tex);
+ assert.ok(m,'el PDF no dice sobre qué se ajustó: '+r.tex.split('\n').filter(l=>l.includes('node')).join());
+ assert.ok(Math.abs(+m[1]-r.pendiente)<1e-3,`el PDF ajusta ${m[1]} y la pantalla ${r.pendiente}`);
+ assert.ok(Math.abs(r.pendiente-r.crudo)>1e-3,'la prueba no distingue: elige datos donde ajustar el log no sea lo mismo');
+ assert.match(r.texto,/log/,'en pantalla la ecuación tiene que decir que es el logaritmo');
+ /* La recta se emite como coordenadas: en el espacio del dibujo es recta, y
+    así pgfplots traza exactamente la misma que se ve. */
+ assert.ok(!/domain=.*samples=2/.test(r.tex),'una fórmula lineal sobre un eje log dibujaría otra curva');
+ assert.deepEqual(errors,[]);
+}finally{dom.window.close();}});
+
+test('Log and linear axes agree with the export on what is drawn',async()=>{const{dom,run,errors}=await editor();try{
+ run("wsNueva();addSlide('content')");
+ /* Donde no cabe el logaritmo tampoco se anuncia: en barras la barra sale del
+    cero, y al apilar espectros el desplazamiento se suma sobre el eje. */
+ const casos=JSON.parse(run(`JSON.stringify(['linea','dispersion','ajuste','barras'].map(k=>{
+   const b=Object.assign(newBlock('chart'),{data:${JSON.stringify(DECAE)},kind:k,logY:true,logX:true});
+   const esc=escalasChart(b,k,false);
+   const tex=chartToPgf(b,'');
+   return {k,logY:esc.logY,logX:esc.logX,tex:/ymode=log/.test(tex)&&/xmode=log/.test(tex)};}))`));
+ for(const c of casos){
+  assert.equal(c.tex,c.logY&&c.logX,`«${c.k}»: la pantalla y el PDF no coinciden en la escala`);
+  if(c.k==='barras') assert.equal(c.logY,false,'una barra en eje logarítmico no tiene dónde empezar');
+ }
+ const apilado=run(`escalasChart({logY:true},'linea',true).logY`);
+ assert.equal(apilado,false,'al apilar espectros el desplazamiento vive en el eje: no puede ser logarítmico');
+ assert.deepEqual(errors,[]);
+}finally{dom.window.close();}});

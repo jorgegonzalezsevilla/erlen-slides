@@ -322,7 +322,17 @@ const CHART_SAMPLES = [
     data: 'cm-1\tMuestra\tReferencia\n4000\t98\t97\n3600\t62\t70\n3200\t55\t68\n2900\t88\t86\n2400\t95\t94\n1700\t74\t90\n1600\t68\t72\n1400\t71\t83\n1100\t45\t60\n900\t80\t78\n600\t58\t64' },
   { n: 'Comparación por barras', kind: 'barras',
     xlabel: 'Ensayo', ylabel: 'Rendimiento (%)',
-    data: 'Ensayo\tRendimiento\n1\t62\n2\t71\n3\t85\n4\t78\n5\t91' }
+    data: 'Ensayo\tRendimiento\n1\t62\n2\t71\n3\t85\n4\t78\n5\t91' },
+  /* Una medida con su incertidumbre: la columna «±» no es una serie, es la
+     barra de error de la anterior. */
+  { n: 'Medidas con su error', kind: 'dispersion',
+    xlabel: 'Tiempo (min)', ylabel: 'Conversión (%)',
+    data: 't\tConversión\t±\n5\t18\t2.1\n10\t34\t2.6\n15\t51\t3.4\n20\t63\t3.1\n30\t74\t4.2\n45\t79\t3.8' },
+  /* Primer orden: en eje logarítmico la caída exponencial es una recta, y el
+     ajuste se hace sobre el logaritmo, que es lo que se ve. */
+  { n: 'Cinética en eje logarítmico', kind: 'ajuste', logY: true,
+    xlabel: 'Tiempo (min)', ylabel: 'Concentración (mmol L$^{-1}$)',
+    data: 't\tc\n0\t100\n10\t61\n20\t37\n30\t22\n40\t14\n50\t8.2' }
 ];
 
 /* ---------- plantillas de ecuaciones ---------- */
@@ -637,7 +647,7 @@ function newBlock(type) {
       id: uid(), type, kind: 'ajuste', data: CHART_SAMPLES[0].data,
       xlabel: CHART_SAMPLES[0].xlabel, ylabel: CHART_SAMPLES[0].ylabel, title: '',
       w: 78, ar: 0.52, grid: true, legend: true, offset: false, offsetPct: 55,
-      showFit: true, anim: 'fade'
+      logX: false, logY: false, showFit: true, anim: 'fade'
     };
     case 'func': {
       const m = FUNC_MODELS[1];

@@ -54,3 +54,5 @@ Las estructuras químicas siguen el mismo reparto:
 Aquí la divergencia estaba en el color: la pantalla pintaba el N azul y el O rojo, y el PDF los sacaba negros sobre un parche `fill=white` que en un tema oscuro se veía. `tests/estructura.test.mjs` comprueba elemento por elemento, en tema claro y oscuro, que las dos salidas dicen el mismo color.
 
 `registroColores` (en `09-export.js`) declara cada tono como `\definecolor` antes del dibujo: TikZ no admite expresiones de color con comas dentro de una opción. Lo usan las dos figuras que llevan paleta propia.
+
+Las gráficas no están partidas en tres módulos, pero siguen la misma regla donde importa: `escalasChart` (en `12-chart.js`) decide qué eje va en logaritmo, qué punto cabe en él y en qué espacio se ajusta la recta, y la leen tanto `renderChart` como `chartToPgf`. Con el eje logarítmico eso deja de ser cosmético: el ajuste se hace sobre el logaritmo y la recta se emite como dos coordenadas —en el espacio del dibujo es recta, y pgfplots une coordenadas ya transformadas—, en vez de como la fórmula `{m*x+b}`, que sobre un eje log dibujaría otra curva.

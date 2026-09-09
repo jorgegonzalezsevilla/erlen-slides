@@ -192,19 +192,25 @@ function pgfNum(v) {
   if (Math.abs(v) < 1e-20) return '0';
   return String(Number(Number(v).toPrecision(7)));
 }
-function pgfCoords(pts, p) {
+function pgfCoords(pts, p, conError) {
   const out = [];
   let line = p + '    ';
   const step = Math.max(1, Math.ceil(pts.length / 150));
-  pts.forEach(([x, y], i) => {
+  pts.forEach(([x, y, e], i) => {
     if (!isFinite(y)) return;
     if (i % step && i !== pts.length - 1) return;
-    const t = `(${pgfNum(x)},${pgfNum(y)}) `;
+    /* La barra de error viaja con el punto, en la sintaxis de pgfplots. */
+    const t = `(${pgfNum(x)},${pgfNum(y)})` + (conError ? ` +- (0,${pgfNum(isFinite(e) && e > 0 ? e : 0)})` : '') + ' ';
     if (line.length + t.length > 94) { out.push(line); line = p + '    '; }
     line += t;
   });
   if (line.trim()) out.push(line);
   return out.join('\n');
+}
+/* Un número para el papel: la misma cifra que en pantalla, con la potencia de
+   diez escrita como la escribe LaTeX. */
+function texNum(v, n) {
+  return String(sigFig(v, n || 4)).replace(/\u00d710\^(-?\d+)/, '\\times 10^{$1}');
 }
 function texAxisLabel(s) {
   /* los rótulos ya vienen con $…$; fuera de ellos hay que escapar */
@@ -215,6 +221,12 @@ function chartToPgf(b, p) {
   const series = chartSeries(b);
   if (!series.length || series.every(s => !s.pts.length)) return p + '% (la gráfica no tenía datos)';
   const offsetMode = b.type !== 'func' && kind === 'linea' && !!b.offset;
+  /* Las mismas reglas de escala que en pantalla, leídas de la misma función:
+     qué ejes van en logaritmo, qué punto cabe en ellos y en qué espacio se
+     ajusta la recta. Si esto se copiara aquí, el PDF acabaría dibujando otra
+     gráfica, que es lo que pasa siempre que una decisión vive dos veces. */
+  const esc = escalasChart(b, kind, offsetMode);
+  const { eX, eY, iY, logX, logY, vale } = esc;
   let span = 1;
   if (offsetMode) {
     const ys = [];
@@ -236,6 +248,8 @@ function chartToPgf(b, p) {
   if (b.title) opt.push('title={' + texAxisLabel(b.title) + '}');
   if (b.grid !== false) opt.push('grid=major', 'grid style={line width=.2pt, draw=gray!25}');
   if (b.xrev || b.invertirX) opt.push('x dir=reverse');
+  if (logX) opt.push('xmode=log', 'log basis x=10');
+  if (logY) opt.push('ymode=log', 'log basis y=10');
   if (offsetMode) opt.push('ytick=\\empty');
   opt.push('tick align=outside', 'tick pos=left', 'axis line style={gray!60}', 'label style={font=\\small}', 'tick label style={font=\\footnotesize}');
   if (series.length > 1 && !offsetMode && b.legend !== false) opt.push('legend style={font=\\footnotesize, draw=none, fill=none, at={(0.5,-0.22)}, anchor=north, legend columns=-1, /tikz/every even column/.append style={column sep=8pt}}');
@@ -246,25 +260,33 @@ function chartToPgf(b, p) {
   const conDespues = !!((b.despues && b.despues.data) || b._ejesDe) && b.type !== 'func';
   if (porCapas || conDespues) {
     const xs = [], ys = [];
-    const mete = ss => ss.forEach(s => s.pts.forEach(([x, y]) => { if (isFinite(x)) xs.push(x); if (isFinite(y)) ys.push(y); }));
+    const mete = ss => ss.forEach(s => s.pts.forEach(pt => {
+      if (!vale(pt)) return;
+      xs.push(pt[0]); ys.push(pt[1]);
+      if (isFinite(pt[2]) && pt[2] > 0) { ys.push(pt[1] + pt[2]); if (!logY || pt[1] - pt[2] > 0) ys.push(pt[1] - pt[2]); }
+    }));
     mete(series);
     if (b.despues && b.despues.data) mete(chartSeries(Object.assign({}, b, { data: b.despues.data, despues: null })));
     if (b._ejesDe) mete(chartSeries(Object.assign({}, b._ejesDe, { despues: null })));
     if (xs.length) {
       const y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys), pad = (y1 - y0 || 1) * 0.08;
+      /* En un eje logarítmico el margen no se suma, se multiplica: sumar un
+         octavo del recorrido dejaría el mínimo en cero o por debajo. */
+      const yA = logY ? y0 / 1.3 : (kind === 'barras' ? Math.min(0, y0 - pad) : y0 - pad);
+      const yB = logY ? y1 * 1.3 : y1 + pad;
       opt.push('xmin=' + pgfNum(Math.min.apply(null, xs)), 'xmax=' + pgfNum(Math.max.apply(null, xs)),
-        'ymin=' + pgfNum(kind === 'barras' ? Math.min(0, y0 - pad) : y0 - pad), 'ymax=' + pgfNum(y1 + pad));
+        'ymin=' + pgfNum(yA), 'ymax=' + pgfNum(yB));
     }
   }
   L.push(p + '  \\begin{axis}[');
   L.push(p + '    ' + opt.join(',\n' + p + '    '));
   L.push(p + '  ]');
 
-  const ajustes = [];
+  const ajustes = [], ecuaciones = [];
   series.forEach((s, i) => {
     const col = PGF_COLORS[i % PGF_COLORS.length];
     const mk = PGF_MARKS[i % PGF_MARKS.length];
-    const pts = s.pts.map(([x, y]) => [x, y + offStep * (series.length - 1 - i)]);
+    const pts = s.pts.filter(vale).map(([x, y, e]) => [x, y + offStep * (series.length - 1 - i), e]);
     let style;
     if (kind === 'barras') style = `[fill=${col}, draw=${col}]`;
     else if (kind === 'linea') {
@@ -274,21 +296,29 @@ function chartToPgf(b, p) {
       style = `[${col}, line width=1pt, mark=${conPuntos ? mk + ', mark size=1.7pt' : 'none'}, smooth]`;
     }
     else style = `[only marks, mark=${mk}, mark size=1.9pt, ${col}]`;
+    /* La incertidumbre viaja con la serie, igual que en pantalla. */
+    if (s.tieneError) style = style.slice(0, -1) + ', error bars/.cd, y dir=both, y explicit]';
     /* Por capas: cada serie es un overlay, en el mismo orden que en pantalla. */
     if (porCapas && pts.some(q => isFinite(q[1]))) L.push(p + '    \\only<+->{');
     L.push(p + `    \\addplot${style} coordinates {`);
-    L.push(pgfCoords(pts, p));
+    L.push(pgfCoords(pts, p, !!s.tieneError));
     L.push(p + '    };');
     if (series.length > 1 && !offsetMode && b.legend !== false) L.push(p + '    \\addlegendentry{' + texAxisLabel(s.name) + '}');
     if (porCapas && pts.some(q => isFinite(q[1]))) L.push(p + '    }');
     if (kind === 'ajuste') {
       const ok = pts.filter(q => isFinite(q[1]));
-      const f = linFit(ok);
+      /* El ajuste se hace en el espacio que se ve, como en pantalla: con el
+         eje y en log, sobre log y. Y se emite como dos coordenadas en vez de
+         como fórmula, porque en ese espacio la recta es recta y pgfplots une
+         las coordenadas ya transformadas: así el PDF traza la misma línea. */
+      const f = linFit(ok.map(q => [eX(q[0]), eY(q[1])]));
       if (f && ok.length) {
         const xs = ok.map(q => q[0]);
         const x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
-        const linea = p + `    \\addplot[${col}, line width=.9pt, mark=none, domain=${pgfNum(x0)}:${pgfNum(x1)}, samples=2, forget plot] {${pgfNum(f.m)}*x + ${pgfNum(f.b)}};`;
+        const y0 = iY(f.m * eX(x0) + f.b), y1 = iY(f.m * eX(x1) + f.b);
+        const linea = p + `    \\addplot[${col}, line width=.9pt, mark=none, forget plot] coordinates {(${pgfNum(x0)},${pgfNum(y0)}) (${pgfNum(x1)},${pgfNum(y1)})};`;
         if (porCapas) ajustes.push(linea); else L.push(linea);
+        if (b.showFit !== false) ecuaciones.push({ f, name: s.name, col });
       }
     }
     if (offsetMode && pts.length) {
@@ -307,6 +337,22 @@ function chartToPgf(b, p) {
       if (b.destaca.txt) L.push(p + `    \\node[anchor=south west, font=\\footnotesize\\bfseries, erlenacento, inner sep=2pt] at (axis cs:${pgfNum(pt[0])},${pgfNum(y)}) {${texAxisLabel(b.destaca.txt)}};`);
       L.push(p + '    }');
     }
+  }
+  /* La ecuación del ajuste con su R². En pantalla se leen bajo el título y al
+     PDF no llegaban: la diapositiva decía una cosa y el papel, otra. Van
+     dentro del marco, en la esquina que la propia recta deja libre —arriba a
+     la izquierda si sube, a la derecha si baja—, que es donde las pone a mano
+     cualquiera que dibuje una calibración. */
+  if (ecuaciones.length) {
+    const sube = ecuaciones[0].f.m >= 0;
+    const izq = logY ? '\\log_{10} y' : 'y', der = logX ? '\\log_{10} x' : 'x';
+    const lin = ecuaciones.slice(0, 3).map(e =>
+      (ecuaciones.length > 1 ? texAxisLabel(e.name) + ': ' : '') +
+      `$${izq} = ${texNum(e.f.m)}\\,${der} ${e.f.b < 0 ? '-' : '+'} ${texNum(Math.abs(e.f.b))}$` +
+      ` \\quad $R^{2} = ${e.f.r2.toFixed(4)}$`);
+    L.push(p + `    \\node[anchor=north ${sube ? 'west' : 'east'}, align=${sube ? 'left' : 'right'}, font=\\footnotesize,` +
+      ` fill=erlenfondo, fill opacity=0.72, text opacity=1, inner sep=2pt]` +
+      ` at (rel axis cs:${sube ? '0.03' : '0.97'},0.97) {${lin.join(' \\\\ ')}};`);
   }
   L.push(p + '  \\end{axis}');
   L.push(p + '\\end{tikzpicture}');
@@ -646,10 +692,13 @@ function toBeamer(deck) {
     const thm = temaDe(deck);
     L.push('\\definecolor{erlenliq}{HTML}{' + thm.acc.slice(1).toUpperCase() + '}');
     L.push('\\definecolor{erlentinta}{HTML}{' + (thm.fg || '#222222').slice(1).toUpperCase() + '}');
-    L.push('\\definecolor{erlenfondo}{HTML}{' + (thm.bg || '#FFFFFF').slice(1).toUpperCase() + '}');
     L.push('\\definecolor{erlenvidrio}{HTML}{6E8FA8}');
   }
-  { const thm = temaDe(deck); L.push('\\definecolor{erlenacento}{HTML}{' + (thm.acc || '#C0392B').slice(1).toUpperCase() + '}'); }
+  /* El papel y el acento del tema: los montajes, las estructuras y el rótulo
+     del ajuste los necesitan, así que se declaran siempre. */
+  { const thm = temaDe(deck);
+    L.push('\\definecolor{erlenfondo}{HTML}{' + (thm.bg || '#FFFFFF').slice(1).toUpperCase() + '}');
+    L.push('\\definecolor{erlenacento}{HTML}{' + (thm.acc || '#C0392B').slice(1).toUpperCase() + '}'); }
   teoremasPreambulo(deck).forEach(x => L.push(x));
   const hayEscala = deck.slides.some(sl => zonas(sl).some(z => z.some(b => b.type === 'image' && b.escala)));
   if (haySmart || hayPie || pieTxt || hayEscala || hayQuim || haySangre) {

@@ -94,6 +94,8 @@
           "legend": false,
           "offset": false,
           "offsetPct": 55,
+          "logX": false,
+          "logY": false,
           "showFit": true,
           "anim": "fade",
           "caption": "Datos ilustrativos para explicar el método; sustituir por mediciones propias."

@@ -1,6 +1,6 @@
 # Erlen Slides: Scientific presentations
 
-An open-source, browser-based scientific presentation editor. Spanish interface; no account required. Includes LaTeX equations, chemical reactions and structures, editable charts and tables, presenter tools, local recovery, and JSON/PDF/PPTX/Beamer/HTML export workflows.
+An open-source, browser-based scientific presentation editor. Spanish interface; no account required. Includes LaTeX equations, chemical reactions and structures, editable charts with error bars and logarithmic axes, tables, presenter tools, local recovery, and JSON/PDF/PPTX/Beamer/HTML export workflows.
 
 ![Editor](images/editor.png)
 
