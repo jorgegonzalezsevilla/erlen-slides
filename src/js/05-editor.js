@@ -3,11 +3,17 @@
 /* ================= lienzo: zoom, selección, edición en vivo ================= */
 const MULTILINE = new Set(['text', 'code', 'bblock', 'quote', 'teorema']);
 
+const EN_VERTICAL = () => window.matchMedia('(max-width:920px) and (orientation:portrait)').matches;
 function effZoom() {
   const [W, H] = slideDims(S.deck);
   const sc = $('#canvasScroll');
-  const pad = window.matchMedia('(max-width:920px)').matches ? 22 : 56;
-  const fit = Math.min((sc.clientWidth - pad) / W, (sc.clientHeight - pad) / H, 1.5);
+  const estrecho = window.matchMedia('(max-width:920px)').matches;
+  const pad = estrecho ? 22 : 56;
+  /* En vertical el lienzo se ajusta al alto de la diapositiva, así que medir
+     ese alto para decidir la escala sería morderse la cola: manda el ancho. */
+  const fit = EN_VERTICAL()
+    ? Math.min((sc.clientWidth - pad) / W, 1.5)
+    : Math.min((sc.clientWidth - pad) / W, (sc.clientHeight - pad) / H, 1.5);
   return S.zoom || Math.max(0.08, fit);
 }
 
