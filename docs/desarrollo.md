@@ -33,6 +33,8 @@ La fuente del código es accesible desde la interfaz. Un despliegue derivado deb
 3. Comprueba visualmente escritorio y móvil cuando cambie el diseño.
 4. Si modificas un exportador, inspecciona el archivo exportado, no solo su nombre o extensión.
 
+Para el PowerPoint, «inspeccionar» significa abrirlo con algo que no sea la propia rutina que lo escribió: un paquete puede tener el ZIP intacto, el XML bien formado y las partes declaradas, y aun así llegar con una diapositiva en blanco. Un lector OOXML independiente (`python-pptx`) dice si las formas están; convertirlo a PDF con LibreOffice Impress (`soffice --headless --convert-to pdf`) dice si además se ven. Así se encontraron las dos averías que documenta `docs/validacion.md`: el SmartArt sin cajas y la diapositiva que se vaciaba en dos de cada cinco exportaciones.
+
 Los tests JSDOM no verifican medidas reales ni rasterización. La estructura actual concatena módulos: es una base funcional heredada, no una promesa de arquitectura modular aislada.
 
 ## Editores de figura

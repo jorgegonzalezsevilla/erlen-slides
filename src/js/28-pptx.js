@@ -69,67 +69,77 @@ async function exportPPTX() {
   const th = temaDe(deck);
   const css = collectCSS();
 
-  const wb = $('#workbench');
-  wb.innerHTML = '';
+  /* Banco propio, no el compartido. La exportación va con `await` en medio
+     —cada figura se rasteriza— y cualquier cosa que se despierte mientras
+     tanto y use `#workbench` deja la diapositiva a medio medir. Le pasaba con
+     la revisión del indicador de preparación, que se recalcula «en reposo»: le
+     vacía el banco y lo repone desde su HTML, con lo que los nodos que la
+     exportación tenía en la mano quedan sueltos del documento. Un elemento
+     suelto no tiene ni medidas ni estilo calculado, así que sus formas salían
+     con `sz="NaN"` y un marco de 1 EMU, y la diapositiva llegaba en blanco al
+     PowerPoint. Pasaba en dos de cada cinco exportaciones. */
+  const wb = h('div', { style: 'position:absolute;left:-99999px;top:0' });
+  document.body.append(wb);
   const archivos = [];
   const medios = [];           /* {nombre, bytes} */
   const cacheMedio = new Map();
   const slidesXml = [];
   const conNotas = [];
 
-  for (let i = 0; i < deck.slides.length; i++) {
-    const sl = deck.slides[i];
-    if (typeof fueraDeRama === 'function' && fueraDeRama(sl, deck)) continue;
-    const raiz = renderSlide(deck, i, 'export', 99);
-    raiz.style.position = 'relative';
-    wb.innerHTML = ''; wb.append(raiz);
-    await new Promise(r => setTimeout(r, 10));
-    const relsSlide = [];
-    /* Cada imagen se guarda una vez y cada diapositiva la referencia. */
-    const ctx = {
-      esc, ptPorPx, fuente, css, id: 2, fondo: th.bg,
-      medio: async uri => {
-        if (cacheMedio.has(uri)) {
-          const y = cacheMedio.get(uri);
-          if (!relsSlide.some(x => x.rid === y.rid)) relsSlide.push(y);
+  try {
+    for (let i = 0; i < deck.slides.length; i++) {
+      const sl = deck.slides[i];
+      if (typeof fueraDeRama === 'function' && fueraDeRama(sl, deck)) continue;
+      const raiz = renderSlide(deck, i, 'export', 99);
+      raiz.style.position = 'relative';
+      wb.innerHTML = ''; wb.append(raiz);
+      await new Promise(r => setTimeout(r, 10));
+      const relsSlide = [];
+      /* Cada imagen se guarda una vez y cada diapositiva la referencia. */
+      const ctx = {
+        esc, ptPorPx, fuente, css, id: 2, fondo: th.bg,
+        medio: async uri => {
+          if (cacheMedio.has(uri)) {
+            const y = cacheMedio.get(uri);
+            if (!relsSlide.some(x => x.rid === y.rid)) relsSlide.push(y);
+            return y.rid;
+          }
+          let bytes;
+          try { bytes = b64aBytes(uri); } catch (e) { return null; }
+          const k = medios.length + 1;
+          const nombre = 'imagen' + k + '.png';
+          medios.push({ nombre, bytes });
+          const y = { rid: 'rIdM' + k, destino: '../media/' + nombre };
+          cacheMedio.set(uri, y);
+          relsSlide.push(y);
           return y.rid;
         }
-        let bytes;
-        try { bytes = b64aBytes(uri); } catch (e) { return null; }
-        const k = medios.length + 1;
-        const nombre = 'imagen' + k + '.png';
-        medios.push({ nombre, bytes });
-        const y = { rid: 'rIdM' + k, destino: '../media/' + nombre };
-        cacheMedio.set(uri, y);
-        relsSlide.push(y);
-        return y.rid;
+      };
+
+      const formas = await formasSlide(raiz, sl, deck, i, ctx);
+      const fondo = '<p:bg><p:bgPr><a:solidFill><a:srgbClr val="' + hex6(th.bg) + '"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>';
+      slidesXml.push(XMLCAB + '<p:sld ' + NS + '><p:cSld>' + fondo +
+        '<p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>' +
+        '<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>' +
+        formas.join('') + '</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>');
+
+      /* Las diapositivas fuera de la rama no se escriben: numerar por posición
+         exportada, no por índice del mazo, o el paquete referencia archivos que
+         no existen y PowerPoint lo da por dañado. */
+      const num = slidesXml.length;
+      const tieneNota = !!(sl.notes && sl.notes.trim());
+      conNotas.push(tieneNota);
+      const rels = [rel('rId1', 'slideLayout', '../slideLayouts/slideLayout1.xml')];
+      relsSlide.forEach(x => rels.push(rel(x.rid, 'image', x.destino)));
+      if (tieneNota) rels.push(rel('rIdN', 'notesSlide', '../notesSlides/notesSlide' + num + '.xml'));
+      archivos.push({ nombre: 'ppt/slides/_rels/slide' + num + '.xml.rels', datos: relsDe(rels) });
+      if (tieneNota) {
+        archivos.push({ nombre: 'ppt/notesSlides/notesSlide' + num + '.xml', datos: notasXml(sl.notes) });
+        archivos.push({ nombre: 'ppt/notesSlides/_rels/notesSlide' + num + '.xml.rels',
+          datos: relsDe([rel('rId1', 'notesMaster', '../notesMasters/notesMaster1.xml'), rel('rId2', 'slide', '../slides/slide' + num + '.xml')]) });
       }
-    };
-
-    const formas = await formasSlide(raiz, sl, deck, i, ctx);
-    const fondo = '<p:bg><p:bgPr><a:solidFill><a:srgbClr val="' + hex6(th.bg) + '"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>';
-    slidesXml.push(XMLCAB + '<p:sld ' + NS + '><p:cSld>' + fondo +
-      '<p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>' +
-      '<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>' +
-      formas.join('') + '</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>');
-
-    /* Las diapositivas fuera de la rama no se escriben: numerar por posición
-       exportada, no por índice del mazo, o el paquete referencia archivos que
-       no existen y PowerPoint lo da por dañado. */
-    const num = slidesXml.length;
-    const tieneNota = !!(sl.notes && sl.notes.trim());
-    conNotas.push(tieneNota);
-    const rels = [rel('rId1', 'slideLayout', '../slideLayouts/slideLayout1.xml')];
-    relsSlide.forEach(x => rels.push(rel(x.rid, 'image', x.destino)));
-    if (tieneNota) rels.push(rel('rIdN', 'notesSlide', '../notesSlides/notesSlide' + num + '.xml'));
-    archivos.push({ nombre: 'ppt/slides/_rels/slide' + num + '.xml.rels', datos: relsDe(rels) });
-    if (tieneNota) {
-      archivos.push({ nombre: 'ppt/notesSlides/notesSlide' + num + '.xml', datos: notasXml(sl.notes) });
-      archivos.push({ nombre: 'ppt/notesSlides/_rels/notesSlide' + num + '.xml.rels',
-        datos: relsDe([rel('rId1', 'notesMaster', '../notesMasters/notesMaster1.xml'), rel('rId2', 'slide', '../slides/slide' + num + '.xml')]) });
     }
-  }
-  wb.innerHTML = '';
+  } finally { wb.remove(); }
 
   slidesXml.forEach((x, i) => archivos.push({ nombre: 'ppt/slides/slide' + (i + 1) + '.xml', datos: x }));
   medios.forEach(md => archivos.push({ nombre: 'ppt/media/' + md.nombre, datos: md.bytes }));

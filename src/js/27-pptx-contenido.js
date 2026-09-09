@@ -19,19 +19,24 @@ function parrafosDe(txt, base, opt) {
 }
 
 /* Marco de un elemento en EMU, relativo a la diapositiva. */
+/* Un número que no lo es no puede llegar al XML: PowerPoint da por inservible
+   la forma entera y la diapositiva sale en blanco sin decir por qué. Pasa en
+   cuanto se mide un elemento que ya no está en el documento. */
+const _n = (v, resp) => isFinite(v) ? v : resp;
 function marco(el, raiz, esc) {
   const r = el.getBoundingClientRect(), R = raiz.getBoundingClientRect();
   return {
-    x: Math.round((r.left - R.left) * esc), y: Math.round((r.top - R.top) * esc),
-    w: Math.max(1, Math.round(r.width * esc)), h: Math.max(1, Math.round(r.height * esc))
+    x: _n(Math.round((r.left - R.left) * esc), 0), y: _n(Math.round((r.top - R.top) * esc), 0),
+    w: Math.max(1, _n(Math.round(r.width * esc), 1)), h: Math.max(1, _n(Math.round(r.height * esc), 1))
   };
 }
 /* Estilo de texto leído de la propia diapositiva. */
 let _FONDO = '#FFFFFF';
 function estilo(el, ptPorPx, fuente) {
   const cs = getComputedStyle(el);
+  const px = parseFloat(cs.fontSize);
   return {
-    pt: Math.max(6, +(parseFloat(cs.fontSize) * ptPorPx).toFixed(1)),
+    pt: isFinite(px) ? Math.max(6, +(px * ptPorPx).toFixed(1)) : 18,
     col: hex6(cs.color, _FONDO), neg: parseInt(cs.fontWeight, 10) >= 600,
     al: cs.textAlign === 'start' ? 'left' : cs.textAlign,
     fuente: fuente

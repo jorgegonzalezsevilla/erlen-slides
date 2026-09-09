@@ -102,6 +102,79 @@ test('PowerPoint package stays consistent when a branch hides slides',async()=>{
  assert.deepEqual(errors,[]);
 }finally{dom.window.close();}});
 
+/* La exportación va con `await` en medio, y mientras tanto la aplicación no se
+   detiene: la revisión del indicador de preparación se recalcula «en reposo» y
+   usa el mismo banco de trabajo. Reponía su HTML y dejaba sueltos los nodos que
+   la exportación tenía medio medidos, con lo que las formas que faltaban salían
+   con `sz="NaN"` y un marco de 1 EMU: dos de cada cinco exportaciones traían
+   alguna diapositiva en blanco, y ni el ZIP ni el XML tenían nada de raro. */
+const capturaPptx = 'window.rasteriza=async()=>null;window.__pptx=null;window.downloadFile=async(n,b)=>{window.__pptx={n,bytes:await new Promise(ok=>{const fr=new FileReader();fr.onload=()=>ok(Array.from(new Uint8Array(fr.result)));fr.readAsArrayBuffer(b)})};return true};';
+
+test('An idle recheck in the middle of the export cannot blank a slide',async()=>{const{dom,run,errors}=await editor();try{
+ run(capturaPptx+"wsNueva(EJEMPLOS[0].build());window.__t=setInterval(()=>{try{revisaMazo()}catch(e){}},3)");
+ await run('exportPPTX()');
+ run('clearInterval(window.__t)');
+ const partes=leeZip(Uint8Array.from(run('window.__pptx').bytes));
+ const slides=[...partes.keys()].filter(n=>/^ppt\/slides\/slide\d+\.xml$/.test(n));
+ assert.equal(slides.length,6);
+ for(const n of slides){
+  const x=partes.get(n);
+  assert.ok(!x.includes('NaN'),n+' lleva una medida que no es un número');
+  assert.ok((x.match(/<p:sp>/g)||[]).length>=2,n+' se quedó sin formas');
+  /* Un marco de 1 EMU es lo que deja un elemento que ya no estaba medido. */
+  assert.ok(!/<a:ext cx="1" cy="1"\/>/.test(x),n+' tiene una forma de tamaño cero');
+ }
+ assert.deepEqual(errors,[]);
+}finally{dom.window.close();}});
+
+test('The export measures on its own bench, not on the shared one',async()=>{const{dom,run,errors}=await editor();try{
+ run(capturaPptx+"wsNueva(EJEMPLOS[0].build());document.getElementById('workbench').innerHTML='<i id=\"testigo\"></i>'");
+ await run('exportPPTX()');
+ assert.ok(run("!!document.getElementById('testigo')"),'la exportación arrasó el banco compartido');
+ assert.equal(run("document.querySelectorAll('body > div[style*=\"-99999px\"]').length"),1,'y tiene que recoger el suyo al terminar');
+ assert.deepEqual(errors,[]);
+}finally{dom.window.close();}});
+
+test('A shape never carries a measurement that is not a number',async()=>{const{dom,run,errors}=await editor();try{
+ run("wsNueva(EJEMPLOS[0].build())");
+ const r=JSON.parse(run(`JSON.stringify((()=>{const suelto=document.createElement('p');
+   const raiz=document.createElement('div');
+   return {estilo:estilo(suelto,0.05,'Calibri'), marco:marco(suelto,raiz,1)};})())`));
+ assert.ok(isFinite(r.estilo.pt)&&r.estilo.pt>0,'un elemento sin estilo calculado daba «sz=NaN»: '+r.estilo.pt);
+ for(const k of ['x','y','w','h']) assert.ok(isFinite(r.marco[k]),'marco.'+k+' salió '+r.marco[k]);
+ assert.ok(r.marco.w>=1&&r.marco.h>=1);
+ assert.deepEqual(errors,[]);
+}finally{dom.window.close();}});
+
+/* Lo que se rasteriza se serializa dentro de un <foreignObject>, donde no hay
+   ni `:root` ni la diapositiva de la que colgaba: sin llevárselo escrito, un
+   <svg> pierde su espacio de nombres y las variables de CSS se quedan sin
+   valor. El SmartArt llegaba al PowerPoint como una hilera de rótulos sueltos,
+   en serifa y sin cajas ni flechas. */
+test('What gets rasterised carries its namespace and its inherited style',async()=>{const{dom,run,errors}=await editor();try{
+ run("wsNueva(EJEMPLOS[0].build());S.cur=2;renderAll()");
+ /* JSDOM no carga imágenes: se atrapa el `src` que rasteriza le pone al <img>. */
+ const uri=run(`(()=>{const el=document.querySelector('#stageInner .smart-box');
+   if(!el)return 'sin smart-box';
+   el.style.setProperty('--acc','#123456');
+   let visto='';
+   const O=window.Image;
+   window.Image=function(){const o={};Object.defineProperty(o,'src',{set(v){visto=v}});return o};
+   rasteriza(el,':root{--acc:#123456}',2);
+   window.Image=O;
+   return visto})()`);
+ const svg=decodeURIComponent(uri.replace(/^data:image\/svg\+xml;charset=utf-8,/,''));
+ const dentro=/<svg [^>]*class="smart-svg[^>]*>/.exec(svg);
+ assert.ok(dentro,'no está el dibujo del SmartArt dentro del recorte');
+ assert.match(dentro[0],/xmlns="http:\/\/www\.w3\.org\/2000\/svg"/,'el <svg> de dentro va sin espacio de nombres: se leería como una etiqueta desconocida y solo saldría su texto');
+ /* Lo heredado se escribe en el envoltorio. JSDOM no resuelve propiedades
+    personalizadas ni la familia tipográfica, así que aquí solo se comprueba
+    que el envoltorio las lleva; el color y la letra de verdad se revisaron en
+    Chromium contra el PowerPoint exportado. */
+ assert.match(svg,/<div xmlns="http:\/\/www\.w3\.org\/1999\/xhtml" style="[^"]*color:/,'sin lo heredado, el recorte sale en la serifa de fábrica y sin color');
+ assert.deepEqual(errors,[]);
+}finally{dom.window.close();}});
+
 test('Loading or undoing while the title has focus does not write the old title back',async()=>{const{dom,run,errors}=await editor();try{
  const campo=()=>run("document.getElementById('deckTitleInput').value");
  run("wsNueva(EJEMPLOS[0].build());document.getElementById('deckTitleInput').focus()");
