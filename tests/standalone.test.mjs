@@ -25,3 +25,28 @@ test('Build has no production endpoints, cloud SDK, external font requests or ot
  for(const bad of ['.supabase.co','sentryDsn','window.supabase','fonts.googleapis.com','function docEstudio(','function figEstudio(','function daEstudio('])assert.equal(html.includes(bad),false,bad);
  assert.match(html,/github.com\/jorgegonzalezsevilla\/erlen-slides/);
 });
+
+test('The suite menu appears only when mounted at /slides/, and links out without importing other editors',async()=>{
+ // Montado en la suite: el menú común, con su aviso MIT íntegro en el build.
+ const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+ const licencia=readFileSync(new URL('../src/js/88a0-suite-nav.js',import.meta.url),'utf8');
+ for(const clausula of ['SPDX-License-Identifier: MIT','Permission is hereby granted','WITHOUT WARRANTY OF ANY KIND'])
+  assert.ok(html.includes(clausula)&&licencia.includes(clausula),'Falta parte del aviso MIT: '+clausula);
+ const montado=await editor('http://localhost:8130/slides/');
+ try{
+  const host=montado.dom.window.document.querySelector('erlen-suite-nav');
+  assert.ok(host,'El menú no se montó bajo /slides/.');
+  const enlaces=[...host.shadowRoot.querySelectorAll('a')];
+  assert.equal(enlaces.length,7,'Inicio de Erlen y las seis aplicaciones.');
+  assert.equal(host.shadowRoot.querySelector('[aria-current]').getAttribute('href'),'/slides/');
+  assert.equal(host.shadowRoot.querySelector('details').open,false,'El menú abre cerrado.');
+  for(const a of enlaces.filter(a=>!a.hasAttribute('aria-current')))assert.equal(a.target,'_blank');
+  assert.deepEqual(montado.errors,[]);
+ }finally{montado.dom.window.close();}
+ // Distribución independiente: sin apps hermanas, no se inventan enlaces rotos.
+ const suelto=await editor('http://localhost:8130/');
+ try{
+  assert.equal(suelto.dom.window.document.querySelector('erlen-suite-nav'),null,'Fuera de /slides/ no debe aparecer.');
+  assert.deepEqual(suelto.errors,[]);
+ }finally{suelto.dom.window.close();}
+});
