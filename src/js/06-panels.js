@@ -3,7 +3,13 @@
 /* ================= tira de diapositivas + panel derecho ================= */
 let dragFrom = null;
 
-function thumbW() { return window.matchMedia('(max-width:920px)').matches ? 100 : 168; }
+/* En vertical la tira es una cuadrícula de dos columnas con el ancho que sobra:
+   las miniaturas dejan de ser sellos de 100 px y se pueden tocar y leer. */
+function thumbW() {
+  if (window.matchMedia('(max-width:920px) and (orientation:portrait)').matches)
+    return clamp(Math.floor((Math.min(window.innerWidth, 920) - 52) / 2), 100, 190);
+  return window.matchMedia('(max-width:920px)').matches ? 100 : 168;
+}
 
 /* Devuelve, para cada diapositiva, el id de la sección a la que pertenece
    (las de sección no pertenecen a sí mismas). */
@@ -133,7 +139,14 @@ function pintaCabeceraTira(cab) {
 }
 
 function updateChrome() {
-  $('#slidePos').textContent = `Diapositiva ${S.cur + 1} de ${S.deck.slides.length}`;
+  /* «Diapositiva 4 de 6» no cabe con el resto de la barra en una pantalla
+     estrecha: ahí se queda en «4/6», que es lo que se consulta. */
+  const pos = $('#slidePos');
+  pos.innerHTML = '';
+  pos.append(h('span', { class: 'only-wide-i' }, 'Diapositiva '), String(S.cur + 1),
+    h('span', { class: 'only-wide-i' }, ' de '), h('span', { class: 'only-narrow-i' }, '/'),
+    String(S.deck.slides.length));
+  pos.setAttribute('aria-label', `Diapositiva ${S.cur + 1} de ${S.deck.slides.length}`);
   $('#undoBtn').toggleAttribute('disabled', !S.undo.length);
   $('#redoBtn').toggleAttribute('disabled', !S.redo.length);
   /* Se compara en vez de mirar el foco: mientras escribes, campo y mazo ya

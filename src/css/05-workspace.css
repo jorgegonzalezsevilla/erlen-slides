@@ -125,6 +125,46 @@
   .topbar .ed-badge {display:none}
   .zoombox #concBtn {display:none}
 }
+/* ---------- vertical: el lienzo ocupa lo que mide la diapositiva ----------
+   En retrato una diapositiva 16:9 cabe de sobra a lo ancho y deja un tercio de
+   pantalla vacío alrededor si el lienzo se queda con toda la altura. Aquí el
+   lienzo se ciñe a la diapositiva, los controles pasan a ser una barra debajo
+   —no pastillas flotando sobre el vacío— y el hueco que sobra se lo lleva la
+   tira, que deja de ser un friso de sellos y pasa a rejilla de dos columnas. */
+@media (max-width:920px) and (orientation:portrait){
+  .main{grid-template-rows:auto minmax(0,1fr)}
+  .canvas-wrap{min-height:0}
+  .canvas-scroll{flex:none;padding:var(--e3) var(--e2)}
+  .canvas-foot{position:static;padding:0 var(--e2) var(--e2);flex-wrap:nowrap;gap:var(--e2)}
+  .canvas-foot .foot-izq{min-width:0;flex:1 1 auto;overflow:hidden}
+  .zoombox{flex:none}
+  .zoombox .zlabel{min-width:38px}
+  .filmstrip{order:2;height:auto;border-top:1px solid var(--line);min-height:0;
+    flex-direction:column;align-items:stretch}
+  .fs-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+    justify-content:center;align-content:start;gap:var(--e3);
+    padding:var(--e3) var(--e3) var(--e5);overflow-y:auto;overflow-x:hidden}
+  .fs-item{width:auto;justify-self:center}
+  .fs-sec{grid-column:1/-1}
+  /* El botón vuelve a ser un botón con su nombre, debajo de la rejilla. */
+  .fs-add{order:2;margin:0 var(--e3) var(--e3);width:auto;height:var(--h-ctl);padding:0 var(--e4);font-size:var(--t2)}
+  .fs-add .only-wide-i{display:inline!important}
+  .fs-add .only-narrow-i{display:none}
+  .fs-item.dragover-before::before{top:auto;bottom:auto;left:calc(var(--e3) / -2 - 1px);right:auto;
+    width:3px;height:100%}
+  .fs-item.dragover-after::after{top:auto;bottom:auto;right:calc(var(--e3) / -2 - 1px);left:auto;
+    width:3px;height:100%}
+}
+/* Los ajustes de móvil de este archivo son los últimos en cargarse: el bloque
+   vertical vive aquí para poder con ellos. */
+@media (max-width:920px) and (orientation:portrait){
+  .filmstrip {height:auto;padding-bottom:env(safe-area-inset-bottom)}
+  .fs-add {width:auto;height:var(--h-ctl);margin:0 12px 12px}
+  .prep-ind {max-width:none}
+  .zoombox {margin-left:0}
+  .canvas-foot {flex-wrap:nowrap}
+}
+
 @media (prefers-reduced-motion:reduce) {.ws-card{transition:none}}
 @media print {.workspace{display:none!important}}
 

@@ -455,7 +455,7 @@ function montajeTikz(b, p) {
     const sx = pz.espejo ? -e : e;
     const PX = v => (+X(pz.x) + (v - 50) * sx).toFixed(3);
     const PY = v => (+Y(pz.y) - (v - 70) * e).toFixed(3);
-    const C = coloresLab(pz, m, S.deck);
+    const C = coloresLab(pz, m, TEX_DECK || S.deck);
     const estilo = C.estilo;
     const nivel = (pz.nivel == null) ? 1 : clamp(pz.nivel, 0, 1);
     L.push(p + `  % ${def.n}`);
@@ -492,55 +492,25 @@ function montajeTikz(b, p) {
   if (reg.defs.length) L.splice(marcaDefs, 0, ...reg.defs.map(d => p + d));
   return L.join('\n');
 }
-/* Un registro de colores: TikZ no admite expresiones de color con comas
-   dentro de una opción, así que cada tono se declara antes con su nombre. */
-function registroColores() {
-  const mapa = new Map(); const defs = [];
-  return {
-    defs,
-    n(hex, respaldo) {
-      if (!/^#[0-9a-f]{6}$/i.test(String(hex || ''))) return respaldo || 'erlentinta';
-      const k = hex.toUpperCase();
-      if (!mapa.has(k)) {
-        const nom = 'tpc' + mapa.size;
-        mapa.set(k, nom);
-        defs.push('\\definecolor{' + nom + '}{HTML}{' + k.slice(1) + '}');
-      }
-      return mapa.get(k);
-    }
-  };
-}
-/* Las mismas reglas de pintado que en pantalla, pero en opciones de TikZ.
-   Los tonos se calculan aquí, mezclando con el fondo, para que el PDF salga
-   igual que la pantalla también en los temas oscuros. */
+/* Las mismas reglas de pintado que en pantalla, leídas de la misma tabla
+   (PINTURA_LAB, en 47b-lab.js). Aquí solo se traduce: los rellenos se mezclan
+   con el fondo en vez de usar opacidad —así el PDF sale igual también en los
+   temas oscuros— y el ancho se toma en puntos, que es la unidad del papel.
+   Antes esta función tenía su propia copia de las reglas y ya había divergido:
+   la sombra, el líquido, el metal y las líneas finas no coincidían con la
+   pantalla, y el grosor del trazo era el mismo en los cuatro estilos. */
 function estiloTikz(pap, estilo, C, reg) {
-  const F = C.fondo || '#FFFFFF', T = C.traza || '#222222';
-  const c = (hex, resp) => reg.n(hex, resp);
-  const finoW = estilo === 'tecnico' ? '0.3' : '0.45';
-  const plano = estilo === 'linea' || estilo === 'tecnico';
-  const trazo = `draw=${c(T)}`;
-  if (pap === 'sombra') return plano ? null : `[fill=${c(labMezcla(F, T, 0.14))}, draw=none]`;
-  if (pap === 'brillo') return estilo !== 'suave' ? null : `[draw=${c(F)}, line width=1.1pt, opacity=0.72]`;
-  if (pap === 'liq') {
-    const t = estilo === 'tecnico' ? 0.22 : estilo === 'solido' ? 1 : estilo === 'linea' ? 0.6 : 0.78;
-    return `[fill=${c(labMezcla(F, C.liq, t))}, draw=none]`;
-  }
-  if (pap === 'vidrio') {
-    if (plano) return `[${trazo}]`;
-    const f = estilo === 'solido' ? labMezcla(F, T, 0.16) : labMezcla(F, C.vidrio || '#6E8FA8', 0.13);
-    return `[fill=${c(f)}, ${trazo}]`;
-  }
-  if (pap === 'solido' || pap === 'metal') {
-    if (plano) return `[${trazo}]`;
-    const f = estilo === 'solido'
-      ? (pap === 'metal' ? labMezcla(F, T, 0.32) : T)
-      : labMezcla(F, T, pap === 'metal' ? 0.12 : 0.07);
-    return `[fill=${c(f)}, ${trazo}]`;
-  }
-  if (pap === 'acento') return `[draw=${c(C.liq)}, line width=${estilo === 'tecnico' ? '0.5' : '0.85'}pt]`;
-  if (pap === 'fina') return `[${trazo}, line width=${finoW}pt]`;
-  if (pap === 'detalle') return `[draw=${c(estilo === 'solido' ? F : T)}, line width=${finoW}pt]`;
-  return `[${trazo}]`;
+  const c = celdaLab(pap, estilo);
+  if (!c) return null;
+  const T = C.traza || '#222222';
+  const anchoPt = (c.ancho ? c.ancho[1] : (TRAZO_BASE[estilo] || TRAZO_BASE.suave)[1]);
+  if (c.sinTrazo) return `[fill=${reg.n(tonoLab(c.relleno, C))}, draw=none]`;
+  const op = [];
+  if (c.relleno) op.push('fill=' + reg.n(tonoLab(c.relleno, C)));
+  op.push('draw=' + reg.n(c.trazo ? tonoLab(c.trazo, C) : T));
+  op.push('line width=' + anchoPt + 'pt');
+  if (c.opacidad != null) op.push('opacity=' + c.opacidad);
+  return '[' + op.join(', ') + ']';
 }
 /* Traduce un path SVG sencillo (M L Q A Z) a un \draw de TikZ.
    Los arcos se muestrean en tramos: así el relleno del líquido tiene el área

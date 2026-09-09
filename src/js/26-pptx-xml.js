@@ -48,6 +48,30 @@ function hex6(c, fondo) {
 }
 const opaco = c => { const v = leeColor(c); return !!v && v.a > 0.04; };
 
+/* Nada de lo que se hereda viaja en el clon: dentro del <foreignObject> no hay
+   ni `:root` ni la diapositiva de la que colgaba el trozo, así que cada
+   `var(--acc)` se queda sin valor y la letra vuelve a la serifa de fábrica.
+   Se resuelve todo contra el elemento original —que sí lo hereda— y se
+   escribe en el envoltorio. */
+/* Solo lo que se hereda y no cambia de tamaño a nada: fijar aquí el
+   `font-size` reescalaba los `em` de dentro y partía los rótulos. */
+const HEREDA = ['font-family', 'color', 'direction'];
+function variablesHeredadas(el, css) {
+  const cs = getComputedStyle(el);
+  const nombres = new Set();
+  for (let i = 0; i < cs.length; i++) if (String(cs[i]).indexOf('--') === 0) nombres.add(cs[i]);
+  /* Donde el navegador no las enumera, los nombres salen de las hojas de
+     estilo, que ya vienen recogidas para meterlas en el SVG. */
+  if (!nombres.size && css) { const re = /--[A-Za-z0-9_-]+/g; let m; while ((m = re.exec(css))) nombres.add(m[0]); }
+  const out = [];
+  nombres.forEach(n => { const v = cs.getPropertyValue(n); if (v && v.trim()) out.push(n + ':' + v.trim()); });
+  /* Y lo que se heredaba del cuerpo de la página: sin la letra, el SmartArt
+     salía en la serifa de fábrica del navegador en vez de en la del tema. */
+  HEREDA.forEach(n => { const v = cs.getPropertyValue(n); if (v && v.trim()) out.push(n + ':' + v.trim()); });
+  return out.join(';');
+}
+const _atrXml = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
 /* Rasteriza un trozo de la diapositiva a PNG con la misma pinta que en pantalla. */
 function rasteriza(el, css, escala) {
   return new Promise(res => {
@@ -55,7 +79,16 @@ function rasteriza(el, css, escala) {
     const w = Math.max(1, Math.round(r.width)), hh = Math.max(1, Math.round(r.height));
     const clon = el.cloneNode(true);
     clon.style.margin = '0';
-    const html = '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + w + 'px;height:' + hh + 'px">' + htmlAXml(clon.outerHTML) + '</div>';
+    /* Un <svg> serializado dentro del <foreignObject> pierde su espacio de
+       nombres si no lo lleva escrito: el navegador lo lee como una etiqueta
+       desconocida de XHTML y solo pinta su texto suelto. Le pasaba a todo lo
+       dibujado con `sv()` sin declararlo —el SmartArt llegaba al PowerPoint
+       como una hilera de rótulos, sin cajas, sin flechas y sin color. */
+    const svgs = (clon.tagName || '').toLowerCase() === 'svg' ? [clon] : [];
+    if (clon.querySelectorAll) Array.prototype.push.apply(svgs, clon.querySelectorAll('svg'));
+    svgs.forEach(s => s.setAttribute('xmlns', 'http://www.w3.org/2000/svg'));
+    const estilo = 'width:' + w + 'px;height:' + hh + 'px;' + variablesHeredadas(el, css);
+    const html = '<div xmlns="http://www.w3.org/1999/xhtml" style="' + _atrXml(estilo) + '">' + htmlAXml(clon.outerHTML) + '</div>';
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + hh + '">' +
       '<defs><style type="text/css"><![CDATA[' + css + ']]></style></defs>' +
       '<foreignObject width="100%" height="100%">' + html + '</foreignObject></svg>';

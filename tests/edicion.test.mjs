@@ -66,3 +66,43 @@ test('A selected figure can be grabbed and resized from either side',async()=>{c
  assert.equal(run("document.querySelectorAll('#stageInner .ancho-asa').length"),0,'el texto ocupa el ancho de su zona');
  assert.deepEqual(errors,[]);
 }finally{dom.window.close();}});
+
+/* En retrato el lienzo se ciñe a la diapositiva, así que la escala no puede
+   depender del alto del lienzo, y la tira pasa a rejilla con miniaturas
+   grandes. La composición es de CSS y JSDOM no la calcula: aquí se comprueban
+   las decisiones que sí toma el código. */
+const enRetrato = (dom, si) => { dom.window.matchMedia = q =>
+  ({ matches: si ? /max-width:920px/.test(q) : false, media: q, addEventListener() {}, removeEventListener() {} }); };
+
+test('In portrait the scale follows the width, not the height of the canvas',async()=>{const{dom,run,errors}=await editor();try{
+ run("wsNueva();addSlide('content')");
+ run(`(()=>{const sc=document.getElementById('canvasScroll');
+   Object.defineProperty(sc,'clientWidth',{value:822,configurable:true});
+   Object.defineProperty(sc,'clientHeight',{value:120,configurable:true})})()`);
+ enRetrato(dom, false);
+ const apaisado = run('effZoom()');
+ enRetrato(dom, true);
+ const vertical = run('effZoom()');
+ assert.ok(Math.abs(vertical - 800 / 1280) < 1e-6, 'en vertical manda el ancho: ' + vertical);
+ assert.ok(apaisado < vertical, 'en apaisado el alto sigue limitando: ' + apaisado);
+ assert.deepEqual(errors,[]);
+}finally{dom.window.close();}});
+
+test('Portrait thumbnails are big enough to read and the counter fits the bar',async()=>{const{dom,run,errors}=await editor();try{
+ run("wsNueva(EJEMPLOS[0].build())");
+ enRetrato(dom, false);
+ const apaisado = run('thumbW()');
+ enRetrato(dom, true);
+ dom.window.innerWidth = 390;
+ const vertical = run('thumbW()');
+ assert.equal(apaisado, 168);
+ assert.ok(vertical >= 140 && vertical <= 190, 'dos columnas con el ancho que sobra: ' + vertical);
+ run('updateChrome()');
+ /* Las dos formas conviven en el marcado y el CSS enseña la que toca; el
+    aria-label dice la larga siempre, que es lo que oye quien no la ve. */
+ assert.equal(run("document.getElementById('slidePos').getAttribute('aria-label')"), 'Diapositiva 1 de 6');
+ assert.match(run("document.getElementById('slidePos').textContent"), /Diapositiva 1 de \/6/);
+ assert.equal(run("document.querySelectorAll('#slidePos .only-wide-i').length"), 2, 'lo prescindible se oculta en estrecho');
+ assert.equal(run("document.querySelectorAll('#slidePos .only-narrow-i').length"), 1, 'y en su lugar queda «4/6»');
+ assert.deepEqual(errors,[]);
+}finally{dom.window.close();}});

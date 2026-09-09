@@ -59,6 +59,9 @@ function openChartEditor(b) {
       h('input', { type: 'checkbox', checked: b[key] !== undefined ? !!b[key] : !!def, onchange: e => { b[key] = e.target.checked; paintOpts(); draw(); } }), label);
     opts.append(chk('grid', 'Rejilla de fondo', true));
     if (b.kind === 'linea') {
+      /* Por omisión se marcan los puntos cuando son pocos: pocos datos son
+         mediciones y hay que verlas; muchos son un registro continuo. */
+      opts.append(chk('puntos', 'Marcar los puntos medidos', (parseTable(b.data || '').rows.length || 0) <= 30));
       opts.append(chk('offset', 'Apilar series con desplazamiento (espectros comparados)'));
       opts.append(chk('area', 'Rellenar bajo la curva'));
       if (b.offset) {
@@ -70,13 +73,33 @@ function openChartEditor(b) {
       opts.append(chk('xrev', 'Invertir el eje X (útil en FTIR)'));
     }
     if (b.kind === 'ajuste') opts.append(chk('showFit', 'Mostrar la ecuación y el R²', true));
+    /* Escala logarítmica. En barras no cabe —la barra sale del cero— y al
+       apilar espectros tampoco, porque el desplazamiento se suma sobre el
+       propio eje. El ajuste, si lo hay, pasa a hacerse sobre el logaritmo:
+       es la linealización de siempre, y conviene decirlo aquí. */
+    if (b.kind !== 'barras') {
+      opts.append(h('span', { class: 'panel-label', style: 'display:block;margin:10px 0 4px' }, 'Escala'));
+      opts.append(chk('logX', 'Eje X logarítmico'));
+      if (!(b.kind === 'linea' && b.offset)) opts.append(chk('logY', 'Eje Y logarítmico'));
+      if (b.logX || b.logY) {
+        const ss = chartSeries(b);
+        const esc = escalasChart(b, b.kind, b.kind === 'linea' && !!b.offset);
+        let fuera = 0, total = 0;
+        ss.forEach(s => s.pts.forEach(pt => { total++; if (!esc.vale(pt)) fuera++; }));
+        opts.append(h('p', { class: 'hint' },
+          (b.kind === 'ajuste' ? 'El ajuste se hace sobre el logaritmo, que es la recta que se ve. ' : '') +
+          (fuera ? `${fuera} de ${total} puntos no son positivos y quedan fuera: en un eje logarítmico no tienen sitio.`
+                 : 'Un cero o un negativo no tienen logaritmo: si los hubiera, quedarían fuera del dibujo.')));
+      }
+    }
     opts.append(chk('legend', 'Leyenda', true));
   }
   paintKinds(); paintOpts();
 
   const samples = h('div', { class: 'chips', style: 'margin-top:4px' },
     CHART_SAMPLES.map(sm => h('button', { class: 'chip', onclick: () => {
-      Object.assign(b, { data: sm.data, kind: sm.kind, xlabel: sm.xlabel, ylabel: sm.ylabel, offset: !!sm.offset });
+      Object.assign(b, { data: sm.data, kind: sm.kind, xlabel: sm.xlabel, ylabel: sm.ylabel,
+        offset: !!sm.offset, logX: !!sm.logX, logY: !!sm.logY });
       ta.value = sm.data; paintKinds(); paintOpts(); draw();
     } }, sm.n)));
 
@@ -89,7 +112,8 @@ function openChartEditor(b) {
         h('div', null,
           h('span', { class: 'panel-label', style: 'display:block;margin-bottom:6px' }, 'Datos'),
           ta,
-          h('p', { class: 'hint' }, 'Reconoce tabuladores, comas y punto y coma, y también la coma decimal del Excel en español. Para varias series, agrega más columnas.'),
+          h('p', { class: 'hint' }, 'Reconoce tabuladores, comas y punto y coma, y también la coma decimal del Excel en español. Para varias series, agrega más columnas. ' +
+            'Una columna titulada «±», «error», «sd», «sem» o «desv» no se dibuja como serie: es la incertidumbre de la columna anterior y sale como barra de error.'),
           h('span', { class: 'panel-label', style: 'display:block;margin:10px 0 4px' }, 'O empieza con un ejemplo'),
           samples),
         h('div', null,
@@ -104,10 +128,14 @@ function openChartEditor(b) {
   draw();
 }
 function describeData(b) {
-  const { headers, rows } = parseTable(b.data);
+  const { rows } = parseTable(b.data);
   if (!rows.length) return 'Aún no hay datos numéricos que graficar.';
-  const n = Math.max(0, headers.length - 1);
-  return `${rows.length} puntos · ${n} ${n === 1 ? 'serie' : 'series'} (${headers.slice(1).join(', ')})`;
+  /* Se cuenta lo que se va a dibujar, no las columnas: una columna de error no
+     es una serie, y decirlo aquí es la señal de que se reconoció como tal. */
+  const ss = chartSeries(b);
+  const conErr = ss.filter(s => s.tieneError).length;
+  return `${rows.length} puntos · ${ss.length} ${ss.length === 1 ? 'serie' : 'series'} (${ss.map(s => s.name).join(', ')})` +
+    (conErr ? ` · ${conErr === ss.length && ss.length === 1 ? 'con barras de error' : conErr + ' con barras de error'}` : '');
 }
 
 /* ---------- gráfica dinámica (fórmulas + deslizadores) ---------- */

@@ -52,6 +52,33 @@ function fmtTick(v, step) {
   if (s.includes('.')) s = s.replace(/0+$/, '').replace(/\.$/, '');
   return s;
 }
+/* Marcas de un eje logarítmico. Un eje log no se rotula «cada paso»: se
+   rotula por décadas, y solo cuando el recorrido es corto caben dentro el 2 y
+   el 5. Con muchas décadas se saltan las que no quepan. */
+function ticksLog(min, max) {
+  const e0 = Math.floor(Math.log10(min) + 1e-12), e1 = Math.ceil(Math.log10(max) - 1e-12);
+  const dec = Math.max(1, e1 - e0);
+  const mant = dec <= 1 ? [1, 2, 3, 5, 7] : dec <= 3 ? [1, 2, 5] : [1];
+  const salto = dec > 8 ? Math.ceil(dec / 8) : 1;
+  const out = [];
+  for (let e = e0; e <= e1; e++) {
+    if (salto > 1 && ((e % salto) + salto) % salto !== 0) continue;
+    for (const m of mant) {
+      const v = m * Math.pow(10, e);
+      if (v >= min * (1 - 1e-9) && v <= max * (1 + 1e-9)) out.push(v);
+    }
+  }
+  return { ticks: out.length ? out : [min, max], log: true };
+}
+/* El rango de un eje logarítmico llega hasta la década que envuelve los datos.
+   Si lo que entra no es positivo no hay logaritmo posible: se sustituye por un
+   rango legible en vez de propagar un NaN al dibujo entero. */
+function rangoLog(min, max) {
+  if (!(max > 0)) { min = 1; max = 10; }
+  if (!(min > 0)) min = max / 10;
+  if (max <= min) max = min * 10;
+  return [Math.pow(10, Math.floor(Math.log10(min) + 1e-12)), Math.pow(10, Math.ceil(Math.log10(max) - 1e-12))];
+}
 /* Texto de tick como nodos SVG (soporta 10^n con superíndice) */
 function tickText(v, step) {
   const s = fmtTick(v, step);
@@ -59,6 +86,19 @@ function tickText(v, step) {
   if (!m) return [{ t: s }];
   return [{ t: m[1] + '10' }, { t: m[2], sup: true }];
 }
+/* En un eje log el rótulo es la potencia: «10⁻³» y no «0.001». Mientras el
+   número se lea de un vistazo se escribe entero, que es lo que espera el ojo. */
+function tickTextLog(v) {
+  const e = Math.floor(Math.log10(v) + 1e-9);
+  const man = v / Math.pow(10, e);
+  if (e >= -3 && e <= 4) return [{ t: fmtTick(v, Math.pow(10, e) / 10) }];
+  const cabeza = Math.abs(man - 1) < 1e-9 ? '10' : (Math.round(man * 10) / 10) + '×10';
+  return [{ t: cabeza }, { t: String(e), sup: true }];
+}
+/* La marca de un eje, sea cual sea su escala: una sola puerta para que la
+   rejilla, los rótulos y el ancho del margen no puedan discrepar. */
+const rotuloTick = (eje, v) => eje.log ? tickTextLog(v) : tickText(v, eje.step);
+const anchoRotulo = partes => partes.reduce((a, p) => a + String(p.t).length * (p.sup ? 0.72 : 1), 0);
 
 /* Texto para el interior del SVG: convierte lo básico de LaTeX a Unicode
    (los títulos de ejes sí usan KaTeX, fuera del SVG). */
@@ -144,6 +184,27 @@ function parseTable(text) {
   return { headers, rows };
 }
 
+/* ---------- la incertidumbre viaja en su propia columna ----------
+   Una medida sin su error es media medida. La forma en que llega pegada desde
+   Excel u Origin es siempre la misma: una columna a la derecha de la serie con
+   un encabezado que la delata. Esta lista es la única que decide, y la leen
+   por igual la pantalla y el PDF; fuera de ella, una columna es una serie más.
+   Están solo las marcas que no significan otra cosa en un laboratorio: «E» es
+   un potencial y «u» una velocidad, así que ninguna de las dos entra. */
+const MARCA_ERROR = ['±', '+/-', '+-', 'sd', 'sem', 'err', 'error', 'errores', 'desv',
+  'desviacion', 'desviación', 'incert', 'incertidumbre', 'sigma', 'σ', 'δy', 'dy', 'ey', 's.d.', 'e.e.'];
+function esColumnaError(cab) {
+  const t = String(cab == null ? '' : cab).toLowerCase()
+    .replace(/[()\[\]{}]/g, ' ').replace(/[_.]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!t) return false;
+  if (t.includes('±')) return true;
+  if (MARCA_ERROR.includes(t.replace(/ /g, ''))) return true;
+  /* «error de la absorbancia», «Absorbancia sd»: la marca abre o cierra. */
+  const primera = t.split(' ')[0], ultima = t.split(' ').pop();
+  const clara = m => m !== '+-' && m !== 's.d.' && m !== 'e.e.' && m.length > 1;
+  return MARCA_ERROR.some(m => clara(m) && (primera === m || ultima === m));
+}
+
 function linFit(pts) {
   const n = pts.length;
   if (n < 2) return null;
@@ -197,11 +258,41 @@ function chartSeries(b) {
   const out = [];
   const ncol = headers.length;
   for (let j = 1; j < ncol; j++) {
+    /* Una columna de error no es una serie: es la incertidumbre de la que
+       viene delante, y se engancha como tercer número de cada punto. */
+    if (out.length && esColumnaError(headers[j])) {
+      const s = out[out.length - 1];
+      if (!s.tieneError) {
+        s.tieneError = true;
+        s.pts.forEach(pt => { const e = rows[pt[3]][j]; if (isFinite(e) && e > 0) pt[2] = Math.abs(e); });
+      }
+      continue;
+    }
     const pts = [];
-    for (const r of rows) if (isFinite(r[0]) && isFinite(r[j])) pts.push([r[0], r[j]]);
+    rows.forEach((r, i) => { if (isFinite(r[0]) && isFinite(r[j])) pts.push([r[0], r[j], NaN, i]); });
     if (pts.length) out.push({ name: headers[j], pts });
   }
+  /* El índice de fila era andamio: un punto es (x, y) y, si la tiene, su barra. */
+  out.forEach(s => { s.pts = s.pts.map(pt => isFinite(pt[2]) ? [pt[0], pt[1], pt[2]] : [pt[0], pt[1]]); });
   return out;
+}
+
+/* ---------- la escala de los ejes, decidida una sola vez ----------
+   Qué eje va en logaritmo, qué punto cabe en él y en qué espacio se dibuja
+   sale de aquí, y lo leen por igual la pantalla (`renderChart`) y el código
+   pgfplots (`chartToPgf`). Es la misma regla que sostiene el montaje y las
+   estructuras: una decisión que vive dos veces acaba divergiendo. */
+function escalasChart(b, kind, offsetMode) {
+  const logX = !!b.logX && kind !== 'barras';
+  const logY = !!b.logY && kind !== 'barras' && !offsetMode;
+  const eX = v => logX ? (v > 0 ? Math.log10(v) : NaN) : v;
+  const eY = v => logY ? (v > 0 ? Math.log10(v) : NaN) : v;
+  return {
+    logX, logY, eX, eY,
+    iX: t => logX ? Math.pow(10, t) : t,
+    iY: t => logY ? Math.pow(10, t) : t,
+    vale: pt => isFinite(eX(pt[0])) && isFinite(eY(pt[1]))
+  };
 }
 
 /* ---------- render ---------- */
@@ -231,54 +322,117 @@ function renderChart(b, deck, mode, availPx) {
   });
 
   const FS = 19, FSL = 20;
-  const padL = 72, padR = 26, padT = 16;
+  /* El margen izquierdo lo pide el rótulo de tick más largo; fijarlo en 72
+     dejaba un pasillo vacío con «0,1» y apretaba el eje con «1,2×10⁻³». */
+  let padL = 72;
+  const padR = 26, padT = 16;
   const padB = 48 + (series.length > 1 && !(kind === 'linea' && b.offset) && b.legend !== false ? 34 : 0);
-  const iw = W - padL - padR, ih = H - padT - padB;
+  let iw = W - padL - padR, ih = H - padT - padB;
 
   /* desplazamiento vertical entre series (apilar espectros) */
   const offsetMode = !isFunc && kind === 'linea' && !!b.offset;
+  /* Escala logarítmica. Un cero o un negativo no tienen logaritmo: en vez de
+     inventarles uno se quedan fuera del dibujo, y el editor dice cuántos. En
+     barras no cabe —la barra sale del cero— ni al apilar espectros, porque el
+     desplazamiento se suma en el espacio que se ve. */
+  const { logX, logY, eX, eY, vale } = escalasChart(b, kind, offsetMode);
+
   let allY = [], allX = [];
-  series.forEach(s => s.pts.forEach(([x, y]) => { if (isFinite(x)) allX.push(x); if (isFinite(y)) allY.push(y); }));
+  /* Los extremos del eje tienen que abarcar la barra de error entera: si no,
+     la incertidumbre se dibuja cortada, que es peor que no dibujarla. */
+  const meteY = (y, e) => {
+    if (isFinite(eY(y))) allY.push(y);
+    if (isFinite(e) && e > 0 && isFinite(eY(y))) {
+      allY.push(y + e);
+      const bajo = y - e;
+      allY.push(logY ? Math.max(bajo, y / 100) : bajo);
+    }
+  };
+  const meteSerie = ss => ss.forEach(s => s.pts.forEach(pt => {
+    if (!vale(pt)) return;
+    allX.push(pt[0]); meteY(pt[1], pt[2]);
+  }));
+  meteSerie(series);
   /* Con un «después», los ejes abarcan los dos estados: así la comparación es
      honesta y el marco no salta al cambiar. */
   if (b.despues && b.despues.data && !isFunc) {
-    chartSeries(Object.assign({}, b, { data: b.despues.data, despues: null }))
-      .forEach(s => s.pts.forEach(([x, y]) => { if (isFinite(x)) allX.push(x); if (isFinite(y)) allY.push(y); }));
+    meteSerie(chartSeries(Object.assign({}, b, { data: b.despues.data, despues: null })));
   }
   if (!allX.length) { allX = [0, 1]; allY = [0, 1]; }
   let yMinRaw = Math.min(...allY), yMaxRaw = Math.max(...allY);
   const spanY = (yMaxRaw - yMinRaw) || 1;
   const offStep = offsetMode ? spanY * (b.offsetPct == null ? 55 : b.offsetPct) / 100 : 0;
   const draw = series.map((s, i) => ({
-    name: s.name, i,
-    pts: s.pts.map(([x, y]) => [x, y + offStep * (series.length - 1 - i)])
+    name: s.name, i, tieneError: !!s.tieneError,
+    pts: s.pts.map(([x, y, e]) => [x, y + offStep * (series.length - 1 - i), e])
   }));
   let ys = [];
-  draw.forEach(s => s.pts.forEach(([, y]) => { if (isFinite(y)) ys.push(y); }));
-  if (b.despues && b.despues.data && !isFunc && !offsetMode) ys = ys.concat(allY);
-  if (!ys.length) ys = [0, 1];
+  draw.forEach(s => s.pts.forEach(([, y, e]) => {
+    if (!isFinite(eY(y))) return;
+    ys.push(y);
+    if (isFinite(e) && e > 0) { ys.push(y + e); ys.push(logY ? Math.max(y - e, y / 100) : y - e); }
+  }));
+  if (b.despues && b.despues.data && !isFunc && !offsetMode) ys = ys.concat(allY.filter(v => isFinite(eY(v))));
+  if (!ys.length) ys = logY ? [1, 10] : [0, 1];
 
   let xmin = b.xminAuto === false && isFinite(+b.xmin0) ? +b.xmin0 : Math.min(...allX);
   let xmax = b.xminAuto === false && isFinite(+b.xmax0) ? +b.xmax0 : Math.max(...allX);
   if (isFunc) { xmin = +b.xmin; xmax = +b.xmax; }
+  if (logX) { const r = rangoLog(Math.min(xmin, xmax), Math.max(xmin, xmax)); xmin = r[0]; xmax = r[1]; }
   if (b.xrev) { const t = xmin; xmin = xmax; xmax = t; }
-  let ymin = Math.min(...ys), ymax = Math.max(...ys);
+  let ymin = Math.min(...ys), ymax = Math.max(...ys), pasoY = 0;
   if (b.yminAuto === false) { if (isFinite(+b.ymin0)) ymin = +b.ymin0; if (isFinite(+b.ymax0)) ymax = +b.ymax0; }
-  else { const pad = (ymax - ymin || 1) * 0.08; ymin -= pad; ymax += pad; if (kind === 'barras') ymin = Math.min(0, ymin); }
+  /* En logarítmica el rango lo fijan las décadas, unas líneas más abajo:
+     ensancharlo antes con el paso lineal lo dejaba corrido una década entera
+     (con datos de 8 a 100 el eje salía de 10 a 1000). */
+  else if (logY) { /* el rango log se ajusta abajo */ }
+  else {
+    /* Con un margen ciego del 8 % el último tick se quedaba por debajo del dato
+       más alto y el máximo de la serie no se podía leer en el eje. Se redondea
+       el rango a la marca siguiente: el eje termina justo en un tick, que ya
+       hace de margen, y el extremo de los datos queda rotulado. */
+    pasoY = niceTicks(ymin, ymax, 5).step;
+    const y0 = Math.floor(ymin / pasoY + 1e-9) * pasoY;
+    const y1 = Math.ceil(ymax / pasoY - 1e-9) * pasoY;
+    ymin = y0 === ymin && y0 !== 0 ? y0 - pasoY : y0;
+    ymax = y1 === ymax ? y1 + (kind === 'barras' ? 0 : pasoY) : y1;
+    if (kind === 'barras') ymin = Math.min(0, ymin);
+  }
+  /* En escala logarítmica el rango se ajusta a décadas enteras, y un extremo
+     no positivo puesto a mano se corrige en vez de romper el dibujo. */
+  if (logY && (b.yminAuto !== false || !(ymin > 0) || !(ymax > ymin))) {
+    const r = rangoLog(ymin, ymax); ymin = r[0]; ymax = r[1]; pasoY = 0;
+  }
   /* Ejes fijados desde fuera: el antes/después y las capas necesitan que el
      marco no salte entre un estado y otro. */
   if (b._ejes) { if (isFinite(b._ejes.xmin)) xmin = b._ejes.xmin; if (isFinite(b._ejes.xmax)) xmax = b._ejes.xmax; if (isFinite(b._ejes.ymin)) ymin = b._ejes.ymin; if (isFinite(b._ejes.ymax)) ymax = b._ejes.ymax; }
 
   /* El FTIR se dibuja de mayor a menor número de onda: es la convención. */
   const invX = !!b.invertirX;
-  const sx = v => invX
-    ? padL + iw - (v - xmin) / ((xmax - xmin) || 1) * iw
-    : padL + (v - xmin) / ((xmax - xmin) || 1) * iw;
-  const sy = v => padT + ih - (v - ymin) / ((ymax - ymin) || 1) * ih;
+  /* Del dato al píxel, pasando por el espacio en que se dibuja: con escala
+     lineal ese espacio es el dato mismo, y con logarítmica su logaritmo. */
+  const pxDe = t => {
+    const a = eX(xmin), z = eX(xmax), f = (t - a) / ((z - a) || 1);
+    return invX ? padL + iw - f * iw : padL + f * iw;
+  };
+  const pyDe = t => padT + ih - (t - eY(ymin)) / ((eY(ymax) - eY(ymin)) || 1) * ih;
+  const sx = v => pxDe(eX(v));
+  const sy = v => pyDe(eY(v));
 
   /* --- rejilla y ejes --- */
-  const tx = niceTicks(Math.min(xmin, xmax), Math.max(xmin, xmax), 6);
-  const ty = niceTicks(ymin, ymax, 5);
+  const tx = logX ? ticksLog(Math.min(xmin, xmax), Math.max(xmin, xmax))
+                 : niceTicks(Math.min(xmin, xmax), Math.max(xmin, xmax), 6);
+  /* Con el rango ya redondeado se conserva el mismo paso: recalcularlo sobre
+     el rango ensanchado dejaría la mitad de las marcas. */
+  const ty = logY ? ticksLog(Math.min(ymin, ymax), Math.max(ymin, ymax))
+    : pasoY ? { step: pasoY, ticks: (() => {
+    const t = []; for (let v = Math.ceil(ymin / pasoY - 1e-9) * pasoY; v <= ymax + pasoY * 1e-9; v += pasoY) t.push(Math.abs(v) < pasoY * 1e-9 ? 0 : v);
+    return t; })() } : niceTicks(ymin, ymax, 5);
+  {
+    const anchoTick = ty.ticks.reduce((m, v) => Math.max(m, anchoRotulo(rotuloTick(ty, v))), 1);
+    padL = Math.round(clamp(26 + anchoTick * FS * 0.55, 46, 118));
+    iw = W - padL - padR;
+  }
   const g = sv('g');
   if (b.grid !== false) {
     ty.ticks.forEach(v => g.append(sv('line', { x1: padL, x2: padL + iw, y1: sy(v).toFixed(1), y2: sy(v).toFixed(1), stroke: P.grid, 'stroke-width': 1 })));
@@ -300,18 +454,34 @@ function renderChart(b, deck, mode, availPx) {
     else t.textContent = s;
     return t;
   };
+  /* La barra de error. Va por debajo del marcador —el punto medido tiene que
+     seguir siendo lo primero que se ve— y con topes, que es lo que la
+     distingue de un trazo cualquiera. En escala logarítmica el brazo de abajo
+     no puede cruzar el cero: se para en el borde del eje. */
+  const barraError = (destino, x, y, e, col) => {
+    if (!isFinite(e) || e <= 0 || !isFinite(sy(y))) return;
+    const abajo = (logY && y - e <= 0) ? ymin : y - e;
+    const X = sx(x), ya = sy(y + e), yb = sy(abajo);
+    if (!isFinite(ya) || !isFinite(yb)) return;
+    const w = 5;
+    const g2 = sv('g', { stroke: col, 'stroke-width': 1.6, 'stroke-linecap': 'round', fill: 'none' });
+    g2.append(sv('line', { x1: X.toFixed(1), x2: X.toFixed(1), y1: ya.toFixed(1), y2: yb.toFixed(1) }));
+    [ya, yb].forEach(Y => g2.append(sv('line', { x1: (X - w).toFixed(1), x2: (X + w).toFixed(1), y1: Y.toFixed(1), y2: Y.toFixed(1) })));
+    destino.append(g2);
+  };
+
   const ticksG = sv('g');
   tx.ticks.forEach(v => {
     const X = sx(v);
     if (X < padL - 2 || X > padL + iw + 2) return;
     ticksG.append(sv('line', { x1: X.toFixed(1), x2: X.toFixed(1), y1: padT + ih, y2: padT + ih + 6, stroke: P.axis, 'stroke-width': 1.4 }));
-    ticksG.append(txt(X, padT + ih + 6 + FS, tickText(v, tx.step)));
+    ticksG.append(txt(X, padT + ih + 6 + FS, rotuloTick(tx, v)));
   });
   if (!offsetMode) ty.ticks.forEach(v => {
     const Y = sy(v);
     if (Y < padT - 2 || Y > padT + ih + 2) return;
     ticksG.append(sv('line', { x1: padL - 6, x2: padL, y1: Y.toFixed(1), y2: Y.toFixed(1), stroke: P.axis, 'stroke-width': 1.4 }));
-    ticksG.append(txt(padL - 12, Y + FS * 0.34, tickText(v, ty.step), { anchor: 'end' }));
+    ticksG.append(txt(padL - 12, Y + FS * 0.34, rotuloTick(ty, v), { anchor: 'end' }));
   });
   else ticksG.append(txt(padL - 12, padT + ih * 0.5, mathToUnicode(b.yunit || 'u. a.'), { anchor: 'middle', rot: -90 }));
   svg.append(ticksG);
@@ -335,7 +505,7 @@ function renderChart(b, deck, mode, availPx) {
   draw.forEach((s, i) => {
     const col = P.series[i % P.series.length];
     const mk = MARKERS[i % MARKERS.length];
-    const pts = s.pts.filter(pt => isFinite(pt[1]));
+    const pts = s.pts.filter(vale);
     if (!pts.length) return;
     const destino = porCapas ? capaG(mathToUnicode(s.name)) : plot;
     if (porCapas && kind === 'ajuste' && !gAjuste) gAjuste = sv('g', { class: 'capa', 'data-nombre': 'el ajuste' });
@@ -344,7 +514,7 @@ function renderChart(b, deck, mode, availPx) {
     if (kind === 'barras') {
       const n = draw.length, slot = iw / Math.max(1, pts.length);
       const bw = Math.min(24, (slot / n) - 2 - (n > 1 ? 2 : 0));
-      pts.forEach(([x, y]) => {
+      pts.forEach(([x, y, e]) => {
         const cx = sx(x) - (n * (bw + 2)) / 2 + i * (bw + 2) + bw / 2;
         const y0 = sy(Math.max(0, ymin)), y1 = sy(y);
         const hh = Math.abs(y0 - y1), top = Math.min(y0, y1), r = Math.min(4, bw / 2, hh);
@@ -352,15 +522,24 @@ function renderChart(b, deck, mode, availPx) {
           d: `M${cx - bw / 2},${top + hh}v${-(hh - r)}a${r},${r} 0 0,1 ${r},${-r}h${bw - 2 * r}a${r},${r} 0 0,1 ${r},${r}v${hh - r}z`,
           fill: col
         }));
+        /* Sobre la barra, la incertidumbre va en la tinta del texto: del color
+           de la propia barra se perdería contra el relleno. */
+        if (isFinite(e) && e > 0) {
+          const ya = sy(y + e), yb = sy(logY && y - e <= 0 ? ymin : y - e);
+          const g2 = sv('g', { stroke: P.ink, 'stroke-width': 1.5, 'stroke-linecap': 'round', fill: 'none' });
+          g2.append(sv('line', { x1: cx.toFixed(1), x2: cx.toFixed(1), y1: ya.toFixed(1), y2: yb.toFixed(1) }));
+          [ya, yb].forEach(Y => g2.append(sv('line', { x1: (cx - Math.min(6, bw / 2)).toFixed(1), x2: (cx + Math.min(6, bw / 2)).toFixed(1), y1: Y.toFixed(1), y2: Y.toFixed(1) })));
+          destino.append(g2);
+        }
       });
       return;
     }
 
     const d = [];
     let pen = false;
-    s.pts.forEach(([x, y]) => {
-      if (!isFinite(y)) { pen = false; return; }
-      d.push((pen ? 'L' : 'M') + sx(x).toFixed(1) + ',' + sy(y).toFixed(1));
+    s.pts.forEach(pt => {
+      if (!vale(pt)) { pen = false; return; }
+      d.push((pen ? 'L' : 'M') + sx(pt[0]).toFixed(1) + ',' + sy(pt[1]).toFixed(1));
       pen = true;
     });
 
@@ -368,6 +547,14 @@ function renderChart(b, deck, mode, availPx) {
       const path = sv('path', { d: d.join(''), fill: 'none', stroke: col, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' });
       if (b.anim === 'draw' && (mode === 'present' || mode === 'edit')) path.classList.add('chart-draw');
       destino.append(path);
+      /* Una curva sin puntos no deja ver dónde se midió. Con pocos datos son
+         mediciones y se marcan; con muchos es un registro continuo y estorban.
+         La casilla «Marcar los puntos» decide cuando el usuario quiere otra cosa. */
+      pts.forEach(([x, y, e]) => barraError(destino, x, y, e, col));
+      if (b.puntos == null ? (pts.length <= 30 || s.tieneError) : !!b.puntos) {
+        pts.forEach(([x, y]) => destino.append(sv('path',
+          { d: markerPath(mk, sx(x), sy(y), 5), fill: col, stroke: P.surface, 'stroke-width': 2 })));
+      }
       if (b.area) {
         const base = sy(Math.max(ymin, Math.min(0, ymax)));
         destino.append(sv('path', { d: d.join('') + `L${sx(pts[pts.length - 1][0]).toFixed(1)},${base}L${sx(pts[0][0]).toFixed(1)},${base}z`, fill: col, opacity: 0.1 }));
@@ -378,17 +565,24 @@ function renderChart(b, deck, mode, availPx) {
       }
     } else {
       if (kind === 'ajuste') {
-        const f = (typeof linFitSE === 'function' ? linFitSE(pts) : null) || linFit(pts);
+        /* El ajuste se hace en el espacio que se ve. Con el eje y en log, la
+           recta que el químico busca es la de log y frente a x —la
+           linealización de siempre—, y así además sale recta en el dibujo en
+           vez de curvarse; con los dos ejes lineales, esto es el ajuste de
+           siempre, número por número. */
+        const enEje = pts.map(pt => [eX(pt[0]), eY(pt[1])]);
+        const f = (typeof linFitSE === 'function' ? linFitSE(enEje) : null) || linFit(enEje);
         if (f) {
-          fits.push({ f, col, name: s.name });
-          const xa = Math.min(xmin, xmax), xb = Math.max(xmin, xmax);
+          fits.push({ f, col, name: s.name, logX, logY });
+          const ta = eX(Math.min(xmin, xmax)), tb = eX(Math.max(xmin, xmax));
           plotFit.append(sv('line', {
-            x1: sx(xa).toFixed(1), y1: sy(f.m * xa + f.b).toFixed(1),
-            x2: sx(xb).toFixed(1), y2: sy(f.m * xb + f.b).toFixed(1),
+            x1: pxDe(ta).toFixed(1), y1: pyDe(f.m * ta + f.b).toFixed(1),
+            x2: pxDe(tb).toFixed(1), y2: pyDe(f.m * tb + f.b).toFixed(1),
             stroke: col, 'stroke-width': 2, opacity: .85
           }));
         }
       }
+      pts.forEach(([x, y, e]) => barraError(destino, x, y, e, col));
       pts.forEach(([x, y]) => {
         destino.append(sv('path', { d: markerPath(mk, sx(x), sy(y), 5.5), fill: col, stroke: P.surface, 'stroke-width': 2 }));
       });
@@ -480,7 +674,7 @@ function renderChart(b, deck, mode, availPx) {
   if (kind === 'ajuste' && fits.length && b.showFit !== false) {
     box.append(h('div', { class: 'ch-fit' }, fits.slice(0, 3).map((ft, i) => h('div', {
       html: (fits.length > 1 ? esc(mathToUnicode(ft.name)) + ': ' : '') +
-        inlineRich(`$y = ${sigFig(ft.f.m, 4)}\\,x ${ft.f.b < 0 ? '-' : '+'} ${sigFig(Math.abs(ft.f.b), 4)}$`) +
+        inlineRich(`$${ft.logY ? '\\log_{10} y' : 'y'} = ${sigFig(ft.f.m, 4)}\\,${ft.logX ? '\\log_{10} x' : 'x'} ${ft.f.b < 0 ? '-' : '+'} ${sigFig(Math.abs(ft.f.b), 4)}$`) +
         ' &nbsp;·&nbsp; ' + inlineRich(`$R^2 = ${ft.f.r2.toFixed(4)}$`) +
         /* La pendiente con su error es lo que se reporta en un artículo. */
         (b.conError !== false && ft.f.sm != null

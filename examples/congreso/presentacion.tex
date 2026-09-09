@@ -29,6 +29,7 @@
 \IfFileExists{spanish.ldf}{\usepackage[spanish,es-nodecimaldot]{babel}}{}
 \usepackage{amsmath,amssymb}
 \usepackage[version=4]{mhchem}
+\definecolor{erlenfondo}{HTML}{F4F6FA}
 \definecolor{erlenacento}{HTML}{B08A32}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, calc}
@@ -128,7 +129,7 @@
         label style={font=\small},
         tick label style={font=\footnotesize}
       ]
-        \addplot[serieA, line width=1pt, mark=none, smooth] coordinates {
+        \addplot[serieA, line width=1pt, mark=*, mark size=1.7pt, smooth] coordinates {
         (0,0) (1,0.4) (2,0.65) (3,0.8) (4,0.86) 
         };
       \end{axis}

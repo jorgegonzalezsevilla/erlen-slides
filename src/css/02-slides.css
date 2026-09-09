@@ -296,6 +296,8 @@ ul.bl li.lv2::before{content:var(--bl-m2);color:var(--bl-col2);font-size:.8em;to
 table.btab{border-collapse:collapse;font-size:.85em;font-variant-numeric:tabular-nums;line-height:1.35}
 table.btab th,table.btab td{padding:var(--e3) var(--e5);border:none;text-align:center}
 table.btab.al-l th,table.btab.al-l td{text-align:left}
+/* Las cifras se leen alineadas por la derecha: así comparan de fila a fila. */
+table.btab th.num,table.btab td.num,table.btab.al-l th.num,table.btab.al-l td.num{text-align:right}
 table.btab thead th{border-top:2.2px solid var(--sfg);border-bottom:1.1px solid var(--sfg);font-weight:600}
 table.btab tbody tr:last-child td{border-bottom:2.2px solid var(--sfg)}
 table.btab.no-head tbody tr:first-child td{border-top:2.2px solid var(--sfg)}

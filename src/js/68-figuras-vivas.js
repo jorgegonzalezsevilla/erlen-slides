@@ -182,15 +182,22 @@ async function paqueteFigura(b) {
   const t = toast('Armando el paquete…');
   try {
     const nombre = (b.caption || b.title || 'figura').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '').toLowerCase().slice(0, 40) || 'figura';
-    const { headers, rows } = parseTable(b.data || '');
+    const { rows } = parseTable(b.data || '');
     const series = chartSeries(b);
     const L = ['PAQUETE DE FIGURA · Erlen', '', 'Figura: ' + (b.caption || b.title || '(sin pie)'),
       'Tipo: ' + (b.kind || 'linea'), 'Ejes: ' + (b.xlabel || 'x') + ' / ' + (b.ylabel || 'y'),
-      'Puntos: ' + rows.length + ' · series: ' + headers.slice(1).join(', ')];
+      'Puntos: ' + rows.length + ' · series: ' + series.map(x => x.name).join(', ') +
+        (series.some(x => x.tieneError) ? ' · con barras de error' : '')];
     if (b.fuente) L.push('Procedencia: ' + b.fuente.nombre + ' · ' + b.fuente.cuando + ' · huella ' + b.fuente.huella + (b.fuente.instrumento ? ' · ' + b.fuente.instrumento : ''));
+    /* El ajuste que se anota es el que se ve: con un eje logarítmico, el del
+       logaritmo. Si aquí se recalculara sobre los datos crudos, el LEEME del
+       paquete contradiría a la propia figura que lo acompaña. */
+    const esc = escalasChart(b, b.kind || 'linea', (b.kind || 'linea') === 'linea' && !!b.offset);
     if ((b.kind || '') === 'ajuste') series.forEach(s => {
-      const f = (typeof linFitSE === 'function' ? linFitSE(s.pts.filter(q => isFinite(q[1]))) : null) || linFit(s.pts.filter(q => isFinite(q[1])));
-      if (f) L.push('Ajuste ' + s.name + ': pendiente ' + sigFig(f.m, 4) + (f.sm != null ? ' ± ' + sigFig(f.sm, 2) : '') + ', ordenada ' + sigFig(f.b, 4) + (f.sb != null ? ' ± ' + sigFig(f.sb, 2) : '') + (f.r2 != null ? ', R² = ' + sigFig(f.r2, 4) : ''));
+      const ok = s.pts.filter(esc.vale).map(q => [esc.eX(q[0]), esc.eY(q[1])]);
+      const f = (typeof linFitSE === 'function' ? linFitSE(ok) : null) || linFit(ok);
+      const de = (esc.logY ? 'log₁₀ y' : 'y') + ' frente a ' + (esc.logX ? 'log₁₀ x' : 'x');
+      if (f) L.push('Ajuste ' + s.name + ' (' + de + '): pendiente ' + sigFig(f.m, 4) + (f.sm != null ? ' ± ' + sigFig(f.sm, 2) : '') + ', ordenada ' + sigFig(f.b, 4) + (f.sb != null ? ' ± ' + sigFig(f.sb, 2) : '') + (f.r2 != null ? ', R² = ' + sigFig(f.r2, 4) : ''));
     });
     L.push('', 'Archivos:', '  datos.csv    los datos tal cual, coma como separador',
       '  figura.tex   la figura en pgfplots; pdflatex figura.tex la regenera',

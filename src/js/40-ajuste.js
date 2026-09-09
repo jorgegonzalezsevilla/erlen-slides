@@ -35,6 +35,10 @@ function limiteDeteccion(f) {
 /* Redondeo a la incertidumbre: 1.5479 ± 0.0231 → «1.548 ± 0.023». */
 function conError(v, e) {
   if (e == null || !isFinite(e) || e === 0) return sigFig(v, 4);
+  /* Con datos exactamente colineales la incertidumbre que sale del ajuste es
+     ruido de coma flotante: escribir «± 1.6×10⁻¹⁸» aparenta una precisión que
+     no existe, así que por debajo del millonésimo del valor no se reporta. */
+  if (v !== 0 && Math.abs(e / v) < 1e-6) return sigFig(v, 4);
   const dec = Math.max(0, -Math.floor(Math.log10(Math.abs(e))) + 1);
   if (dec > 8) return sigFig(v, 4) + ' ± ' + sigFig(e, 2);
   return v.toFixed(dec) + ' ± ' + e.toFixed(dec);
