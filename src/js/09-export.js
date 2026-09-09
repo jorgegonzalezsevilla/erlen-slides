@@ -68,6 +68,26 @@ function enCaja(tikz, pct, p) {
   const w = clamp(+pct || 70, 10, 100) / 100;
   return p + '\\resizebox{' + w.toFixed(2) + '\\linewidth}{!}{%\n' + tikz + '\n' + p + '}';
 }
+/* Un registro de colores: TikZ no admite expresiones de color con comas
+   dentro de una opción, así que cada tono se declara antes con su nombre.
+   Lo usan las figuras que llevan su propia paleta —el montaje y la estructura—,
+   y por eso vive aquí y no dentro de ninguna de las dos. */
+function registroColores() {
+  const mapa = new Map(); const defs = [];
+  return {
+    defs,
+    n(hex, respaldo) {
+      if (!/^#[0-9a-f]{6}$/i.test(String(hex || ''))) return respaldo || 'erlentinta';
+      const k = hex.toUpperCase();
+      if (!mapa.has(k)) {
+        const nom = 'tpc' + mapa.size;
+        mapa.set(k, nom);
+        defs.push('\\definecolor{' + nom + '}{HTML}{' + k.slice(1) + '}');
+      }
+      return mapa.get(k);
+    }
+  };
+}
 const figName = b => b._nom || ('figura-' + String(b.id || 'x').slice(0, 8));
 /* La figura, con su barra de escala encima si la tiene. */
 function figTex(b) {
@@ -350,7 +370,7 @@ function texBlocks(arr, ind) {
       case 'estruct': {
         const capE = b.caption ? '\n' + p + '  \\caption{' + texInline(b.caption) + '}' : '';
         L.push(p + '\\begin{figure}\n' + p + '  \\centering\n' +
-          enCaja(estructuraTikz(b, p + '    '), b.w || 55, p + '  ') + capE + '\n' + p + '\\end{figure}');
+          enCaja(estructuraTikz(b, p + '    ', TEX_DECK || S.deck), b.w || 55, p + '  ') + capE + '\n' + p + '\\end{figure}');
         break;
       }
       case 'galeria': {

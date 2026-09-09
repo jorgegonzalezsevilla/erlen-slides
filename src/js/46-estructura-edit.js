@@ -1,6 +1,15 @@
 /* ==== 46-estructura-edit.js ==== */
 'use strict';
-/* ================= el lienzo donde se dibuja la estructura ================= */
+/* ================= el lienzo donde se dibuja la estructura =================
+   El lienzo va con el tema de la aplicación, no con el de la diapositiva: es
+   el editor —y no el motor de dibujo— quien mira cómo está puesta la app. */
+
+/* ¿Está el editor en oscuro? Con «auto» manda el sistema. */
+function editorOscuro() {
+  const t = document.documentElement.dataset.theme;
+  if (t) return t === 'dark';
+  return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+}
 
 const HERR = [
   { id: 'enlace', n: 'Enlace', ic: '／', d: 'Arrastra desde un átomo para sacar un enlace. Clic en el vacío para empezar uno nuevo.' },
@@ -61,7 +70,7 @@ function openEstructura(b) {
       vista = { x: caja.x + caja.w / 2 - W / (2 * escala), y: caja.y + caja.h / 2 - H / (2 * escala), w: W / escala, h: H / escala };
     }
     capa.setAttribute('viewBox', `${vista.x.toFixed(1)} ${vista.y.toFixed(1)} ${vista.w.toFixed(1)} ${vista.h.toFixed(1)}`);
-    const g = svgEstructura({ est }, S.deck, 'currentColor', true);
+    const g = svgEstructura({ est }, S.deck, 'currentColor', true, editorOscuro());
     Array.from(g.childNodes).forEach(n => capa.append(n));
     /* puntos de agarre */
     est.atomos.forEach(a => {

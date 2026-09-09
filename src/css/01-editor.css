@@ -957,7 +957,11 @@ textarea.field.es-area{min-height:300px;font:var(--t2)/1.6 var(--mono);white-spa
 .ee-an.on{background:var(--accSoft);border-color:var(--acc);color:var(--acc)}
 .ee-lienzo{border:1px solid var(--line);border-radius:var(--r2);background:var(--panel2);overflow:hidden;
   touch-action:none;cursor:crosshair}
-.ee-svg{display:block;width:100%;height:auto;aspect-ratio:720/420;color:var(--ink);font-family:var(--ui)}
+.ee-svg{display:block;width:100%;height:auto;aspect-ratio:720/420;color:var(--ink);font-family:var(--ui);
+  /* El rótulo de cada átomo se recorta contra el papel: en la diapositiva es
+     el del tema y aquí, el del lienzo. Sin esto, con la app en oscuro cada
+     rótulo salía sobre un disco casi blanco. */
+  --sbg:var(--panel2)}
 .ee-punto{fill:var(--acc);opacity:.14}
 .ee-punto:hover{opacity:.4}
 .ee-punto.sel{opacity:.55}

@@ -455,7 +455,7 @@ function montajeTikz(b, p) {
     const sx = pz.espejo ? -e : e;
     const PX = v => (+X(pz.x) + (v - 50) * sx).toFixed(3);
     const PY = v => (+Y(pz.y) - (v - 70) * e).toFixed(3);
-    const C = coloresLab(pz, m, S.deck);
+    const C = coloresLab(pz, m, TEX_DECK || S.deck);
     const estilo = C.estilo;
     const nivel = (pz.nivel == null) ? 1 : clamp(pz.nivel, 0, 1);
     L.push(p + `  % ${def.n}`);
@@ -491,24 +491,6 @@ function montajeTikz(b, p) {
   /* Las declaraciones de color van antes del dibujo. */
   if (reg.defs.length) L.splice(marcaDefs, 0, ...reg.defs.map(d => p + d));
   return L.join('\n');
-}
-/* Un registro de colores: TikZ no admite expresiones de color con comas
-   dentro de una opción, así que cada tono se declara antes con su nombre. */
-function registroColores() {
-  const mapa = new Map(); const defs = [];
-  return {
-    defs,
-    n(hex, respaldo) {
-      if (!/^#[0-9a-f]{6}$/i.test(String(hex || ''))) return respaldo || 'erlentinta';
-      const k = hex.toUpperCase();
-      if (!mapa.has(k)) {
-        const nom = 'tpc' + mapa.size;
-        mapa.set(k, nom);
-        defs.push('\\definecolor{' + nom + '}{HTML}{' + k.slice(1) + '}');
-      }
-      return mapa.get(k);
-    }
-  };
 }
 /* Las mismas reglas de pintado que en pantalla, leídas de la misma tabla
    (PINTURA_LAB, en 47b-lab.js). Aquí solo se traduce: los rellenos se mezclan
