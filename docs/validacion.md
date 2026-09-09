@@ -5,8 +5,8 @@ Comprobaciones del 5 de septiembre de 2026, sobre esta distribución independien
 | Comprobación | Resultado y alcance |
 |---|---|
 | Dependencias | Instalación aislada desde npm; lockfile portable, sin enlaces a rutas del equipo original |
-| Build | 86 módulos; aplicación sin configuración de producción ni fuentes externas automáticas |
-| Tests | 55 casos: 6 de interacción científica, 9 de herramientas científicas, 17 de recuperación, 5 de integración independiente, 5 de exportaciones y saneado, 7 de edición y composición vertical y 6 de gráficas y tablas |
+| Build | 87 módulos; aplicación sin configuración de producción ni fuentes externas automáticas |
+| Tests | 59 casos: 6 de interacción científica, 9 de herramientas científicas, 17 de recuperación, 5 de integración independiente, 5 de exportaciones y saneado, 7 de edición y composición vertical, 6 de gráficas y tablas y 4 de la frontera del montaje |
 | Ejemplos | 12 proyectos, 72 diapositivas; validación JSON, render DOM de cada diapositiva, ausencia de errores KaTeX y generación Beamer |
 | Guardado | Conservar una presentación con nombre al abrir otro ejemplo; navegación y enlace directo de ejemplo |
 | PowerPoint | Generado un archivo con texto, tabla y notas; integridad ZIP, XML parseable y contenido conservado. Una prueba automática arma el paquete con una rama activa y comprueba CRC, partes declaradas y referencias |
@@ -16,4 +16,4 @@ Comprobaciones del 5 de septiembre de 2026, sobre esta distribución independien
 
 Los tests de DOM usan JSDOM y almacenamiento aislado; no prueban medidas de pantalla reales, y JSDOM no implementa `innerText`, así que el guardado del texto tecleado se comprueba en navegador y no en la suite. Las capturas complementan esa limitación. No se ha verificado visualmente el PPTX en Microsoft PowerPoint, ni compilado los ejemplos TEX con una distribución LaTeX. La comprobación real de RDKit no equivale a validar todas sus operaciones ni las herramientas 3D.
 
-`npm test` ejecuta los siete archivos de pruebas. Algunas versiones de Node muestran siete grupos en el resumen; ejecutando cada archivo directamente se muestran sus 55 casos. No se atribuye a esta distribución el resultado histórico de pruebas de la suite completa.
+`npm test` ejecuta los ocho archivos de pruebas. Algunas versiones de Node muestran ocho grupos en el resumen; ejecutando cada archivo directamente se muestran sus 59 casos. No se atribuye a esta distribución el resultado histórico de pruebas de la suite completa.

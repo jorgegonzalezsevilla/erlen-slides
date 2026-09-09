@@ -44,7 +44,8 @@
 44-historia.js
 45-estructura.js
 46-estructura-edit.js
-47-lab.js
+47-lab-catalogo.js
+47b-lab.js
 48-lab-edit.js
 49-teorema.js
 50-geometria.js
