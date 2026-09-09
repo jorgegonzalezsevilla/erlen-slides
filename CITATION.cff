@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "Si utilizas Erlen Slides en tu trabajo, cita esta versión del software."
 type: software
 title: "Erlen Slides: Scientific presentations"
-version: 0.1.0
-date-released: 2026-09-05
+version: 0.2.0
+date-released: 2026-09-09
 authors:
   - family-names: "González Sevilla"
     given-names: "Jorge"

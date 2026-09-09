@@ -1,6 +1,6 @@
-# Validación de 0.1.0
+# Validación de 0.2.0
 
-Comprobaciones del 5 de septiembre de 2026, sobre esta distribución independiente:
+Comprobaciones del 9 de septiembre de 2026, sobre esta distribución independiente:
 
 | Comprobación | Resultado y alcance |
 |---|---|
