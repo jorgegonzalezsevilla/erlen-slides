@@ -8,7 +8,12 @@ Repositorio público previsto: `jorgegonzalezsevilla/erlen-slides`. El repositor
 2. Ejecuta `npm ci`, `npm run build`, `npm test` y `npm run examples`.
 3. Revisa capturas y exportaciones, licencia, datos de ejemplo y ausencia de secretos.
 4. Ejecuta `python3 herramientas/package-release.py` para obtener el ZIP web y su checksum.
-5. Crea una etiqueta Git y una release en GitHub con las notas y archivos de esa versión.
+5. Escribe las notas en `docs/publicacion-<version>.md`.
+6. Empuja la etiqueta `v<version>`. El workflow **Publish release** vuelve a construir
+   desde la etiqueta, repite las pruebas y publica la release con esas notas, el ZIP y
+   su suma sha256. Si prefieres crear la release desde la interfaz de GitHub, hazlo con
+   esa misma etiqueta: el workflow completa entonces las notas y adjunta los archivos.
+   La etiqueta debe coincidir con la versión de package.json o el workflow se detiene.
 
 ## Zenodo
 
