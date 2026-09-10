@@ -82,6 +82,7 @@
 83-edicion.js
 87-ejemplos.js
 88-workspace.js
+88a0-suite-nav.js
 88a-suite.js
 88b-recuperacion.js
 88c-ciencia-libre.js

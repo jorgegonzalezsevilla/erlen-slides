@@ -4,7 +4,7 @@
 
 Escribe ecuaciones, dibuja química, explica datos y prepara tu próxima charla. Erlen Slides reúne edición por bloques, herramientas científicas y modo de presentación en una aplicación local, sin cuenta ni suscripción.
 
-**Versión 0.2.0 · beta · AGPLv3.** Publicación independiente del módulo Presentaciones de Erlen. Interfaz en español.
+**Versión 0.2.1 · beta · AGPLv3.** Publicación independiente del módulo Presentaciones de Erlen. Interfaz en español.
 
 ![Inicio de Erlen Slides](docs/images/inicio.png)
 
@@ -24,7 +24,7 @@ El asistente integrado localiza herramientas mediante reglas; **no es un modelo 
 
 ## Empezar
 
-Descarga el paquete `erlen-slides-0.2.0-web.zip` desde [Releases](https://github.com/jorgegonzalezsevilla/erlen-slides/releases). Incluye la aplicación ya construida:
+Descarga el paquete `erlen-slides-0.2.1-web.zip` desde [Releases](https://github.com/jorgegonzalezsevilla/erlen-slides/releases). Incluye la aplicación ya construida:
 
 1. Descomprime el ZIP.
 2. Para el editor básico, abre `erlen-slides-offline.html`.
